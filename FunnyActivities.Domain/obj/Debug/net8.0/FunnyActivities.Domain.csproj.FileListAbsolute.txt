@@ -1,0 +1,14 @@
+D:\Projects\FunnyActivities\FunnyActivities.Domain\bin\Debug\net8.0\FunnyActivities.Domain.deps.json
+D:\Projects\FunnyActivities\FunnyActivities.Domain\bin\Debug\net8.0\FunnyActivities.Domain.dll
+D:\Projects\FunnyActivities\FunnyActivities.Domain\bin\Debug\net8.0\FunnyActivities.Domain.pdb
+D:\Projects\FunnyActivities\FunnyActivities.Domain\bin\Debug\net8.0\FunnyActivities.Domain.xml
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\FunnyActivities.Domain.csproj.AssemblyReference.cache
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\FunnyActivities.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\FunnyActivities.Domain.AssemblyInfoInputs.cache
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\FunnyActivities.Domain.AssemblyInfo.cs
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\FunnyActivities.Domain.csproj.CoreCompileInputs.cache
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\FunnyActivities.Domain.dll
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\refint\FunnyActivities.Domain.dll
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\FunnyActivities.Domain.xml
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\FunnyActivities.Domain.pdb
+D:\Projects\FunnyActivities\FunnyActivities.Domain\obj\Debug\net8.0\ref\FunnyActivities.Domain.dll

@@ -1,0 +1,166 @@
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: funnyactivities_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: funnyactivities
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - funnyactivities_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: funnyactivities_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - funnyactivities_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  webapi:
+    build:
+      context: .
+      dockerfile: FunnyActivities.WebAPI/Dockerfile
+    container_name: funnyactivities_webapi
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "9091:9090"  # Prometheus metrics port
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Database=funnyactivities;Username=postgres;Password=postgres123
+      ConnectionStrings__Redis: redis:6379,abortConnect=false
+      MinIO__Endpoint: minio:9000
+      MinIO__AccessKey: minioadmin
+      MinIO__SecretKey: minioadmin123
+      MinIO__UseSSL: false
+      # JWT Settings
+      JwtSettings__SecretKey: your-super-secret-jwt-key-that-is-at-least-32-characters-long
+      JwtSettings__Issuer: FunnyActivities
+      JwtSettings__Audience: FunnyActivitiesUsers
+      JwtSettings__ExpiryMinutes: 60
+      JwtSettings__RefreshTokenExpiryDays: 7
+      # Add other environment variables as needed (e.g., SendGrid, Twilio)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - funnyactivities_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: funnyactivities_prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - funnyactivities_network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: funnyactivities_jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    networks:
+      - funnyactivities_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: funnyactivities_grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - funnyactivities_network
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: funnyactivities_alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/config.yml
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - funnyactivities_network
+
+  minio:
+    image: minio/minio:latest
+    container_name: funnyactivities_minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - funnyactivities_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  funnyactivities_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  minio_data:

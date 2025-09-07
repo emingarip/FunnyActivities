@@ -1,0 +1,26 @@
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: devpassword
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  webapi:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Database=funnyactivities;Username=postgres;Password=devpassword
+      # Override other secrets for local development
+      SendGrid__ApiKey: your-local-sendgrid-key
+      Twilio__AccountSid: your-local-twilio-sid
+      Twilio__AuthToken: your-local-twilio-token
+      Twilio__FromNumber: your-local-twilio-number
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./FunnyActivities.WebAPI/appsettings.Development.json:/app/appsettings.Development.json:ro
+      - ./logs:/app/logs

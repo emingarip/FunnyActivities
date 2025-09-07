@@ -1,0 +1,68 @@
+# Build outputs
+**/bin/
+**/obj/
+**/out/
+
+# .NET Core
+*.user
+*.suo
+*.cache
+*.log
+*.tmp
+*.temp
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Test results
+TestResults/
+*.trx
+
+# NuGet
+*.nupkg
+.nuget/
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+
+# Coverage
+coverage/
+*.coverage
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Secrets
+secrets/

@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Projects\\FunnyActivities\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|d:\\projects\\funnyactivities\\funnyactivities.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|solutionrelative:funnyactivities.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|d:\\projects\\funnyactivities\\funnyactivities.webapi\\extensions\\middlewareextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|solutionrelative:funnyactivities.webapi\\extensions\\middlewareextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|d:\\projects\\funnyactivities\\funnyactivities.webapi\\extensions\\servicecollectionextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|solutionrelative:funnyactivities.webapi\\extensions\\servicecollectionextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MiddlewareExtensions.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Extensions\\MiddlewareExtensions.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.WebAPI\\Extensions\\MiddlewareExtensions.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Extensions\\MiddlewareExtensions.cs",
+              "RelativeToolTip": "FunnyActivities.WebAPI\\Extensions\\MiddlewareExtensions.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-05T11:23:54.578Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ServiceCollectionExtensions.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Extensions\\ServiceCollectionExtensions.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.WebAPI\\Extensions\\ServiceCollectionExtensions.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Extensions\\ServiceCollectionExtensions.cs",
+              "RelativeToolTip": "FunnyActivities.WebAPI\\Extensions\\ServiceCollectionExtensions.cs",
+              "ViewState": "AgIAAJ8AAAAAAAAAAAAowEUAAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-05T11:23:45.534Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Program.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.WebAPI\\Program.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Program.cs*",
+              "RelativeToolTip": "FunnyActivities.WebAPI\\Program.cs*",
+              "ViewState": "AgIAAHgAAAAAAAAAAAAAAIoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-05T11:22:09.088Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

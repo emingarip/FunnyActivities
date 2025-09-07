@@ -1,0 +1,1049 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FunnyActivities.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="T:FunnyActivities.WebAPI.Controllers.ActivityCategoryController">
+            <summary>
+            Activity Category Controller for managing activity categories in the system.
+            Provides comprehensive CRUD operations for activity category management.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - Admin Role: Full CRUD operations
+            - Viewer Role: Read-only operations
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityCategoryController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.ActivityCategoryController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.ActivityCategoryController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityCategoryController.GetActivityCategories(System.Int32,System.Int32,System.String,System.String,System.String)">
+            <summary>
+            Retrieves a paginated list of activity categories with optional filtering.
+            </summary>
+            <remarks>
+            Requires Admin or Viewer role authorization.
+            Returns activity categories with their activity counts.
+            </remarks>
+            <param name="pageNumber">The page number (1-based, default: 1).</param>
+            <param name="pageSize">The number of items per page (default: 10, max: 100).</param>
+            <param name="searchTerm">Optional search term for filtering categories by name.</param>
+            <param name="sortBy">Sort field (name, createdAt, updatedAt).</param>
+            <param name="sortOrder">Sort order (asc, desc).</param>
+            <returns>A paginated list of activity categories.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityCategoryController.GetActivityCategory(System.Guid)">
+            <summary>
+            Retrieves a specific activity category by its unique identifier.
+            </summary>
+            <param name="id">The unique identifier of the activity category.</param>
+            <returns>The activity category information.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityCategoryController.CreateActivityCategory(FunnyActivities.Application.DTOs.ActivityManagement.CreateActivityCategoryRequest)">
+            <summary>
+            Creates a new activity category.
+            </summary>
+            <param name="request">The activity category creation request.</param>
+            <returns>The created activity category.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityCategoryController.UpdateActivityCategory(System.Guid,FunnyActivities.Application.DTOs.ActivityManagement.UpdateActivityCategoryRequest)">
+            <summary>
+            Updates an existing activity category.
+            </summary>
+            <param name="id">The unique identifier of the activity category to update.</param>
+            <param name="request">The activity category update request.</param>
+            <returns>The updated activity category.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityCategoryController.DeleteActivityCategory(System.Guid)">
+            <summary>
+            Deletes an activity category.
+            </summary>
+            <param name="id">The unique identifier of the activity category to delete.</param>
+            <returns>No content on successful deletion.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.ActivityController">
+            <summary>
+            Activity Controller for managing activities in the system.
+            Provides comprehensive CRUD operations for activity management.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - Admin Role: Full CRUD operations
+            - Viewer Role: Read-only operations
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.ActivityController},FunnyActivities.Application.Interfaces.IMinioService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.ActivityController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+            <param name="minioService">The Minio service for file operations.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.GetActivities(System.Int32,System.Int32,System.String,System.Nullable{System.Guid},System.String,System.String)">
+            <summary>
+            Retrieves a paginated list of activities with optional filtering.
+            </summary>
+            <remarks>
+            Requires Admin or Viewer role authorization.
+            Returns activities with their category information.
+            </remarks>
+            <param name="pageNumber">The page number (1-based, default: 1).</param>
+            <param name="pageSize">The number of items per page (default: 10, max: 100).</param>
+            <param name="searchTerm">Optional search term for filtering activities by name.</param>
+            <param name="activityCategoryId">Optional activity category ID for filtering.</param>
+            <param name="sortBy">Sort field (name, createdAt, updatedAt).</param>
+            <param name="sortOrder">Sort order (asc, desc).</param>
+            <returns>A paginated list of activities.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.GetActivity(System.Guid)">
+            <summary>
+            Retrieves a specific activity by its unique identifier.
+            </summary>
+            <param name="id">The unique identifier of the activity.</param>
+            <returns>The activity information.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.GetActivityWithDetails(System.Guid)">
+            <summary>
+            Retrieves an activity with all its associated details including steps and product variants.
+            </summary>
+            <param name="id">The unique identifier of the activity.</param>
+            <returns>The activity with its details.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.CreateActivity(FunnyActivities.Application.DTOs.ActivityManagement.CreateActivityRequest)">
+            <summary>
+            Creates a new activity.
+            </summary>
+            <param name="request">The activity creation request.</param>
+            <returns>The created activity.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.UpdateActivity(System.Guid,FunnyActivities.Application.DTOs.ActivityManagement.UpdateActivityRequest)">
+            <summary>
+            Updates an existing activity.
+            </summary>
+            <param name="id">The unique identifier of the activity to update.</param>
+            <param name="request">The activity update request.</param>
+            <returns>The updated activity.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.DeleteActivity(System.Guid)">
+            <summary>
+            Deletes an activity.
+            </summary>
+            <param name="id">The unique identifier of the activity to delete.</param>
+            <returns>No content on successful deletion.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.UploadActivityVideo(System.Guid,FunnyActivities.Application.DTOs.ActivityManagement.UploadActivityVideoRequest)">
+            <summary>
+            Uploads a video for a specific activity.
+            </summary>
+            <param name="request">The video upload request containing activity ID and video data.</param>
+            <returns>The upload result with signed URL for video access.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.GetActivityVideoUrl(System.Guid,System.String,System.Int32)">
+            <summary>
+            Gets a signed URL for accessing an activity's video.
+            </summary>
+            <param name="activityId">The unique identifier of the activity.</param>
+            <param name="videoObjectKey">The video object key in storage.</param>
+            <param name="expirySeconds">The expiry time for the signed URL in seconds (default: 3600).</param>
+            <returns>The signed URL for video access.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityController.DeleteActivityVideo(System.Guid,System.String)">
+            <summary>
+            Deletes a video for a specific activity.
+            </summary>
+            <param name="activityId">The unique identifier of the activity.</param>
+            <param name="videoObjectKey">The video object key in storage.</param>
+            <returns>No content on successful deletion.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.ActivityProductVariantController">
+            <summary>
+            Activity Product Variant Controller for managing activity product variants in the system.
+            Provides comprehensive CRUD operations for activity product variant management.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - Admin Role: Full CRUD operations
+            - Viewer Role: Read-only operations
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityProductVariantController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.ActivityProductVariantController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.ActivityProductVariantController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityProductVariantController.GetActivityProductVariant(System.Guid)">
+            <summary>
+            Retrieves a specific activity product variant by its unique identifier.
+            </summary>
+            <param name="id">The unique identifier of the activity product variant.</param>
+            <returns>The activity product variant information.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityProductVariantController.GetActivityProductVariantsByActivityId(System.Guid)">
+            <summary>
+            Retrieves all activity product variants for a specific activity.
+            </summary>
+            <param name="activityId">The unique identifier of the activity.</param>
+            <returns>A list of activity product variants for the activity.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityProductVariantController.CreateActivityProductVariant(FunnyActivities.Application.DTOs.ActivityManagement.CreateActivityProductVariantRequest)">
+            <summary>
+            Creates a new activity product variant.
+            </summary>
+            <param name="request">The activity product variant creation request.</param>
+            <returns>The created activity product variant.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityProductVariantController.UpdateActivityProductVariant(System.Guid,FunnyActivities.Application.DTOs.ActivityManagement.UpdateActivityProductVariantRequest)">
+            <summary>
+            Updates an existing activity product variant.
+            </summary>
+            <param name="id">The unique identifier of the activity product variant to update.</param>
+            <param name="request">The activity product variant update request.</param>
+            <returns>The updated activity product variant.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ActivityProductVariantController.DeleteActivityProductVariant(System.Guid)">
+            <summary>
+            Deletes an activity product variant.
+            </summary>
+            <param name="id">The unique identifier of the activity product variant to delete.</param>
+            <returns>No content on successful deletion.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.BaseProductController">
+            <summary>
+            Controller for managing base products with role-based authorization.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - Admin Role: Full CRUD operations (Create, Read, Update, Delete)
+            - Viewer Role: Read-only operations (Get single base product, List base products)
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.BaseProductController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.BaseProductController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.BaseProductController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.BaseProductController.CreateBaseProduct(FunnyActivities.Application.DTOs.BaseProductManagement.CreateBaseProductRequest)">
+             <summary>
+             Creates a new base product in the system.
+             </summary>
+             <remarks>
+             Requires Admin role authorization.
+            
+             Sample request:
+             POST /api/base-products
+             {
+               "name": "Laptop Computer",
+               "description": "High-performance laptop for business use",
+               "categoryId": "550e8400-e29b-41d4-a716-446655440000"
+             }
+            
+             Sample response (201 Created):
+             {
+               "id": "550e8400-e29b-41d4-a716-446655440001",
+               "name": "Laptop Computer",
+               "description": "High-performance laptop for business use",
+               "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+               "categoryName": "Electronics",
+               "createdAt": "2024-01-15T10:30:00Z",
+               "updatedAt": "2024-01-15T10:30:00Z"
+             }
+             </remarks>
+             <param name="request">The base product creation request containing all required base product information.</param>
+             <returns>The complete base product information including the generated ID and timestamps.</returns>
+             <response code="201">Base product created successfully</response>
+             <response code="400">Invalid request data or validation errors</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin role required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.BaseProductController.GetBaseProduct(System.Guid)">
+             <summary>
+             Retrieves a specific base product by its unique identifier.
+             </summary>
+             <remarks>
+             Requires Admin or Viewer role authorization.
+            
+             Sample request:
+             GET /api/base-products/550e8400-e29b-41d4-a716-446655440000
+            
+             Sample response (200 OK):
+             {
+               "id": "550e8400-e29b-41d4-a716-446655440000",
+               "name": "Laptop Computer",
+               "description": "High-performance laptop for business use",
+               "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+               "categoryName": "Electronics",
+               "createdAt": "2024-01-15T10:30:00Z",
+               "updatedAt": "2024-01-20T14:45:00Z"
+             }
+             </remarks>
+             <param name="id">The unique identifier (GUID) of the base product to retrieve.</param>
+             <returns>The complete base product information if found.</returns>
+             <response code="200">Base product found and returned successfully</response>
+             <response code="404">Base product not found with the specified ID</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin or Viewer role required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.BaseProductController.UpdateBaseProduct(System.Guid,FunnyActivities.Application.DTOs.BaseProductManagement.UpdateBaseProductRequest)">
+             <summary>
+             Updates an existing base product with new information.
+             </summary>
+             <remarks>
+             Requires Admin role authorization.
+             Only provided fields will be updated; omitted fields retain their current values.
+            
+             Sample request:
+             PUT /api/base-products/550e8400-e29b-41d4-a716-446655440000
+             {
+               "name": "Updated Laptop Computer",
+               "description": "Updated description",
+               "categoryId": "550e8400-e29b-41d4-a716-446655440001"
+             }
+            
+             Sample response (200 OK):
+             {
+               "id": "550e8400-e29b-41d4-a716-446655440000",
+               "name": "Updated Laptop Computer",
+               "description": "Updated description",
+               "categoryId": "550e8400-e29b-41d4-a716-446655440001",
+               "categoryName": "Updated Electronics",
+               "createdAt": "2024-01-15T10:30:00Z",
+               "updatedAt": "2024-01-20T15:30:00Z"
+             }
+             </remarks>
+             <param name="id">The unique identifier (GUID) of the base product to update.</param>
+             <param name="request">The base product update request containing fields to modify.</param>
+             <returns>The complete updated base product information.</returns>
+             <response code="200">Base product updated successfully</response>
+             <response code="400">Invalid request data or validation errors</response>
+             <response code="404">Base product not found with the specified ID</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin role required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.BaseProductController.DeleteBaseProduct(System.Guid)">
+             <summary>
+             Deletes a base product from the system.
+             </summary>
+             <remarks>
+             Requires Admin role authorization.
+             This operation permanently removes the base product and cannot be undone.
+            
+             Sample request:
+             DELETE /api/base-products/550e8400-e29b-41d4-a716-446655440000
+            
+             Sample response (204 No Content): (empty body)
+             </remarks>
+             <param name="id">The unique identifier (GUID) of the base product to delete.</param>
+             <returns>No content (successful deletion).</returns>
+             <response code="204">Base product deleted successfully</response>
+             <response code="404">Base product not found with the specified ID</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin role required</response>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:FunnyActivities.WebAPI.Controllers.BaseProductController.GetBaseProducts(System.Int32,System.Int32,System.String,System.Nullable{System.Guid})" -->
+        <member name="T:FunnyActivities.WebAPI.Controllers.Base.BaseController">
+            <summary>
+            Base controller providing centralized access to authenticated user context.
+            All controllers should inherit from this base class to access user information.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.WebAPI.Controllers.Base.BaseController.CurrentUserId">
+            <summary>
+            Gets the current authenticated user's ID.
+            This property is guaranteed to return a valid user ID when accessed from authenticated endpoints.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.WebAPI.Controllers.Base.BaseController.CurrentUserRole">
+            <summary>
+            Gets the current authenticated user's role.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.WebAPI.Controllers.Base.BaseController.CurrentUserName">
+            <summary>
+            Gets the current authenticated user's name.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.Base.BaseController.HasRole(System.String)">
+            <summary>
+            Validates that the current user has the specified role.
+            </summary>
+            <param name="requiredRole">The role required for the operation.</param>
+            <returns>True if the user has the required role, false otherwise.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.Base.BaseController.HasAnyRole(System.String[])">
+            <summary>
+            Validates that the current user has any of the specified roles.
+            </summary>
+            <param name="requiredRoles">The roles to check against.</param>
+            <returns>True if the user has any of the required roles, false otherwise.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.Base.BaseController.ExtractUserId">
+            <summary>
+            Extracts the user ID from the current user's claims.
+            This is a fallback method and should not be called directly in normal operation.
+            </summary>
+            <returns>The user ID if valid, otherwise throws UnauthorizedAccessException.</returns>
+            <exception cref="T:System.UnauthorizedAccessException">Thrown when user ID cannot be extracted.</exception>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.CategoryController">
+            <summary>
+            Category Controller for managing categories in the system.
+            Provides comprehensive CRUD operations for category management.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - Admin Role: Full CRUD operations
+            - Viewer Role: Read-only operations
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.CategoryController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.CategoryController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.CategoryController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.CategoryController.GetCategories(System.Int32,System.Int32,System.String,System.String,System.String)">
+            <summary>
+            Retrieves a paginated list of categories with optional filtering.
+            </summary>
+            <remarks>
+            Requires Admin or Viewer role authorization.
+            Returns categories with their product counts.
+            </remarks>
+            <param name="pageNumber">The page number (1-based, default: 1).</param>
+            <param name="pageSize">The number of items per page (default: 10, max: 100).</param>
+            <param name="searchTerm">Optional search term for filtering categories by name.</param>
+            <param name="sortBy">Sort field (name, createdAt, updatedAt).</param>
+            <param name="sortOrder">Sort order (asc, desc).</param>
+            <returns>A paginated list of categories.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.CategoryController.GetCategory(System.Guid)">
+            <summary>
+            Retrieves a specific category by its unique identifier.
+            </summary>
+            <param name="id">The unique identifier of the category.</param>
+            <returns>The category information.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.CategoryController.GetCategoryWithProducts(System.Guid)">
+            <summary>
+            Retrieves a category with all its associated products.
+            </summary>
+            <param name="id">The unique identifier of the category.</param>
+            <returns>The category with its products.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.CategoryController.SearchCategories(System.String,System.Int32,System.Int32)">
+            <summary>
+            Searches for categories based on the provided search criteria.
+            </summary>
+            <param name="searchTerm">The search term to filter categories.</param>
+            <param name="pageNumber">The page number (1-based, default: 1).</param>
+            <param name="pageSize">The number of items per page (default: 10, max: 100).</param>
+            <returns>A paginated list of matching categories.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.CategoryController.CreateCategory(FunnyActivities.Application.DTOs.CategoryManagement.CreateCategoryRequest)">
+            <summary>
+            Creates a new category.
+            </summary>
+            <param name="request">The category creation request.</param>
+            <returns>The created category.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.CategoryController.UpdateCategory(System.Guid,FunnyActivities.Application.DTOs.CategoryManagement.UpdateCategoryRequest)">
+            <summary>
+            Updates an existing category.
+            </summary>
+            <param name="id">The unique identifier of the category to update.</param>
+            <param name="request">The category update request.</param>
+            <returns>The updated category.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.CategoryController.DeleteCategory(System.Guid)">
+            <summary>
+            Deletes a category.
+            </summary>
+            <param name="id">The unique identifier of the category to delete.</param>
+            <returns>No content on successful deletion.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.ControllerExtensions">
+            <summary>
+            Extension methods for ControllerBase to provide standardized API responses.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ControllerExtensions.ApiSuccess``1(Microsoft.AspNetCore.Mvc.ControllerBase,``0,System.String,System.Int32)">
+            <summary>
+            Returns a standardized success response with data.
+            </summary>
+            <typeparam name="T">The type of data to return.</typeparam>
+            <param name="controller">The controller instance.</param>
+            <param name="data">The data to include in the response.</param>
+            <param name="message">Optional success message.</param>
+            <param name="statusCode">HTTP status code (default: 200 OK).</param>
+            <returns>An IActionResult with standardized success response.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ControllerExtensions.ApiSuccess``1(Microsoft.AspNetCore.Mvc.ControllerBase,System.String,System.Int32)">
+            <summary>
+            Returns a standardized success response without data (useful for DELETE operations).
+            </summary>
+            <typeparam name="T">The type of data (can be object for no data).</typeparam>
+            <param name="controller">The controller instance.</param>
+            <param name="message">Optional success message.</param>
+            <param name="statusCode">HTTP status code (default: 200 OK).</param>
+            <returns>An IActionResult with standardized success response.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ControllerExtensions.ApiError(Microsoft.AspNetCore.Mvc.ControllerBase,System.String,System.String,System.Int32)">
+            <summary>
+            Returns a standardized error response.
+            </summary>
+            <param name="controller">The controller instance.</param>
+            <param name="message">The error message.</param>
+            <param name="error">The error type or category.</param>
+            <param name="statusCode">HTTP status code (default: 400 Bad Request).</param>
+            <returns>An IActionResult with standardized error response.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ControllerExtensions.ApiCreated``1(Microsoft.AspNetCore.Mvc.ControllerBase,System.String,System.Object,``0,System.String)">
+            <summary>
+            Returns a standardized success response for Created operations.
+            </summary>
+            <typeparam name="T">The type of data to return.</typeparam>
+            <param name="controller">The controller instance.</param>
+            <param name="actionName">The name of the action to generate the location URL.</param>
+            <param name="routeValues">The route values for the location URL.</param>
+            <param name="data">The data to include in the response.</param>
+            <param name="message">Optional success message.</param>
+            <returns>An IActionResult with standardized success response and Created status.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ControllerExtensions.ApiCreated``1(Microsoft.AspNetCore.Mvc.ControllerBase,System.String,System.Object,System.String)">
+            <summary>
+            Returns a standardized success response for Created operations without data.
+            </summary>
+            <typeparam name="T">The type of data (can be object for no data).</typeparam>
+            <param name="controller">The controller instance.</param>
+            <param name="actionName">The name of the action to generate the location URL.</param>
+            <param name="routeValues">The route values for the location URL.</param>
+            <param name="message">Optional success message.</param>
+            <returns>An IActionResult with standardized success response and Created status.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.ProductsController">
+            <summary>
+            Unified Products Controller for managing base products and their variants.
+            Provides a single API surface for all product-related operations.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - Admin Role: Full CRUD operations
+            - Viewer Role: Read-only operations
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.ProductsController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.ProductsController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.GetProducts(System.Int32,System.Int32,System.String,System.Nullable{System.Guid},System.String,System.String)">
+            <summary>
+            Retrieves a paginated list of products with optional filtering.
+            </summary>
+            <remarks>
+            Requires Admin or Viewer role authorization.
+            Returns products with their variants in a unified format.
+            </remarks>
+            <param name="pageNumber">The page number (1-based, default: 1).</param>
+            <param name="pageSize">The number of items per page (default: 10, max: 100).</param>
+            <param name="searchTerm">Optional search term for filtering products.</param>
+            <param name="categoryId">Optional category ID for filtering products.</param>
+            <param name="sortBy">Sort field (name, createdAt, updatedAt).</param>
+            <param name="sortOrder">Sort order (asc, desc).</param>
+            <returns>A paginated list of products with their variants.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.GetProduct(System.Guid)">
+            <summary>
+            Retrieves a specific product by its unique identifier with all its variants.
+            </summary>
+            <param name="id">The unique identifier of the product.</param>
+            <returns>The product with all its variants.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.CreateBaseProduct(FunnyActivities.Application.DTOs.ProductsManagement.CreateBaseProductRequest)">
+            <summary>
+            Creates a new base product.
+            </summary>
+            <param name="request">The base product creation request.</param>
+            <returns>The created base product.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.UpdateBaseProduct(System.Guid,FunnyActivities.Application.DTOs.ProductsManagement.UpdateBaseProductRequest)">
+            <summary>
+            Updates an existing base product.
+            </summary>
+            <param name="id">The unique identifier of the base product to update.</param>
+            <param name="request">The base product update request.</param>
+            <returns>The updated base product.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.DeleteBaseProduct(System.Guid,System.Boolean)">
+            <summary>
+            Deletes a base product.
+            </summary>
+            <param name="id">The unique identifier of the base product to delete.</param>
+            <param name="cascadeDeleteVariants">Whether to cascade delete associated variants. Defaults to false.</param>
+            <returns>No content on successful deletion.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.GetAllProductVariants(System.Int32,System.Int32)">
+            <summary>
+            Retrieves all product variants across all base products.
+            </summary>
+            <param name="pageNumber">The page number (1-based, default: 1).</param>
+            <param name="pageSize">The number of items per page (default: 10, max: 100).</param>
+            <returns>A paginated list of all product variants.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.GetProductVariants(System.Guid,System.Int32,System.Int32)">
+            <summary>
+            Retrieves product variants for a specific base product.
+            </summary>
+            <param name="baseProductId">The unique identifier of the base product.</param>
+            <param name="pageNumber">The page number (1-based, default: 1).</param>
+            <param name="pageSize">The number of items per page (default: 10, max: 100).</param>
+            <returns>A paginated list of product variants.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.CreateProductVariant(FunnyActivities.Application.DTOs.ProductVariantManagement.CreateProductVariantRequest)">
+            <summary>
+            Creates a new product variant.
+            </summary>
+            <param name="request">The product variant creation request.</param>
+            <returns>The created product variant.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.UpdateProductVariant(System.Guid,FunnyActivities.Application.DTOs.ProductVariantManagement.UpdateProductVariantRequest)">
+            <summary>
+            Updates an existing product variant.
+            </summary>
+            <param name="id">The unique identifier of the product variant to update.</param>
+            <param name="request">The product variant update request.</param>
+            <returns>The updated product variant.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.DeleteProductVariant(System.Guid)">
+            <summary>
+            Deletes a product variant.
+            </summary>
+            <param name="id">The unique identifier of the product variant to delete.</param>
+            <returns>No content on successful deletion.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ProductsController.BulkUpdateProductVariants(FunnyActivities.Application.DTOs.ProductsManagement.BulkUpdateProductVariantsRequest)">
+            <summary>
+            Performs bulk update operations on product variants.
+            </summary>
+            <param name="request">The bulk update request containing multiple variant updates.</param>
+            <returns>The bulk update response with results and any errors.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.ShoppingCartController">
+            <summary>
+            Controller for managing shopping cart operations with role-based authorization.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - All operations require authenticated user (automatically scoped to current user)
+            - Users can only manage their own cart items
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ShoppingCartController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.ShoppingCartController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.ShoppingCartController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ShoppingCartController.AddToCart(FunnyActivities.Application.DTOs.ShoppingCartManagement.AddToCartRequest)">
+             <summary>
+             Adds an item to the user's shopping cart.
+             </summary>
+             <remarks>
+             If the item already exists in the cart, the quantity will be updated.
+            
+             Sample request:
+             POST /api/shopping-cart
+             {
+               "productVariantId": "550e8400-e29b-41d4-a716-446655440000",
+               "quantity": 2.0
+             }
+            
+             Sample response (201 Created):
+             {
+               "id": "550e8400-e29b-41d4-a716-446655440001",
+               "productVariantId": "550e8400-e29b-41d4-a716-446655440000",
+               "productVariantName": "Laptop 16GB RAM",
+               "userId": "550e8400-e29b-41d4-a716-446655440002",
+               "quantity": 2.0,
+               "addedAt": "2024-01-15T10:30:00Z"
+             }
+             </remarks>
+             <param name="request">The add to cart request containing product variant ID and quantity.</param>
+             <returns>The cart item information.</returns>
+             <response code="201">Item added to cart successfully</response>
+             <response code="400">Invalid request data or validation errors</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ShoppingCartController.UpdateCartItem(System.Guid,FunnyActivities.Application.DTOs.ShoppingCartManagement.UpdateCartItemRequest)">
+             <summary>
+             Updates the quantity of an item in the user's shopping cart.
+             </summary>
+             <remarks>
+             Sample request:
+             PUT /api/shopping-cart/550e8400-e29b-41d4-a716-446655440000
+             {
+               "quantity": 3.0
+             }
+            
+             Sample response (200 OK):
+             {
+               "id": "550e8400-e29b-41d4-a716-446655440000",
+               "productVariantId": "550e8400-e29b-41d4-a716-446655440001",
+               "productVariantName": "Laptop 16GB RAM",
+               "userId": "550e8400-e29b-41d4-a716-446655440002",
+               "quantity": 3.0,
+               "addedAt": "2024-01-15T10:30:00Z"
+             }
+             </remarks>
+             <param name="id">The unique identifier of the cart item.</param>
+             <param name="request">The update request containing the new quantity.</param>
+             <returns>The updated cart item information.</returns>
+             <response code="200">Cart item updated successfully</response>
+             <response code="400">Invalid request data or validation errors</response>
+             <response code="404">Cart item not found</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ShoppingCartController.RemoveFromCart(System.Guid)">
+             <summary>
+             Removes an item from the user's shopping cart.
+             </summary>
+             <remarks>
+             Sample request:
+             DELETE /api/shopping-cart/550e8400-e29b-41d4-a716-446655440000
+            
+             Sample response (204 No Content): (empty body)
+             </remarks>
+             <param name="id">The unique identifier of the cart item to remove.</param>
+             <returns>No content (successful removal).</returns>
+             <response code="204">Item removed from cart successfully</response>
+             <response code="404">Cart item not found</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.ShoppingCartController.GetShoppingCart">
+             <summary>
+             Retrieves all items in the user's shopping cart.
+             </summary>
+             <remarks>
+             Sample request:
+             GET /api/shopping-cart
+            
+             Sample response (200 OK):
+             [
+               {
+                 "id": "550e8400-e29b-41d4-a716-446655440000",
+                 "productVariantId": "550e8400-e29b-41d4-a716-446655440001",
+                 "productVariantName": "Laptop 16GB RAM",
+                 "userId": "550e8400-e29b-41d4-a716-446655440002",
+                 "quantity": 2.0,
+                 "addedAt": "2024-01-15T10:30:00Z"
+               }
+             ]
+             </remarks>
+             <returns>A list of all items in the user's shopping cart.</returns>
+             <response code="200">Shopping cart retrieved successfully</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.StepController">
+            <summary>
+            Step Controller for managing activity steps in the system.
+            Provides comprehensive CRUD operations for step management.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - Admin Role: Full CRUD operations
+            - Viewer Role: Read-only operations
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.StepController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.StepController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.StepController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.StepController.GetStep(System.Guid)">
+            <summary>
+            Retrieves a specific step by its unique identifier.
+            </summary>
+            <param name="id">The unique identifier of the step.</param>
+            <returns>The step information.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.StepController.GetStepsByActivityId(System.Guid)">
+            <summary>
+            Retrieves all steps for a specific activity.
+            </summary>
+            <param name="activityId">The unique identifier of the activity.</param>
+            <returns>A list of steps for the activity.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.StepController.CreateStep(FunnyActivities.Application.DTOs.ActivityManagement.CreateStepRequest)">
+            <summary>
+            Creates a new step.
+            </summary>
+            <param name="request">The step creation request.</param>
+            <returns>The created step.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.StepController.UpdateStep(System.Guid,FunnyActivities.Application.DTOs.ActivityManagement.UpdateStepRequest)">
+            <summary>
+            Updates an existing step.
+            </summary>
+            <param name="id">The unique identifier of the step to update.</param>
+            <param name="request">The step update request.</param>
+            <returns>The updated step.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.StepController.DeleteStep(System.Guid)">
+            <summary>
+            Deletes a step.
+            </summary>
+            <param name="id">The unique identifier of the step to delete.</param>
+            <returns>No content on successful deletion.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Controllers.UnitOfMeasureController">
+            <summary>
+            Controller for managing units of measure with role-based authorization.
+            </summary>
+            <remarks>
+            Authorization Requirements:
+            - Admin Role: Full CRUD operations (Create, Read, Update, Delete)
+            - Viewer Role: Read-only operations (Get single unit, List units)
+            - All endpoints require valid JWT token authentication
+            </remarks>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.UnitOfMeasureController.#ctor(MediatR.IMediator,Microsoft.Extensions.Logging.ILogger{FunnyActivities.WebAPI.Controllers.UnitOfMeasureController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.WebAPI.Controllers.UnitOfMeasureController"/> class.
+            </summary>
+            <param name="mediator">The mediator for handling commands and queries.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.UnitOfMeasureController.CreateUnitOfMeasure(FunnyActivities.Application.DTOs.UnitOfMeasureManagement.CreateUnitOfMeasureRequest)">
+             <summary>
+             Creates a new unit of measure in the system.
+             </summary>
+             <remarks>
+             Requires Admin role authorization.
+            
+             Sample request:
+             POST /api/units-of-measure
+             {
+               "name": "Kilogram",
+               "symbol": "kg",
+               "type": "Weight"
+             }
+            
+             Sample response (201 Created):
+             {
+               "id": "550e8400-e29b-41d4-a716-446655440001",
+               "name": "Kilogram",
+               "symbol": "kg",
+               "type": "Weight",
+               "createdAt": "2024-01-15T10:30:00Z",
+               "updatedAt": "2024-01-15T10:30:00Z"
+             }
+             </remarks>
+             <param name="request">The unit of measure creation request containing all required information.</param>
+             <returns>The complete unit of measure information including the generated ID and timestamps.</returns>
+             <response code="201">Unit of measure created successfully</response>
+             <response code="400">Invalid request data or validation errors</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin role required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.UnitOfMeasureController.GetUnitOfMeasure(System.Guid)">
+             <summary>
+             Retrieves a specific unit of measure by its unique identifier.
+             </summary>
+             <remarks>
+             Requires Admin or Viewer role authorization.
+            
+             Sample request:
+             GET /api/units-of-measure/550e8400-e29b-41d4-a716-446655440000
+            
+             Sample response (200 OK):
+             {
+               "id": "550e8400-e29b-41d4-a716-446655440000",
+               "name": "Kilogram",
+               "symbol": "kg",
+               "type": "Weight",
+               "createdAt": "2024-01-15T10:30:00Z",
+               "updatedAt": "2024-01-20T14:45:00Z"
+             }
+             </remarks>
+             <param name="id">The unique identifier (GUID) of the unit of measure to retrieve.</param>
+             <returns>The complete unit of measure information if found.</returns>
+             <response code="200">Unit of measure found and returned successfully</response>
+             <response code="404">Unit of measure not found with the specified ID</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin or Viewer role required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.UnitOfMeasureController.UpdateUnitOfMeasure(System.Guid,FunnyActivities.Application.DTOs.UnitOfMeasureManagement.UpdateUnitOfMeasureRequest)">
+             <summary>
+             Updates an existing unit of measure with new information.
+             </summary>
+             <remarks>
+             Requires Admin role authorization.
+             Only provided fields will be updated; omitted fields retain their current values.
+            
+             Sample request:
+             PUT /api/units-of-measure/550e8400-e29b-41d4-a716-446655440000
+             {
+               "name": "Updated Kilogram",
+               "symbol": "kg",
+               "type": "Weight"
+             }
+            
+             Sample response (200 OK):
+             {
+               "id": "550e8400-e29b-41d4-a716-446655440000",
+               "name": "Updated Kilogram",
+               "symbol": "kg",
+               "type": "Weight",
+               "createdAt": "2024-01-15T10:30:00Z",
+               "updatedAt": "2024-01-20T15:30:00Z"
+             }
+             </remarks>
+             <param name="id">The unique identifier (GUID) of the unit of measure to update.</param>
+             <param name="request">The unit of measure update request containing fields to modify.</param>
+             <returns>The complete updated unit of measure information.</returns>
+             <response code="200">Unit of measure updated successfully</response>
+             <response code="400">Invalid request data or validation errors</response>
+             <response code="404">Unit of measure not found with the specified ID</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin role required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.UnitOfMeasureController.DeleteUnitOfMeasure(System.Guid)">
+             <summary>
+             Deletes a unit of measure from the system.
+             </summary>
+             <remarks>
+             Requires Admin role authorization.
+             This operation permanently removes the unit of measure and cannot be undone.
+            
+             Sample request:
+             DELETE /api/units-of-measure/550e8400-e29b-41d4-a716-446655440000
+            
+             Sample response (204 No Content): (empty body)
+             </remarks>
+             <param name="id">The unique identifier (GUID) of the unit of measure to delete.</param>
+             <returns>No content (successful deletion).</returns>
+             <response code="204">Unit of measure deleted successfully</response>
+             <response code="404">Unit of measure not found with the specified ID</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin role required</response>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Controllers.UnitOfMeasureController.GetUnitsOfMeasure">
+             <summary>
+             Retrieves a list of all units of measure.
+             </summary>
+             <remarks>
+             Requires Admin or Viewer role authorization.
+            
+             Sample request:
+             GET /api/units-of-measure
+            
+             Sample response (200 OK):
+             [
+               {
+                 "id": "550e8400-e29b-41d4-a716-446655440000",
+                 "name": "Kilogram",
+                 "symbol": "kg",
+                 "type": "Weight",
+                 "createdAt": "2024-01-15T10:30:00Z",
+                 "updatedAt": "2024-01-15T10:30:00Z"
+               }
+             ]
+             </remarks>
+             <returns>A list of all units of measure.</returns>
+             <response code="200">Units of measure list retrieved successfully</response>
+             <response code="401">Unauthorized - valid JWT token required</response>
+             <response code="403">Forbidden - Admin or Viewer role required</response>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Extensions.MiddlewareExtensions">
+            <summary>
+            Extension methods for registering custom middleware components.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Extensions.MiddlewareExtensions.UseAuthenticationMiddleware(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds the authentication middleware to the application pipeline.
+            This middleware validates user authentication and sets up user context.
+            </summary>
+            <param name="app">The application builder instance.</param>
+            <returns>The application builder with authentication middleware added.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Extensions.MiddlewareExtensions.UseRequestResponseLogging(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds request/response logging middleware to the application pipeline.
+            This middleware logs HTTP requests and responses with PII-safe data.
+            </summary>
+            <param name="app">The application builder instance.</param>
+            <returns>The application builder with request/response logging middleware added.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Extensions.MiddlewareExtensions.UseRateLimitingLogging(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds rate limiting logging middleware to the application pipeline.
+            This middleware logs rate limiting events and security violations.
+            </summary>
+            <param name="app">The application builder instance.</param>
+            <returns>The application builder with rate limiting logging middleware added.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Extensions.MiddlewareExtensions.UseCachingLogging(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds caching logging middleware to the application pipeline.
+            This middleware logs cache hits, misses, and invalidation events.
+            </summary>
+            <param name="app">The application builder instance.</param>
+            <returns>The application builder with caching logging middleware added.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Middleware.AuthenticationMiddleware">
+            <summary>
+            Middleware for centralized user authentication and context management.
+            Validates user identity and stores user information in HttpContext.Items for easy access.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Middleware.AuthenticationMiddleware.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Processes the HTTP request to validate user authentication and set user context.
+            </summary>
+            <param name="context">The HTTP context for the current request.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:FunnyActivities.WebAPI.Middleware.AuthenticationMiddleware.ExtractUserId(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Extracts the user ID from the claims principal.
+            </summary>
+            <param name="user">The claims principal containing user information.</param>
+            <returns>The user ID if valid, otherwise Guid.Empty.</returns>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.TestEntryPoint">
+            <summary>
+            Entry point for integration tests.
+            </summary>
+        </member>
+        <member name="T:FunnyActivities.WebAPI.Startup">
+            <summary>
+            Startup class for integration tests.
+            </summary>
+        </member>
+    </members>
+</doc>

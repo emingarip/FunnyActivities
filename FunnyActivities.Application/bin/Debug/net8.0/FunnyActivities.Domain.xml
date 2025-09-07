@@ -1,0 +1,1423 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FunnyActivities.Domain</name>
+    </assembly>
+    <members>
+        <member name="T:FunnyActivities.Domain.Entities.Activity">
+            <summary>
+            Represents an activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.Id">
+            <summary>
+            Gets the unique identifier of the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.Name">
+            <summary>
+            Gets the name of the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.Description">
+            <summary>
+            Gets the description of the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.VideoUrl">
+            <summary>
+            Gets the video URL of the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.Duration">
+            <summary>
+            Gets the duration of the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.ActivityCategoryId">
+            <summary>
+            Gets the activity category ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.ActivityCategory">
+            <summary>
+            Gets the activity category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.Steps">
+            <summary>
+            Gets the list of steps in the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.ActivityProductVariants">
+            <summary>
+            Gets the list of activity product variants.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.CreatedAt">
+            <summary>
+            Gets the date and time when the activity was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.UpdatedAt">
+            <summary>
+            Gets the date and time when the activity was last updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Activity.DomainEvents">
+            <summary>
+            Gets the domain events.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.#ctor(System.Guid,System.String,System.String,FunnyActivities.Domain.ValueObjects.VideoUrl,FunnyActivities.Domain.ValueObjects.Duration,System.Guid)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.Activity"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="name">The name of the activity.</param>
+            <param name="description">The description of the activity.</param>
+            <param name="videoUrl">The video URL of the activity.</param>
+            <param name="duration">The duration of the activity.</param>
+            <param name="activityCategoryId">The activity category ID.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.Create(System.String,System.String,FunnyActivities.Domain.ValueObjects.VideoUrl,FunnyActivities.Domain.ValueObjects.Duration,System.Guid)">
+            <summary>
+            Creates a new activity instance.
+            </summary>
+            <param name="name">The name of the activity.</param>
+            <param name="description">The description of the activity.</param>
+            <param name="videoUrl">The video URL of the activity.</param>
+            <param name="duration">The duration of the activity.</param>
+            <param name="activityCategoryId">The activity category ID.</param>
+            <returns>A new activity instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.UpdateDetails(System.String,System.String,FunnyActivities.Domain.ValueObjects.VideoUrl,FunnyActivities.Domain.ValueObjects.Duration)">
+            <summary>
+            Updates the details of the activity.
+            </summary>
+            <param name="name">The new name.</param>
+            <param name="description">The new description.</param>
+            <param name="videoUrl">The new video URL.</param>
+            <param name="duration">The new duration.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.AddStep(FunnyActivities.Domain.Entities.Step)">
+            <summary>
+            Adds a step to the activity.
+            </summary>
+            <param name="step">The step to add.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.RemoveStep(FunnyActivities.Domain.Entities.Step)">
+            <summary>
+            Removes a step from the activity.
+            </summary>
+            <param name="step">The step to remove.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.AddProductVariant(FunnyActivities.Domain.Entities.ActivityProductVariant)">
+            <summary>
+            Adds an activity product variant.
+            </summary>
+            <param name="activityProductVariant">The activity product variant to add.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.RemoveProductVariant(FunnyActivities.Domain.Entities.ActivityProductVariant)">
+            <summary>
+            Removes an activity product variant.
+            </summary>
+            <param name="activityProductVariant">The activity product variant to remove.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.AddDomainEvent(FunnyActivities.Domain.Events.IDomainEvent)">
+            <summary>
+            Adds a domain event.
+            </summary>
+            <param name="domainEvent">The domain event to add.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Activity.ClearDomainEvents">
+            <summary>
+            Clears the domain events.
+            </summary>
+        </member>
+        <member name="T:FunnyActivities.Domain.Entities.ActivityCategory">
+            <summary>
+            Represents a category for activities.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityCategory.Id">
+            <summary>
+            Gets the unique identifier of the activity category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityCategory.Name">
+            <summary>
+            Gets the name of the category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityCategory.Description">
+            <summary>
+            Gets the description of the category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityCategory.Activities">
+            <summary>
+            Gets the list of activities in this category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityCategory.CreatedAt">
+            <summary>
+            Gets the date and time when the category was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityCategory.UpdatedAt">
+            <summary>
+            Gets the date and time when the category was last updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityCategory.DomainEvents">
+            <summary>
+            Gets the domain events.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityCategory.#ctor(System.Guid,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.ActivityCategory"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="name">The name of the category.</param>
+            <param name="description">The description of the category.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityCategory.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityCategory.Create(System.String,System.String)">
+            <summary>
+            Creates a new activity category instance.
+            </summary>
+            <param name="name">The name of the category.</param>
+            <param name="description">The description of the category.</param>
+            <returns>A new activity category instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityCategory.UpdateDetails(System.String,System.String)">
+            <summary>
+            Updates the details of the category.
+            </summary>
+            <param name="name">The new name.</param>
+            <param name="description">The new description.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityCategory.AddDomainEvent(FunnyActivities.Domain.Events.IDomainEvent)">
+            <summary>
+            Adds a domain event.
+            </summary>
+            <param name="domainEvent">The domain event to add.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityCategory.ClearDomainEvents">
+            <summary>
+            Clears the domain events.
+            </summary>
+        </member>
+        <member name="T:FunnyActivities.Domain.Entities.ActivityProductVariant">
+            <summary>
+            Represents the association between an activity and a product variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.Id">
+            <summary>
+            Gets the unique identifier of the activity product variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.ActivityId">
+            <summary>
+            Gets the activity ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.Activity">
+            <summary>
+            Gets the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.ProductVariantId">
+            <summary>
+            Gets the product variant ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.ProductVariant">
+            <summary>
+            Gets the product variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.Quantity">
+            <summary>
+            Gets the quantity required for the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.UnitOfMeasureId">
+            <summary>
+            Gets the unit of measure ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.UnitOfMeasure">
+            <summary>
+            Gets the unit of measure.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.CreatedAt">
+            <summary>
+            Gets the date and time when the association was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.UpdatedAt">
+            <summary>
+            Gets the date and time when the association was last updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ActivityProductVariant.DomainEvents">
+            <summary>
+            Gets the domain events.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityProductVariant.#ctor(System.Guid,System.Guid,System.Guid,System.Decimal,System.Guid)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.ActivityProductVariant"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="activityId">The activity ID.</param>
+            <param name="productVariantId">The product variant ID.</param>
+            <param name="quantity">The quantity required.</param>
+            <param name="unitOfMeasureId">The unit of measure ID.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityProductVariant.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityProductVariant.Create(System.Guid,System.Guid,System.Decimal,System.Guid)">
+            <summary>
+            Creates a new activity product variant instance.
+            </summary>
+            <param name="activityId">The activity ID.</param>
+            <param name="productVariantId">The product variant ID.</param>
+            <param name="quantity">The quantity required.</param>
+            <param name="unitOfMeasureId">The unit of measure ID.</param>
+            <returns>A new activity product variant instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityProductVariant.UpdateDetails(System.Decimal,System.Guid)">
+            <summary>
+            Updates the quantity and unit of measure.
+            </summary>
+            <param name="quantity">The new quantity.</param>
+            <param name="unitOfMeasureId">The new unit of measure ID.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityProductVariant.AddDomainEvent(FunnyActivities.Domain.Events.IDomainEvent)">
+            <summary>
+            Adds a domain event.
+            </summary>
+            <param name="domainEvent">The domain event to add.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ActivityProductVariant.ClearDomainEvents">
+            <summary>
+            Clears the domain events.
+            </summary>
+        </member>
+        <member name="T:FunnyActivities.Domain.Entities.BaseProduct">
+            <summary>
+            Represents a base product that can have multiple variants.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.BaseProduct.Id">
+            <summary>
+            Gets the unique identifier of the base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.BaseProduct.Name">
+            <summary>
+            Gets the name of the base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.BaseProduct.Description">
+            <summary>
+            Gets the description of the base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.BaseProduct.CategoryId">
+            <summary>
+            Gets the category ID of the base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.BaseProduct.Category">
+            <summary>
+            Gets the category of the base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.BaseProduct.CreatedAt">
+            <summary>
+            Gets the date and time when the base product was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.BaseProduct.UpdatedAt">
+            <summary>
+            Gets the date and time when the base product was last updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.BaseProduct.Variants">
+            <summary>
+            Gets the collection of variants for this base product.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.BaseProduct.#ctor(System.Guid,System.String,System.String,System.Nullable{System.Guid})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.BaseProduct"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="name">The name of the base product.</param>
+            <param name="description">The description of the base product.</param>
+            <param name="categoryId">The category ID.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.BaseProduct.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.BaseProduct.Create(System.String,System.String,System.Nullable{System.Guid})">
+            <summary>
+            Creates a new base product instance.
+            </summary>
+            <param name="name">The name of the base product.</param>
+            <param name="description">The description of the base product.</param>
+            <param name="categoryId">The category ID.</param>
+            <returns>A new base product instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.BaseProduct.UpdateDetails(System.String,System.String,System.Nullable{System.Guid})">
+            <summary>
+            Updates the details of the base product.
+            </summary>
+            <param name="name">The new name.</param>
+            <param name="description">The new description.</param>
+            <param name="categoryId">The new category ID.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Entities.Category">
+            <summary>
+            Represents a category entity in the system.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Category.Id">
+            <summary>
+            Gets the unique identifier of the category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Category.Name">
+            <summary>
+            Gets the name of the category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Category.Description">
+            <summary>
+            Gets the description of the category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Category.CreatedAt">
+            <summary>
+            Gets the date and time when the category was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Category.UpdatedAt">
+            <summary>
+            Gets the date and time when the category was last updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Category.BaseProducts">
+            <summary>
+            Gets the collection of base products in this category.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Category.#ctor(System.Guid,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.Category"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="name">The name of the category.</param>
+            <param name="description">The description of the category.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Category.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Category.Create(System.String,System.String)">
+            <summary>
+            Creates a new category instance.
+            </summary>
+            <param name="name">The name of the category.</param>
+            <param name="description">The description of the category.</param>
+            <returns>A new category instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Category.UpdateDetails(System.String,System.String)">
+            <summary>
+            Updates the details of the category.
+            </summary>
+            <param name="name">The new name.</param>
+            <param name="description">The new description.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Entities.ProductVariant">
+            <summary>
+            Represents a specific variant of a base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.Id">
+            <summary>
+            Gets the unique identifier of the product variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.BaseProductId">
+            <summary>
+            Gets the base product ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.BaseProduct">
+            <summary>
+            Gets the base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.Name">
+            <summary>
+            Gets the name of the variant (e.g., "Red - Small").
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.StockQuantity">
+            <summary>
+            Gets the current stock quantity of the variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.UnitOfMeasureId">
+            <summary>
+            Gets the unit of measure ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.UnitOfMeasure">
+            <summary>
+            Gets the unit of measure.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.UnitValue">
+            <summary>
+            Gets the unit value of the variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.UsageNotes">
+            <summary>
+            Gets the usage notes for the variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.Photos">
+            <summary>
+            Gets the list of photo URLs for the variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.DynamicProperties">
+            <summary>
+            Gets the dynamic properties for the variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.CreatedAt">
+            <summary>
+            Gets the date and time when the variant was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ProductVariant.UpdatedAt">
+            <summary>
+            Gets the date and time when the variant was last updated.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ProductVariant.#ctor(System.Guid,System.Guid,System.String,System.Decimal,System.Guid,System.Decimal,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.ProductVariant"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="baseProductId">The base product ID.</param>
+            <param name="name">The name of the variant.</param>
+            <param name="stockQuantity">The stock quantity.</param>
+            <param name="unitOfMeasureId">The unit of measure ID.</param>
+            <param name="unitValue">The unit value.</param>
+            <param name="usageNotes">The usage notes.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ProductVariant.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ProductVariant.Create(System.Guid,System.String,System.Decimal,System.Guid,System.Decimal,System.String)">
+            <summary>
+            Creates a new product variant instance.
+            </summary>
+            <param name="baseProductId">The base product ID.</param>
+            <param name="name">The name of the variant.</param>
+            <param name="stockQuantity">The stock quantity.</param>
+            <param name="unitOfMeasureId">The unit of measure ID.</param>
+            <param name="unitValue">The unit value.</param>
+            <param name="usageNotes">The usage notes.</param>
+            <returns>A new product variant instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ProductVariant.UpdateStock(System.Decimal)">
+            <summary>
+            Updates the stock quantity of the variant.
+            </summary>
+            <param name="newQuantity">The new stock quantity.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ProductVariant.UpdateDetails(System.String,System.Guid,System.Decimal,System.String)">
+            <summary>
+            Updates the details of the variant.
+            </summary>
+            <param name="name">The new name.</param>
+            <param name="unitOfMeasureId">The new unit of measure ID.</param>
+            <param name="unitValue">The new unit value.</param>
+            <param name="usageNotes">The new usage notes.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ProductVariant.UpdatePhotos(System.Collections.Generic.List{System.String})">
+            <summary>
+            Updates the photos of the variant.
+            </summary>
+            <param name="photos">The list of photo URLs.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ProductVariant.UpdateDynamicProperties(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Updates the dynamic properties of the variant.
+            </summary>
+            <param name="dynamicProperties">The dynamic properties.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ProductVariant.ValidateStock">
+            <summary>
+            Validates the stock quantity.
+            </summary>
+            <returns>True if the stock quantity is valid; otherwise, false.</returns>
+        </member>
+        <member name="T:FunnyActivities.Domain.Entities.ShoppingCartItem">
+            <summary>
+            Represents an item in a shopping cart.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ShoppingCartItem.Id">
+            <summary>
+            Gets the unique identifier of the cart item.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ShoppingCartItem.ProductVariantId">
+            <summary>
+            Gets the product variant ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ShoppingCartItem.ProductVariant">
+            <summary>
+            Gets the product variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ShoppingCartItem.UserId">
+            <summary>
+            Gets the user ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ShoppingCartItem.User">
+            <summary>
+            Gets the user.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ShoppingCartItem.Quantity">
+            <summary>
+            Gets the quantity of the item in the cart.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.ShoppingCartItem.AddedAt">
+            <summary>
+            Gets the date and time when the item was added to the cart.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ShoppingCartItem.#ctor(System.Guid,System.Guid,System.Guid,System.Decimal)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.ShoppingCartItem"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="productVariantId">The product variant ID.</param>
+            <param name="userId">The user ID.</param>
+            <param name="quantity">The quantity.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ShoppingCartItem.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ShoppingCartItem.Create(System.Guid,System.Guid,System.Decimal)">
+            <summary>
+            Creates a new shopping cart item instance.
+            </summary>
+            <param name="productVariantId">The product variant ID.</param>
+            <param name="userId">The user ID.</param>
+            <param name="quantity">The quantity.</param>
+            <returns>A new shopping cart item instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.ShoppingCartItem.UpdateQuantity(System.Decimal)">
+            <summary>
+            Updates the quantity of the cart item.
+            </summary>
+            <param name="quantity">The new quantity.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Entities.Step">
+            <summary>
+            Represents a step in an activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Step.Id">
+            <summary>
+            Gets the unique identifier of the step.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Step.ActivityId">
+            <summary>
+            Gets the activity ID.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Step.Activity">
+            <summary>
+            Gets the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Step.Order">
+            <summary>
+            Gets the order of the step in the activity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Step.Description">
+            <summary>
+            Gets the description of the step.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Step.CreatedAt">
+            <summary>
+            Gets the date and time when the step was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Step.UpdatedAt">
+            <summary>
+            Gets the date and time when the step was last updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.Step.DomainEvents">
+            <summary>
+            Gets the domain events.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Step.#ctor(System.Guid,System.Guid,System.Int32,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.Step"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="activityId">The activity ID.</param>
+            <param name="order">The order of the step.</param>
+            <param name="description">The description of the step.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Step.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Step.Create(System.Guid,System.Int32,System.String)">
+            <summary>
+            Creates a new step instance.
+            </summary>
+            <param name="activityId">The activity ID.</param>
+            <param name="order">The order of the step.</param>
+            <param name="description">The description of the step.</param>
+            <returns>A new step instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Step.UpdateDetails(System.Int32,System.String)">
+            <summary>
+            Updates the details of the step.
+            </summary>
+            <param name="order">The new order.</param>
+            <param name="description">The new description.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Step.AddDomainEvent(FunnyActivities.Domain.Events.IDomainEvent)">
+            <summary>
+            Adds a domain event.
+            </summary>
+            <param name="domainEvent">The domain event to add.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.Step.ClearDomainEvents">
+            <summary>
+            Clears the domain events.
+            </summary>
+        </member>
+        <member name="T:FunnyActivities.Domain.Entities.UnitOfMeasure">
+            <summary>
+            Represents a unit of measure.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.UnitOfMeasure.Id">
+            <summary>
+            Gets the unique identifier of the unit of measure.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.UnitOfMeasure.Name">
+            <summary>
+            Gets the name of the unit (e.g., "Millimeter").
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.UnitOfMeasure.Symbol">
+            <summary>
+            Gets the symbol of the unit (e.g., "mm").
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.UnitOfMeasure.Type">
+            <summary>
+            Gets the type of the unit (e.g., "Length", "Weight", "Volume").
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.UnitOfMeasure.CreatedAt">
+            <summary>
+            Gets the date and time when the unit was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Entities.UnitOfMeasure.UpdatedAt">
+            <summary>
+            Gets the date and time when the unit was last updated.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.UnitOfMeasure.#ctor(System.Guid,System.String,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Entities.UnitOfMeasure"/> class.
+            </summary>
+            <param name="id">The unique identifier.</param>
+            <param name="name">The name of the unit.</param>
+            <param name="symbol">The symbol of the unit.</param>
+            <param name="type">The type of the unit.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.UnitOfMeasure.#ctor">
+            <summary>
+            Private constructor for EF Core.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.UnitOfMeasure.Create(System.String,System.String,System.String)">
+            <summary>
+            Creates a new unit of measure instance.
+            </summary>
+            <param name="name">The name of the unit.</param>
+            <param name="symbol">The symbol of the unit.</param>
+            <param name="type">The type of the unit.</param>
+            <returns>A new unit of measure instance.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.Entities.UnitOfMeasure.UpdateDetails(System.String,System.String,System.String)">
+            <summary>
+            Updates the details of the unit.
+            </summary>
+            <param name="name">The new name.</param>
+            <param name="symbol">The new symbol.</param>
+            <param name="type">The new type.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.ActivityCategoryCreatedEvent">
+            <summary>
+            Event raised when an activity category is created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ActivityCategoryCreatedEvent.ActivityCategory">
+            <summary>
+            Gets the created activity category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ActivityCategoryCreatedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.ActivityCategoryCreatedEvent.#ctor(FunnyActivities.Domain.Entities.ActivityCategory)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.ActivityCategoryCreatedEvent"/> class.
+            </summary>
+            <param name="activityCategory">The created activity category.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.BaseProductCreatedEvent">
+            <summary>
+            Event raised when a base product is created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductCreatedEvent.BaseProductId">
+            <summary>
+            Gets the ID of the created base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductCreatedEvent.Name">
+            <summary>
+            Gets the name of the created base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductCreatedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.BaseProductCreatedEvent.#ctor(FunnyActivities.Domain.Entities.BaseProduct)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.BaseProductCreatedEvent"/> class.
+            </summary>
+            <param name="baseProduct">The created base product.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.BaseProductDeletedEvent">
+            <summary>
+            Event raised when a base product is deleted.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductDeletedEvent.BaseProductId">
+            <summary>
+            Gets the ID of the deleted base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductDeletedEvent.Name">
+            <summary>
+            Gets the name of the deleted base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductDeletedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.BaseProductDeletedEvent.#ctor(FunnyActivities.Domain.Entities.BaseProduct)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.BaseProductDeletedEvent"/> class.
+            </summary>
+            <param name="baseProduct">The deleted base product.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.BaseProductUpdatedEvent">
+            <summary>
+            Event raised when a base product is updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductUpdatedEvent.BaseProductId">
+            <summary>
+            Gets the ID of the updated base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductUpdatedEvent.Name">
+            <summary>
+            Gets the name of the updated base product.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.BaseProductUpdatedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.BaseProductUpdatedEvent.#ctor(FunnyActivities.Domain.Entities.BaseProduct)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.BaseProductUpdatedEvent"/> class.
+            </summary>
+            <param name="baseProduct">The updated base product.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.CategoryCreatedEvent">
+            <summary>
+            Event raised when a category is created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryCreatedEvent.CategoryId">
+            <summary>
+            Gets the ID of the created category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryCreatedEvent.Name">
+            <summary>
+            Gets the name of the created category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryCreatedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.CategoryCreatedEvent.#ctor(FunnyActivities.Domain.Entities.Category)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.CategoryCreatedEvent"/> class.
+            </summary>
+            <param name="category">The created category.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.CategoryDeletedEvent">
+            <summary>
+            Event raised when a category is deleted.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryDeletedEvent.CategoryId">
+            <summary>
+            Gets the ID of the deleted category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryDeletedEvent.Name">
+            <summary>
+            Gets the name of the deleted category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryDeletedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.CategoryDeletedEvent.#ctor(FunnyActivities.Domain.Entities.Category)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.CategoryDeletedEvent"/> class.
+            </summary>
+            <param name="category">The deleted category.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.CategoryUpdatedEvent">
+            <summary>
+            Event raised when a category is updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryUpdatedEvent.CategoryId">
+            <summary>
+            Gets the ID of the updated category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryUpdatedEvent.Name">
+            <summary>
+            Gets the name of the updated category.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.CategoryUpdatedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.CategoryUpdatedEvent.#ctor(FunnyActivities.Domain.Entities.Category)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.CategoryUpdatedEvent"/> class.
+            </summary>
+            <param name="category">The updated category.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.ItemAddedToCartEvent">
+            <summary>
+            Event raised when an item is added to the shopping cart.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ItemAddedToCartEvent.ShoppingCartItem">
+            <summary>
+            Gets the shopping cart item that was added.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ItemAddedToCartEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.ItemAddedToCartEvent.#ctor(FunnyActivities.Domain.Entities.ShoppingCartItem)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.ItemAddedToCartEvent"/> class.
+            </summary>
+            <param name="shoppingCartItem">The shopping cart item that was added.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.ProductVariantCreatedEvent">
+            <summary>
+            Event raised when a product variant is created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ProductVariantCreatedEvent.ProductVariant">
+            <summary>
+            Gets the product variant that was created.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ProductVariantCreatedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.ProductVariantCreatedEvent.#ctor(FunnyActivities.Domain.Entities.ProductVariant)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.ProductVariantCreatedEvent"/> class.
+            </summary>
+            <param name="productVariant">The product variant that was created.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.ProductVariantDeletedEvent">
+            <summary>
+            Event raised when a product variant is deleted.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ProductVariantDeletedEvent.ProductVariant">
+            <summary>
+            Gets the product variant that was deleted.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ProductVariantDeletedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.ProductVariantDeletedEvent.#ctor(FunnyActivities.Domain.Entities.ProductVariant)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.ProductVariantDeletedEvent"/> class.
+            </summary>
+            <param name="productVariant">The product variant that was deleted.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Events.ProductVariantUpdatedEvent">
+            <summary>
+            Event raised when a product variant is updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ProductVariantUpdatedEvent.ProductVariant">
+            <summary>
+            Gets the product variant that was updated.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Events.ProductVariantUpdatedEvent.OccurredOn">
+            <summary>
+            Gets the date and time when the event occurred.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Events.ProductVariantUpdatedEvent.#ctor(FunnyActivities.Domain.Entities.ProductVariant)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Events.ProductVariantUpdatedEvent"/> class.
+            </summary>
+            <param name="productVariant">The product variant that was updated.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.ActivityCategoryNameAlreadyExistsException">
+            <summary>
+            Exception thrown when attempting to create an activity category with a name that already exists.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.ActivityCategoryNameAlreadyExistsException.Name">
+            <summary>
+            Gets the name that already exists.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.ActivityCategoryNameAlreadyExistsException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.ActivityCategoryNameAlreadyExistsException"/> class.
+            </summary>
+            <param name="name">The name that already exists.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.BaseProductHasVariantsException">
+            <summary>
+            Exception thrown when attempting to delete a base product that has variants.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.BaseProductHasVariantsException.BaseProductId">
+            <summary>
+            Gets the base product ID that has variants.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductHasVariantsException.#ctor(System.Guid)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductHasVariantsException"/> class.
+            </summary>
+            <param name="baseProductId">The base product ID that has variants.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductHasVariantsException.#ctor(System.Guid,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductHasVariantsException"/> class.
+            </summary>
+            <param name="baseProductId">The base product ID that has variants.</param>
+            <param name="message">The error message.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductHasVariantsException.#ctor(System.Guid,System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductHasVariantsException"/> class.
+            </summary>
+            <param name="baseProductId">The base product ID that has variants.</param>
+            <param name="message">The error message.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.BaseProductNameAlreadyExistsException">
+            <summary>
+            Exception thrown when a base product name already exists.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.BaseProductNameAlreadyExistsException.BaseProductName">
+            <summary>
+            Gets the base product name that already exists.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductNameAlreadyExistsException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductNameAlreadyExistsException"/> class.
+            </summary>
+            <param name="baseProductName">The base product name that already exists.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductNameAlreadyExistsException.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductNameAlreadyExistsException"/> class.
+            </summary>
+            <param name="baseProductName">The base product name that already exists.</param>
+            <param name="message">The error message.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductNameAlreadyExistsException.#ctor(System.String,System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductNameAlreadyExistsException"/> class.
+            </summary>
+            <param name="baseProductName">The base product name that already exists.</param>
+            <param name="message">The error message.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.BaseProductNotFoundException">
+            <summary>
+            Exception thrown when a base product is not found.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.BaseProductNotFoundException.BaseProductId">
+            <summary>
+            Gets the base product ID that was not found.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductNotFoundException.#ctor(System.Guid)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductNotFoundException"/> class.
+            </summary>
+            <param name="baseProductId">The base product ID that was not found.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductNotFoundException.#ctor(System.Guid,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductNotFoundException"/> class.
+            </summary>
+            <param name="baseProductId">The base product ID that was not found.</param>
+            <param name="message">The error message.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.BaseProductNotFoundException.#ctor(System.Guid,System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.BaseProductNotFoundException"/> class.
+            </summary>
+            <param name="baseProductId">The base product ID that was not found.</param>
+            <param name="message">The error message.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.CategoryNameAlreadyExistsException">
+            <summary>
+            Exception thrown when attempting to create a category with a name that already exists.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.CategoryNameAlreadyExistsException.CategoryName">
+            <summary>
+            Gets the name that already exists.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.CategoryNameAlreadyExistsException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.CategoryNameAlreadyExistsException"/> class.
+            </summary>
+            <param name="categoryName">The category name that already exists.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.CategoryNotFoundException">
+            <summary>
+            Exception thrown when a category is not found.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.CategoryNotFoundException.CategoryId">
+            <summary>
+            Gets the ID of the category that was not found.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.CategoryNotFoundException.#ctor(System.Guid)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.CategoryNotFoundException"/> class.
+            </summary>
+            <param name="categoryId">The ID of the category that was not found.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.InvalidStockQuantityException">
+            <summary>
+            Exception thrown when attempting to set an invalid stock quantity.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.InvalidStockQuantityException.StockQuantity">
+            <summary>
+            Gets the invalid stock quantity value.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.InvalidStockQuantityException.#ctor(System.Decimal)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.InvalidStockQuantityException"/> class.
+            </summary>
+            <param name="stockQuantity">The invalid stock quantity.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.InvalidStockQuantityException.#ctor(System.Decimal,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.InvalidStockQuantityException"/> class.
+            </summary>
+            <param name="stockQuantity">The invalid stock quantity.</param>
+            <param name="message">The error message.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.InvalidStockQuantityException.#ctor(System.Decimal,System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.InvalidStockQuantityException"/> class.
+            </summary>
+            <param name="stockQuantity">The invalid stock quantity.</param>
+            <param name="message">The error message.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.ProductVariantNameAlreadyExistsException">
+            <summary>
+            Exception thrown when a product variant name already exists.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.ProductVariantNameAlreadyExistsException.Name">
+            <summary>
+            Gets the name of the product variant.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.ProductVariantNameAlreadyExistsException.BaseProductId">
+            <summary>
+            Gets the base product ID.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.ProductVariantNameAlreadyExistsException.#ctor(System.String,System.Guid)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.ProductVariantNameAlreadyExistsException"/> class.
+            </summary>
+            <param name="name">The name of the product variant.</param>
+            <param name="baseProductId">The base product ID.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.ProductVariantNameAlreadyExistsException.#ctor(System.String,System.Guid,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.ProductVariantNameAlreadyExistsException"/> class.
+            </summary>
+            <param name="name">The name of the product variant.</param>
+            <param name="baseProductId">The base product ID.</param>
+            <param name="message">The error message.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.ProductVariantNotFoundException">
+            <summary>
+            Exception thrown when a product variant is not found.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.ProductVariantNotFoundException.ProductVariantId">
+            <summary>
+            Gets the ID of the product variant that was not found.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.ProductVariantNotFoundException.#ctor(System.Guid)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.ProductVariantNotFoundException"/> class.
+            </summary>
+            <param name="productVariantId">The ID of the product variant that was not found.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.ProductVariantNotFoundException.#ctor(System.Guid,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.ProductVariantNotFoundException"/> class.
+            </summary>
+            <param name="productVariantId">The ID of the product variant that was not found.</param>
+            <param name="message">The error message.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.Exceptions.UnitOfMeasureNotFoundException">
+            <summary>
+            Exception thrown when a unit of measure is not found.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.Exceptions.UnitOfMeasureNotFoundException.UnitOfMeasureId">
+            <summary>
+            Gets the ID of the unit of measure that was not found.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.UnitOfMeasureNotFoundException.#ctor(System.Guid)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.UnitOfMeasureNotFoundException"/> class.
+            </summary>
+            <param name="unitOfMeasureId">The ID of the unit of measure that was not found.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.Exceptions.UnitOfMeasureNotFoundException.#ctor(System.Guid,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.Exceptions.UnitOfMeasureNotFoundException"/> class.
+            </summary>
+            <param name="unitOfMeasureId">The ID of the unit of measure that was not found.</param>
+            <param name="message">The error message.</param>
+        </member>
+        <member name="T:FunnyActivities.Domain.ValueObjects.Duration">
+            <summary>
+            Represents a duration value object.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.ValueObjects.Duration.Value">
+            <summary>
+            Gets the duration value in TimeSpan.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.Duration.#ctor(System.TimeSpan)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.ValueObjects.Duration"/> class.
+            </summary>
+            <param name="value">The duration value.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.Duration.Create(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Creates a new duration instance.
+            </summary>
+            <param name="hours">The hours component.</param>
+            <param name="minutes">The minutes component.</param>
+            <param name="seconds">The seconds component.</param>
+            <returns>A new duration instance.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the duration is invalid.</exception>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.Duration.Create(System.TimeSpan)">
+            <summary>
+            Creates a new duration instance from TimeSpan.
+            </summary>
+            <param name="timeSpan">The TimeSpan value.</param>
+            <returns>A new duration instance.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the TimeSpan is invalid.</exception>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.Duration.ToString">
+            <summary>
+            Returns the string representation of the duration.
+            </summary>
+            <returns>The duration in HH:MM:SS format.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.Duration.Equals(System.Object)">
+            <summary>
+            Determines whether the specified object is equal to the current object.
+            </summary>
+            <param name="obj">The object to compare with the current object.</param>
+            <returns>True if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.Duration.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="T:FunnyActivities.Domain.ValueObjects.VideoUrl">
+            <summary>
+            Represents a video URL value object.
+            </summary>
+        </member>
+        <member name="P:FunnyActivities.Domain.ValueObjects.VideoUrl.Value">
+            <summary>
+            Gets the video URL value.
+            </summary>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.VideoUrl.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FunnyActivities.Domain.ValueObjects.VideoUrl"/> class.
+            </summary>
+            <param name="value">The video URL value.</param>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.VideoUrl.Create(System.String)">
+            <summary>
+            Creates a new video URL instance.
+            </summary>
+            <param name="url">The video URL string.</param>
+            <returns>A new video URL instance.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the URL is invalid.</exception>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.VideoUrl.ToString">
+            <summary>
+            Returns the string representation of the video URL.
+            </summary>
+            <returns>The video URL value.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.VideoUrl.Equals(System.Object)">
+            <summary>
+            Determines whether the specified object is equal to the current object.
+            </summary>
+            <param name="obj">The object to compare with the current object.</param>
+            <returns>True if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:FunnyActivities.Domain.ValueObjects.VideoUrl.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>A hash code for the current object.</returns>
+        </member>
+    </members>
+</doc>
