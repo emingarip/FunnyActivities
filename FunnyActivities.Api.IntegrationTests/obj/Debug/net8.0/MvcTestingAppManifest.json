@@ -1,7 +1,0 @@
-{
-  "FunnyActivities.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "d:\\Projects\\FunnyActivities\\FunnyActivities.Application",
-  "FunnyActivities.CrossCuttingConcerns, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "d:\\Projects\\FunnyActivities\\FunnyActivities.CrossCuttingConcerns",
-  "FunnyActivities.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "d:\\Projects\\FunnyActivities\\FunnyActivities.Domain",
-  "FunnyActivities.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "d:\\Projects\\FunnyActivities\\FunnyActivities.Infrastructure",
-  "FunnyActivities.WebAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "d:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI"
-}
