@@ -61,8 +61,18 @@ namespace FunnyActivities.Domain.ValueObjects
         /// <summary>
         /// Returns the string representation of the duration.
         /// </summary>
-        /// <returns>The duration in HH:MM:SS format.</returns>
-        public override string ToString() => Value.ToString(@"hh\:mm\:ss");
+        /// <returns>The duration in MM:SS format for durations less than 1 hour, otherwise HH:MM:SS format.</returns>
+        public override string ToString()
+        {
+            if (Value.TotalHours < 1)
+            {
+                return Value.ToString(@"mm\:ss");
+            }
+            else
+            {
+                return Value.ToString(@"hh\:mm\:ss");
+            }
+        }
 
         /// <summary>
         /// Determines whether the specified object is equal to the current object.

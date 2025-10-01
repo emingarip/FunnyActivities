@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.Queries.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
+using FunnyActivities.Application.Interfaces;
 using FunnyActivities.WebAPI.Controllers.Base;
 
 namespace FunnyActivities.WebAPI.Controllers
@@ -26,17 +27,20 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<ActivityProductVariantController> _logger;
+        private readonly IInputSanitizer _inputSanitizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivityProductVariantController"/> class.
         /// </summary>
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
-        public ActivityProductVariantController(IMediator mediator, ILogger<ActivityProductVariantController> logger)
+        /// <param name="inputSanitizer">The input sanitizer for security.</param>
+        public ActivityProductVariantController(IMediator mediator, ILogger<ActivityProductVariantController> logger, IInputSanitizer inputSanitizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
+            _inputSanitizer = inputSanitizer;
         }
 
         /// <summary>
@@ -59,7 +63,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (variant == null)
             {
                 _logger.LogWarning("Activity product variant with ID {VariantId} not found", id);
-                return this.ApiError("Activity product variant not found", "NotFound", 404);
+                return this.ApiError("The requested activity product variant could not be found. Please check the variant ID and try again.", "NotFound", 404);
             }
 
             return this.ApiSuccess(variant, "Activity product variant retrieved successfully");
@@ -115,12 +119,12 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity product variant creation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError($"Unable to create activity product variant: {ex.Message}. Please check your input and try again.", "ValidationError", 400);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating activity product variant");
-                return this.ApiError("An error occurred while creating the activity product variant", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while creating activity product variant");
+                return this.ApiError("We encountered an issue while creating your activity product variant. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
 
@@ -156,17 +160,17 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity product variant update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError("The activity product variant you're trying to update could not be found. Please verify the variant ID and try again.", "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity product variant update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError($"Unable to update activity product variant: {ex.Message}. Please review your changes and try again.", "ValidationError", 400);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating activity product variant");
-                return this.ApiError("An error occurred while updating the activity product variant", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while updating activity product variant");
+                return this.ApiError("We encountered an issue while updating your activity product variant. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
 
@@ -198,12 +202,12 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity product variant deletion failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError("The activity product variant you're trying to delete could not be found. Please verify the variant ID and try again.", "NotFound", 404);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while deleting activity product variant");
-                return this.ApiError("An error occurred while deleting the activity product variant", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while deleting activity product variant");
+                return this.ApiError("We encountered an issue while deleting your activity product variant. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
     }

@@ -6,6 +6,7 @@ using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.ValueObjects;
+using FunnyActivities.CrossCuttingConcerns.Caching;
 
 namespace FunnyActivities.Application.Handlers.ActivityManagement
 {
@@ -15,16 +16,19 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
     public class UpdateActivityCommandHandler : IRequestHandler<UpdateActivityCommand, ActivityDto>
     {
         private readonly IActivityRepository _activityRepository;
+        private readonly ICacheService _cache;
         private readonly ILogger<UpdateActivityCommandHandler> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateActivityCommandHandler"/> class.
         /// </summary>
         /// <param name="activityRepository">The activity repository.</param>
+        /// <param name="cache">The cache service.</param>
         /// <param name="logger">The logger.</param>
-        public UpdateActivityCommandHandler(IActivityRepository activityRepository, ILogger<UpdateActivityCommandHandler> logger)
+        public UpdateActivityCommandHandler(IActivityRepository activityRepository, ICacheService cache, ILogger<UpdateActivityCommandHandler> logger)
         {
             _activityRepository = activityRepository;
+            _cache = cache;
             _logger = logger;
         }
 
@@ -44,7 +48,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", request.Id);
-                throw new KeyNotFoundException($"Activity with ID {request.Id} not found");
+                throw new KeyNotFoundException($"The activity with ID {request.Id} could not be found. Please verify the activity exists and try again.");
             }
 
             _logger.LogInformation("Current activity data - Name: {Name}, VideoUrl: {VideoUrl}, Duration: {Duration}",
@@ -52,14 +56,26 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
 
             // Create value objects
             VideoUrl? videoUrl = null;
-            if (!string.IsNullOrWhiteSpace(request.VideoUrl))
+            if (request.VideoUrl != null)
             {
-                videoUrl = VideoUrl.Create(request.VideoUrl);
-                _logger.LogInformation("Setting VideoUrl to: {VideoUrl}", request.VideoUrl);
+                // VideoUrl is provided in the request (can be empty string to clear)
+                if (!string.IsNullOrWhiteSpace(request.VideoUrl))
+                {
+                    videoUrl = VideoUrl.Create(request.VideoUrl);
+                    _logger.LogInformation("Setting VideoUrl to: {VideoUrl}", request.VideoUrl);
+                }
+                else
+                {
+                    // Empty string provided - explicitly clear the video URL
+                    _logger.LogInformation("VideoUrl is empty string in request - clearing the existing video URL");
+                }
+                // videoUrl remains null, which will clear the existing video URL
             }
             else
             {
-                _logger.LogWarning("VideoUrl is null/empty in request - this will clear the existing video!");
+                // VideoUrl is null in request - don't update the video URL, keep existing
+                _logger.LogInformation("VideoUrl is null in request - keeping existing video URL unchanged");
+                videoUrl = activity.VideoUrl; // Keep existing value
             }
 
             Duration? duration = null;
@@ -83,6 +99,9 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             // Save to repository
             await _activityRepository.UpdateAsync(activity);
 
+            // Invalidate public activities cache since activity might have changed public status
+            await InvalidatePublicActivitiesCacheAsync();
+
             _logger.LogInformation("Activity updated successfully with ID: {ActivityId}, IsPublic: {IsPublic}", request.Id, request.IsPublic);
 
             // Map to DTO
@@ -102,6 +121,33 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             };
 
             return activityDto;
+        }
+
+        private async Task InvalidatePublicActivitiesCacheAsync()
+        {
+            try
+            {
+                // Clear all public activities cache keys (simplified approach)
+                // In a production system, you might want to use a pattern-based invalidation
+                // For now, we'll clear a few common cache keys
+                var commonCacheKeys = new[]
+                {
+                    "public_activities_1_10_name_asc",
+                    "public_activities_1_20_name_asc",
+                    "public_activities_1_50_name_asc"
+                };
+
+                foreach (var key in commonCacheKeys)
+                {
+                    await _cache.RemoveAsync(key);
+                }
+
+                _logger.LogInformation("Invalidated public activities cache");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error invalidating public activities cache");
+            }
         }
     }
 }

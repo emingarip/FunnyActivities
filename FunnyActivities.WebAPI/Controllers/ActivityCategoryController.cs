@@ -7,6 +7,7 @@ using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.Queries.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.DTOs.Shared;
+using FunnyActivities.Application.Interfaces;
 using FunnyActivities.WebAPI.Controllers.Base;
 
 namespace FunnyActivities.WebAPI.Controllers
@@ -27,17 +28,20 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<ActivityCategoryController> _logger;
+        private readonly IInputSanitizer _inputSanitizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivityCategoryController"/> class.
         /// </summary>
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
-        public ActivityCategoryController(IMediator mediator, ILogger<ActivityCategoryController> logger)
+        /// <param name="inputSanitizer">The input sanitizer for security.</param>
+        public ActivityCategoryController(IMediator mediator, ILogger<ActivityCategoryController> logger, IInputSanitizer inputSanitizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
+            _inputSanitizer = inputSanitizer;
         }
 
         /// <summary>
@@ -105,7 +109,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (category == null)
             {
                 _logger.LogWarning("Activity category with ID {CategoryId} not found", id);
-                return this.ApiError("Activity category not found", "NotFound", 404);
+                return this.ApiError("The requested activity category could not be found. Please check the category ID and try again.", "NotFound", 404);
             }
 
             return this.ApiSuccess(category, "Activity category retrieved successfully");
@@ -124,10 +128,14 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             _logger.LogInformation("Creating new activity category: {Name}", request.Name);
 
+            // Sanitize user inputs
+            var sanitizedName = _inputSanitizer.SanitizeString(request.Name, 200);
+            var sanitizedDescription = request.Description != null ? _inputSanitizer.SanitizeString(request.Description, 1000) : null;
+
             var command = new CreateActivityCategoryCommand
             {
-                Name = request.Name,
-                Description = request.Description,
+                Name = sanitizedName,
+                Description = sanitizedDescription,
                 UserId = CurrentUserId
             };
 
@@ -140,12 +148,12 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity category creation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError($"Unable to create activity category: {ex.Message}. Please check your input and try again.", "ValidationError", 400);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating activity category");
-                return this.ApiError("An error occurred while creating the activity category", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while creating activity category");
+                return this.ApiError("We encountered an issue while creating your activity category. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
 
@@ -164,11 +172,15 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             _logger.LogInformation("Updating activity category with ID: {CategoryId}", id);
 
+            // Sanitize user inputs
+            var sanitizedName = request.Name != null ? _inputSanitizer.SanitizeString(request.Name, 200) : null;
+            var sanitizedDescription = request.Description != null ? _inputSanitizer.SanitizeString(request.Description, 1000) : null;
+
             var command = new UpdateActivityCategoryCommand
             {
                 Id = id,
-                Name = request.Name,
-                Description = request.Description,
+                Name = sanitizedName,
+                Description = sanitizedDescription,
                 UserId = CurrentUserId
             };
 
@@ -181,17 +193,17 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity category update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError("The activity category you're trying to update could not be found. Please verify the category ID and try again.", "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity category update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError($"Unable to update activity category: {ex.Message}. Please review your changes and try again.", "ValidationError", 400);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating activity category");
-                return this.ApiError("An error occurred while updating the activity category", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while updating activity category");
+                return this.ApiError("We encountered an issue while updating your activity category. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
 
@@ -223,12 +235,12 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity category deletion failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError("The activity category you're trying to delete could not be found. Please verify the category ID and try again.", "NotFound", 404);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while deleting activity category");
-                return this.ApiError("An error occurred while deleting the activity category", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while deleting activity category");
+                return this.ApiError("We encountered an issue while deleting your activity category. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
     }
