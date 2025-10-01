@@ -41,6 +41,9 @@ namespace FunnyActivities.Infrastructure.Migrations
                     b.Property<TimeSpan?>("Duration")
                         .HasColumnType("interval");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -234,6 +237,38 @@ namespace FunnyActivities.Infrastructure.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.Favorites", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ActivityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "ActivityId")
+                        .IsUnique();
+
+                    b.ToTable("Favorites");
+                });
+
             modelBuilder.Entity("FunnyActivities.Domain.Entities.Image", b =>
                 {
                     b.Property<Guid>("Id")
@@ -423,7 +458,20 @@ namespace FunnyActivities.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<int?>("DurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MediaAttachments")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PauseTimeSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TimestampSeconds")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -436,6 +484,167 @@ namespace FunnyActivities.Infrastructure.Migrations
                     b.HasIndex("ActivityId", "Order");
 
                     b.ToTable("Steps");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.Survey", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MaxParticipants")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ShareToken")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.ToTable("Surveys");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.SurveyActivity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ActivityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SurveyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("SurveyId");
+
+                    b.ToTable("SurveyActivities");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.SurveyParticipant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ChildrenCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("ParticipatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SurveyId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyId");
+
+                    b.ToTable("SurveyParticipants");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.SurveyVote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SurveyActivityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SurveyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SurveyParticipantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VoteValue")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyActivityId");
+
+                    b.HasIndex("SurveyId");
+
+                    b.HasIndex("SurveyParticipantId");
+
+                    b.ToTable("SurveyVotes");
                 });
 
             modelBuilder.Entity("FunnyActivities.Domain.Entities.UnitConversion", b =>
@@ -518,6 +727,9 @@ namespace FunnyActivities.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("LastLoginDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -597,6 +809,25 @@ namespace FunnyActivities.Infrastructure.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.Favorites", b =>
+                {
+                    b.HasOne("FunnyActivities.Domain.Entities.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FunnyActivities.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FunnyActivities.Domain.Entities.ProductVariant", b =>
                 {
                     b.HasOne("FunnyActivities.Domain.Entities.BaseProduct", "BaseProduct")
@@ -646,6 +877,74 @@ namespace FunnyActivities.Infrastructure.Migrations
                     b.Navigation("Activity");
                 });
 
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.Survey", b =>
+                {
+                    b.HasOne("FunnyActivities.Domain.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.SurveyActivity", b =>
+                {
+                    b.HasOne("FunnyActivities.Domain.Entities.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FunnyActivities.Domain.Entities.Survey", "Survey")
+                        .WithMany("SurveyActivities")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("Survey");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.SurveyParticipant", b =>
+                {
+                    b.HasOne("FunnyActivities.Domain.Entities.Survey", "Survey")
+                        .WithMany("SurveyParticipants")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Survey");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.SurveyVote", b =>
+                {
+                    b.HasOne("FunnyActivities.Domain.Entities.SurveyActivity", "SurveyActivity")
+                        .WithMany("SurveyVotes")
+                        .HasForeignKey("SurveyActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FunnyActivities.Domain.Entities.Survey", "Survey")
+                        .WithMany("SurveyVotes")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FunnyActivities.Domain.Entities.SurveyParticipant", "SurveyParticipant")
+                        .WithMany()
+                        .HasForeignKey("SurveyParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Survey");
+
+                    b.Navigation("SurveyActivity");
+
+                    b.Navigation("SurveyParticipant");
+                });
+
             modelBuilder.Entity("FunnyActivities.Domain.Entities.UnitConversion", b =>
                 {
                     b.HasOne("FunnyActivities.Domain.Entities.UnitOfMeasure", "FromUnit")
@@ -685,6 +984,20 @@ namespace FunnyActivities.Infrastructure.Migrations
             modelBuilder.Entity("FunnyActivities.Domain.Entities.Category", b =>
                 {
                     b.Navigation("BaseProducts");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.Survey", b =>
+                {
+                    b.Navigation("SurveyActivities");
+
+                    b.Navigation("SurveyParticipants");
+
+                    b.Navigation("SurveyVotes");
+                });
+
+            modelBuilder.Entity("FunnyActivities.Domain.Entities.SurveyActivity", b =>
+                {
+                    b.Navigation("SurveyVotes");
                 });
 #pragma warning restore 612, 618
         }

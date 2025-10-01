@@ -38,5 +38,10 @@ namespace FunnyActivities.Application.Queries.ActivityManagement
         /// Gets or sets the sort order (asc or desc).
         /// </summary>
         public string? SortOrder { get; set; } = "asc";
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this is a public query (no authentication required).
+        /// </summary>
+        public bool IsPublic { get; set; } = false;
     }
 }

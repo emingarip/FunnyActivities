@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FunnyActivities.Domain.Entities;
 
@@ -13,5 +14,8 @@ namespace FunnyActivities.Application.Interfaces
         Task UpdateAsync(User user);
         Task<User> GetByResetTokenAsync(string token);
         Task<(IEnumerable<User> Users, int TotalCount)> SearchAsync(string searchTerm, int page, int pageSize, string sortBy, string sortOrder);
+        Task<int> GetTotalCountAsync();
+        Task<int> GetOnlineUsersCountAsync(TimeSpan onlineThreshold);
+        Task<List<UserGrowthDataPoint>> GetUserGrowthDataAsync(string period, int days);
     }
 }

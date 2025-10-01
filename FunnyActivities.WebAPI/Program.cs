@@ -133,13 +133,10 @@ app.UseHttpMetrics();
 
 // CORS middleware'ını ekle. Tarayıcıların farklı domain'lerden API'ye erişimine izin verir.
 // Güvenlik middleware'larından (Authentication/Authorization) önce gelmelidir.
-app.UseCors("AllowSpecificOrigins"); // "AllowSpecificOrigins" adıyla tanımladığınız politikayı kullanır
-
-app.UseAuthentication(); // ← Bu eksik!
+app.UseCors("AllowAllOrigins"); // Development için tüm origin'lere izin ver
 
 // Kimlik doğrulama (Authentication) middleware'ını ekle. Gelen JWT'yi doğrular.
 app.UseAuthenticationMiddleware(); // Sizin custom middleware'ınız
-// Not: Eğer .NET'in kendi JWT mekanizmasını kullanıyorsanız burada app.UseAuthentication(); da olmalı.
 
 // Yetkilendirme (Authorization) middleware'ını ekle. [Authorize] attributelarını denetler.
 app.UseAuthorization();
@@ -156,6 +153,9 @@ app.UseMetricServer();
 
 // Controller endpoint'lerini haritala. Bu, gelen isteği doğru Controller Action'ına yönlendirir.
 app.MapControllers();
+
+// Health check endpoint'ini haritala
+app.MapHealthChecks("/health");
 
 // Uygulamayı çalıştır
 await app.RunAsync();

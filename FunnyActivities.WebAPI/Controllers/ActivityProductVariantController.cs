@@ -71,7 +71,7 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <param name="activityId">The unique identifier of the activity.</param>
         /// <returns>A list of activity product variants for the activity.</returns>
         [HttpGet("by-activity/{activityId}")]
-        [Authorize(Policy = "CanViewActivityProductVariant")]
+        [AllowAnonymous]
         [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
         [ProducesResponseType(typeof(List<ActivityProductVariantDto>), 200)]
         public async Task<IActionResult> GetActivityProductVariantsByActivityId(Guid activityId)

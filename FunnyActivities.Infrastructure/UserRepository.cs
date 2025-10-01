@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -128,6 +130,130 @@ namespace FunnyActivities.Infrastructure
             var users = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync().ConfigureAwait(false);
 
             return (users, totalCount);
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            _logger.LogDebug("[USER-REPO] Starting GetTotalCountAsync");
+
+            var startTime = DateTime.UtcNow;
+
+            try
+            {
+                var count = await _context.Users.CountAsync().ConfigureAwait(false);
+
+                var endTime = DateTime.UtcNow;
+                var duration = endTime - startTime;
+
+                _logger.LogInformation("[USER-REPO] GetTotalCountAsync completed in {Duration}ms. Total users: {Count}",
+                    duration.TotalMilliseconds, count);
+
+                return count;
+            }
+            catch (Exception ex)
+            {
+                var endTime = DateTime.UtcNow;
+                var duration = endTime - startTime;
+
+                _logger.LogError(ex, "[USER-REPO] GetTotalCountAsync failed after {Duration}ms. Error: {ErrorMessage}",
+                    duration.TotalMilliseconds, ex.Message);
+
+                throw;
+            }
+        }
+
+        public async Task<int> GetOnlineUsersCountAsync(TimeSpan onlineThreshold)
+        {
+            _logger.LogDebug("[USER-REPO] Starting GetOnlineUsersCountAsync with threshold: {Threshold} minutes", onlineThreshold.TotalMinutes);
+
+            var startTime = DateTime.UtcNow;
+
+            try
+            {
+                var thresholdDate = DateTime.UtcNow - onlineThreshold;
+                var count = await _context.Users.CountAsync(u => u.LastLoginDate >= thresholdDate).ConfigureAwait(false);
+
+                var endTime = DateTime.UtcNow;
+                var duration = endTime - startTime;
+
+                _logger.LogInformation("[USER-REPO] GetOnlineUsersCountAsync completed in {Duration}ms. Online users: {Count}",
+                    duration.TotalMilliseconds, count);
+
+                return count;
+            }
+            catch (Exception ex)
+            {
+                var endTime = DateTime.UtcNow;
+                var duration = endTime - startTime;
+
+                _logger.LogError(ex, "[USER-REPO] GetOnlineUsersCountAsync failed after {Duration}ms. Error: {ErrorMessage}",
+                    duration.TotalMilliseconds, ex.Message);
+
+                throw;
+            }
+        }
+
+        public async Task<List<UserGrowthDataPoint>> GetUserGrowthDataAsync(string period, int days)
+        {
+            _logger.LogDebug("[USER-REPO] Starting GetUserGrowthDataAsync with period: {Period}, days: {Days}", period, days);
+
+            var startTime = DateTime.UtcNow;
+
+            try
+            {
+                var endDate = DateTime.UtcNow.Date;
+                var startDate = endDate.AddDays(-days);
+
+                var users = await _context.Users
+                    .Where(u => u.CreatedAt >= startDate && u.CreatedAt <= endDate)
+                    .Select(u => new { u.CreatedAt.Date })
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+
+                var dataPoints = new List<UserGrowthDataPoint>();
+                var currentDate = startDate;
+                var cumulativeCount = await _context.Users.CountAsync(u => u.CreatedAt < startDate).ConfigureAwait(false);
+
+                while (currentDate <= endDate)
+                {
+                    var dateStr = currentDate.ToString("yyyy-MM-dd");
+                    var newUsersOnDate = users.Count(u => u.Date == currentDate);
+                    cumulativeCount += newUsersOnDate;
+
+                    dataPoints.Add(new UserGrowthDataPoint
+                    {
+                        Date = dateStr,
+                        Count = cumulativeCount
+                    });
+
+                    // Increment based on period
+                    currentDate = period.ToLower() switch
+                    {
+                        "weekly" => currentDate.AddDays(1),
+                        "monthly" => currentDate.AddDays(1),
+                        "quarterly" => currentDate.AddDays(1),
+                        _ => currentDate.AddDays(1)
+                    };
+                }
+
+                var endTime = DateTime.UtcNow;
+                var duration = endTime - startTime;
+
+                _logger.LogInformation("[USER-REPO] GetUserGrowthDataAsync completed in {Duration}ms. Data points: {Count}",
+                    duration.TotalMilliseconds, dataPoints.Count);
+
+                return dataPoints;
+            }
+            catch (Exception ex)
+            {
+                var endTime = DateTime.UtcNow;
+                var duration = endTime - startTime;
+
+                _logger.LogError(ex, "[USER-REPO] GetUserGrowthDataAsync failed after {Duration}ms. Error: {ErrorMessage}",
+                    duration.TotalMilliseconds, ex.Message);
+
+                throw;
+            }
         }
 
         private string MaskEmail(string email)

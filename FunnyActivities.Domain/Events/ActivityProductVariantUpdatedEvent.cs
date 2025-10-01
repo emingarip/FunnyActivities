@@ -1,8 +1,9 @@
 using System;
+using MediatR;
 
 namespace FunnyActivities.Domain.Events
 {
-    public class ActivityProductVariantUpdatedEvent : IDomainEvent
+    public class ActivityProductVariantUpdatedEvent : IDomainEvent, INotification
     {
         public Guid ActivityProductVariantId { get; }
         public DateTime OccurredOn { get; }

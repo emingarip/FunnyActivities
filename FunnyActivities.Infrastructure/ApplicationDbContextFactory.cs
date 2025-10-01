@@ -10,7 +10,7 @@ namespace FunnyActivities.Infrastructure
         public ApplicationDbContext CreateDbContext(string[] args)
         {
             // Use Docker database connection string directly for migrations
-            var connectionString = "Host=localhost;Port=5432;Database=funnyactivities;Username=postgres;Password=postgres123";
+            var connectionString = "Host=localhost;Port=5432;Database=funnyactivities;Username=postgres;Password=devpassword";
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseNpgsql(connectionString);

@@ -81,6 +81,11 @@ namespace FunnyActivities.Application.Handlers.UserManagement
 
                 _logger.LogInformation("[LOGIN-HANDLER] User authentication successful for {UserId}", user.Id);
 
+                // Update last login date
+                user.UpdateLastLoginDate();
+                await _userRepository.UpdateAsync(user).ConfigureAwait(false);
+                _logger.LogInformation("[LOGIN-HANDLER] Last login date updated for user {UserId}", user.Id);
+
                 // Password re-hashing check
                 if (_userService.IsOldHashFormat(user.PasswordHash))
                 {

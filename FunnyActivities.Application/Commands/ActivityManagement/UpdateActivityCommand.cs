@@ -45,6 +45,11 @@ namespace FunnyActivities.Application.Commands.ActivityManagement
         public int? DurationSeconds { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the activity is public.
+        /// </summary>
+        public bool? IsPublic { get; set; }
+
+        /// <summary>
         /// Gets or sets the ID of the user updating the activity.
         /// </summary>
         public Guid UserId { get; set; }

@@ -178,6 +178,63 @@ namespace FunnyActivities.WebAPI.Controllers
             return Ok(response);
         }
 
+        [HttpGet("admin/count")]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> GetUserCount()
+        {
+            try
+            {
+                var count = await _mediator.Send(new GetUserCountQuery());
+                return Ok(new { totalUsers = count });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user count");
+                return StatusCode(500, new { message = "An error occurred while retrieving user count." });
+            }
+        }
+
+        [HttpGet("admin/online-count")]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> GetOnlineUsersCount([FromQuery] int thresholdMinutes = 30)
+        {
+            try
+            {
+                var query = new GetOnlineUsersCountQuery
+                {
+                    OnlineThreshold = TimeSpan.FromMinutes(thresholdMinutes)
+                };
+                var count = await _mediator.Send(query);
+                return Ok(new { onlineUsers = count });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving online users count");
+                return StatusCode(500, new { message = "An error occurred while retrieving online users count." });
+            }
+        }
+
+        [HttpGet("admin/growth")]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> GetUserGrowth([FromQuery] string period = "weekly", [FromQuery] int days = 30)
+        {
+            try
+            {
+                var query = new GetUserGrowthQuery
+                {
+                    Period = period,
+                    Days = days
+                };
+                var data = await _mediator.Send(query);
+                return Ok(new { data });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user growth data");
+                return StatusCode(500, new { message = "An error occurred while retrieving user growth data." });
+            }
+        }
+
         [HttpPost("upload-profile-image")]
         [Authorize]
         public async Task<IActionResult> UploadProfileImage([FromForm] UploadProfileImageRequest request)

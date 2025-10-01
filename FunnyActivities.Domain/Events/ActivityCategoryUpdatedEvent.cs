@@ -1,8 +1,9 @@
 using System;
+using MediatR;
 
 namespace FunnyActivities.Domain.Events
 {
-    public class ActivityCategoryUpdatedEvent : IDomainEvent
+    public class ActivityCategoryUpdatedEvent : IDomainEvent, INotification
     {
         public Guid ActivityCategoryId { get; }
         public string Name { get; }

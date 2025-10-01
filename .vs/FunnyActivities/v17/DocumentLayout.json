@@ -1,18 +1,50 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Projects\\FunnyActivities\\",
+  "WorkspaceRootPath": "D:\\Projects\\FunnyActivities - Backup\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|d:\\projects\\funnyactivities\\funnyactivities.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|solutionrelative:funnyactivities.webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|d:\\projects\\funnyactivities - backup\\funnyactivities.application\\handlers\\surveymanagement\\getsurveyresultsqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|solutionrelative:funnyactivities.application\\handlers\\surveymanagement\\getsurveyresultsqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|d:\\projects\\funnyactivities\\funnyactivities.webapi\\extensions\\middlewareextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|solutionrelative:funnyactivities.webapi\\extensions\\middlewareextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C6913C34-1521-4EAB-A310-07BF16BF02A7}|FunnyActivities.Domain\\FunnyActivities.Domain.csproj|d:\\projects\\funnyactivities - backup\\funnyactivities.domain\\entities\\surveyvote.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C6913C34-1521-4EAB-A310-07BF16BF02A7}|FunnyActivities.Domain\\FunnyActivities.Domain.csproj|solutionrelative:funnyactivities.domain\\entities\\surveyvote.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|d:\\projects\\funnyactivities\\funnyactivities.webapi\\extensions\\servicecollectionextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|solutionrelative:funnyactivities.webapi\\extensions\\servicecollectionextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|d:\\projects\\funnyactivities - backup\\funnyactivities.application\\validators\\surveymanagement\\voterequestvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|solutionrelative:funnyactivities.application\\validators\\surveymanagement\\voterequestvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|d:\\projects\\funnyactivities - backup\\funnyactivities.webapi\\controllers\\surveycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F554B669-0542-45DF-BFF4-5FB40446D6E6}|FunnyActivities.WebAPI\\FunnyActivities.WebAPI.csproj|solutionrelative:funnyactivities.webapi\\controllers\\surveycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|d:\\projects\\funnyactivities - backup\\funnyactivities.application\\validators\\surveymanagement\\createsurveyrequestvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|solutionrelative:funnyactivities.application\\validators\\surveymanagement\\createsurveyrequestvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|d:\\projects\\funnyactivities - backup\\funnyactivities.application\\handlers\\surveymanagement\\createsurveycommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|solutionrelative:funnyactivities.application\\handlers\\surveymanagement\\createsurveycommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|d:\\projects\\funnyactivities - backup\\funnyactivities.application\\dtos\\surveymanagement\\surveydto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79B6FA61-2E2E-44BB-A19A-50C8296F2285}|FunnyActivities.Application\\FunnyActivities.Application.csproj|solutionrelative:funnyactivities.application\\dtos\\surveymanagement\\surveydto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E4BE8D8A-2FEE-4E9B-A4F1-FE7F9D1B107F}|tests\\unit\\dotnet\\FunnyActivities.Application.UnitTests\\FunnyActivities.Application.UnitTests.csproj|d:\\projects\\funnyactivities - backup\\tests\\unit\\dotnet\\funnyactivities.application.unittests\\funnyactivities.application.unittests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{E4BE8D8A-2FEE-4E9B-A4F1-FE7F9D1B107F}|tests\\unit\\dotnet\\FunnyActivities.Application.UnitTests\\FunnyActivities.Application.UnitTests.csproj|solutionrelative:tests\\unit\\dotnet\\funnyactivities.application.unittests\\funnyactivities.application.unittests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E52FA55B-4BDF-4744-B4D4-53CBD44B28B4}|tests\\integration\\dotnet\\FunnyActivities.IntegrationTests\\FunnyActivities.IntegrationTests.csproj|d:\\projects\\funnyactivities - backup\\tests\\integration\\dotnet\\funnyactivities.integrationtests\\funnyactivities.integrationtests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{E52FA55B-4BDF-4744-B4D4-53CBD44B28B4}|tests\\integration\\dotnet\\FunnyActivities.IntegrationTests\\FunnyActivities.IntegrationTests.csproj|solutionrelative:tests\\integration\\dotnet\\funnyactivities.integrationtests\\funnyactivities.integrationtests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{36A17CE6-C838-4124-81AF-468FBD181048}|tests\\integration\\dotnet\\FunnyActivities.Api.IntegrationTests\\FunnyActivities.Api.IntegrationTests.csproj|d:\\projects\\funnyactivities - backup\\tests\\integration\\dotnet\\funnyactivities.api.integrationtests\\funnyactivities.api.integrationtests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{36A17CE6-C838-4124-81AF-468FBD181048}|tests\\integration\\dotnet\\FunnyActivities.Api.IntegrationTests\\FunnyActivities.Api.IntegrationTests.csproj|solutionrelative:tests\\integration\\dotnet\\funnyactivities.api.integrationtests\\funnyactivities.api.integrationtests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{191660E7-055C-477D-8A0E-B7ED66FC4400}|tests\\unit\\dotnet\\FunnyActivities.Domain.UnitTests\\FunnyActivities.Domain.UnitTests.csproj|d:\\projects\\funnyactivities - backup\\tests\\unit\\dotnet\\funnyactivities.domain.unittests\\funnyactivities.domain.unittests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{191660E7-055C-477D-8A0E-B7ED66FC4400}|tests\\unit\\dotnet\\FunnyActivities.Domain.UnitTests\\FunnyActivities.Domain.UnitTests.csproj|solutionrelative:tests\\unit\\dotnet\\funnyactivities.domain.unittests\\funnyactivities.domain.unittests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,45 +54,149 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MiddlewareExtensions.cs",
-              "DocumentMoniker": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Extensions\\MiddlewareExtensions.cs",
-              "RelativeDocumentMoniker": "FunnyActivities.WebAPI\\Extensions\\MiddlewareExtensions.cs",
-              "ToolTip": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Extensions\\MiddlewareExtensions.cs",
-              "RelativeToolTip": "FunnyActivities.WebAPI\\Extensions\\MiddlewareExtensions.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAArAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "GetSurveyResultsQueryHandler.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\Handlers\\SurveyManagement\\GetSurveyResultsQueryHandler.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.Application\\Handlers\\SurveyManagement\\GetSurveyResultsQueryHandler.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\Handlers\\SurveyManagement\\GetSurveyResultsQueryHandler.cs",
+              "RelativeToolTip": "FunnyActivities.Application\\Handlers\\SurveyManagement\\GetSurveyResultsQueryHandler.cs",
+              "ViewState": "AgIAAGAAAAAAAAAAAADwv3EAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-05T11:23:54.578Z",
+              "WhenOpened": "2025-09-25T07:59:49.89Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SurveyVote.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Domain\\Entities\\SurveyVote.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.Domain\\Entities\\SurveyVote.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Domain\\Entities\\SurveyVote.cs",
+              "RelativeToolTip": "FunnyActivities.Domain\\Entities\\SurveyVote.cs",
+              "ViewState": "AgIAAFwAAAAAAAAAAAAmwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-25T07:45:18.482Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SurveyController.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.WebAPI\\Controllers\\SurveyController.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.WebAPI\\Controllers\\SurveyController.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.WebAPI\\Controllers\\SurveyController.cs",
+              "RelativeToolTip": "FunnyActivities.WebAPI\\Controllers\\SurveyController.cs",
+              "ViewState": "AgIAACsBAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-25T07:32:42.455Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "ServiceCollectionExtensions.cs",
-              "DocumentMoniker": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Extensions\\ServiceCollectionExtensions.cs",
-              "RelativeDocumentMoniker": "FunnyActivities.WebAPI\\Extensions\\ServiceCollectionExtensions.cs",
-              "ToolTip": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Extensions\\ServiceCollectionExtensions.cs",
-              "RelativeToolTip": "FunnyActivities.WebAPI\\Extensions\\ServiceCollectionExtensions.cs",
-              "ViewState": "AgIAAJ8AAAAAAAAAAAAowEUAAAA2AAAAAAAAAA==",
+              "Title": "VoteRequestValidator.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\Validators\\SurveyManagement\\VoteRequestValidator.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.Application\\Validators\\SurveyManagement\\VoteRequestValidator.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\Validators\\SurveyManagement\\VoteRequestValidator.cs",
+              "RelativeToolTip": "FunnyActivities.Application\\Validators\\SurveyManagement\\VoteRequestValidator.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-05T11:23:45.534Z",
+              "WhenOpened": "2025-09-25T07:21:58.899Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Program.cs",
-              "RelativeDocumentMoniker": "FunnyActivities.WebAPI\\Program.cs",
-              "ToolTip": "D:\\Projects\\FunnyActivities\\FunnyActivities.WebAPI\\Program.cs*",
-              "RelativeToolTip": "FunnyActivities.WebAPI\\Program.cs*",
-              "ViewState": "AgIAAHgAAAAAAAAAAAAAAIoAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "CreateSurveyRequestValidator.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\Validators\\SurveyManagement\\CreateSurveyRequestValidator.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.Application\\Validators\\SurveyManagement\\CreateSurveyRequestValidator.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\Validators\\SurveyManagement\\CreateSurveyRequestValidator.cs",
+              "RelativeToolTip": "FunnyActivities.Application\\Validators\\SurveyManagement\\CreateSurveyRequestValidator.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAxwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-05T11:22:09.088Z",
+              "WhenOpened": "2025-09-25T07:21:49.496Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "CreateSurveyCommandHandler.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\Handlers\\SurveyManagement\\CreateSurveyCommandHandler.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.Application\\Handlers\\SurveyManagement\\CreateSurveyCommandHandler.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\Handlers\\SurveyManagement\\CreateSurveyCommandHandler.cs",
+              "RelativeToolTip": "FunnyActivities.Application\\Handlers\\SurveyManagement\\CreateSurveyCommandHandler.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-25T07:21:36.759Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SurveyDto.cs",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\DTOs\\SurveyManagement\\SurveyDto.cs",
+              "RelativeDocumentMoniker": "FunnyActivities.Application\\DTOs\\SurveyManagement\\SurveyDto.cs",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\FunnyActivities.Application\\DTOs\\SurveyManagement\\SurveyDto.cs",
+              "RelativeToolTip": "FunnyActivities.Application\\DTOs\\SurveyManagement\\SurveyDto.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAwwFoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-24T20:36:51.534Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "FunnyActivities.IntegrationTests",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\tests\\integration\\dotnet\\FunnyActivities.IntegrationTests\\FunnyActivities.IntegrationTests.csproj",
+              "RelativeDocumentMoniker": "tests\\integration\\dotnet\\FunnyActivities.IntegrationTests\\FunnyActivities.IntegrationTests.csproj",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\tests\\integration\\dotnet\\FunnyActivities.IntegrationTests\\FunnyActivities.IntegrationTests.csproj",
+              "RelativeToolTip": "tests\\integration\\dotnet\\FunnyActivities.IntegrationTests\\FunnyActivities.IntegrationTests.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-09-24T20:35:16.56Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "FunnyActivities.Api.IntegrationTests",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\tests\\integration\\dotnet\\FunnyActivities.Api.IntegrationTests\\FunnyActivities.Api.IntegrationTests.csproj",
+              "RelativeDocumentMoniker": "tests\\integration\\dotnet\\FunnyActivities.Api.IntegrationTests\\FunnyActivities.Api.IntegrationTests.csproj",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\tests\\integration\\dotnet\\FunnyActivities.Api.IntegrationTests\\FunnyActivities.Api.IntegrationTests.csproj",
+              "RelativeToolTip": "tests\\integration\\dotnet\\FunnyActivities.Api.IntegrationTests\\FunnyActivities.Api.IntegrationTests.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-09-24T20:35:15.892Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "FunnyActivities.Application.UnitTests",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\tests\\unit\\dotnet\\FunnyActivities.Application.UnitTests\\FunnyActivities.Application.UnitTests.csproj",
+              "RelativeDocumentMoniker": "tests\\unit\\dotnet\\FunnyActivities.Application.UnitTests\\FunnyActivities.Application.UnitTests.csproj",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\tests\\unit\\dotnet\\FunnyActivities.Application.UnitTests\\FunnyActivities.Application.UnitTests.csproj",
+              "RelativeToolTip": "tests\\unit\\dotnet\\FunnyActivities.Application.UnitTests\\FunnyActivities.Application.UnitTests.csproj",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-09-24T20:35:15.011Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "FunnyActivities.Domain.UnitTests",
+              "DocumentMoniker": "D:\\Projects\\FunnyActivities - Backup\\tests\\unit\\dotnet\\FunnyActivities.Domain.UnitTests\\FunnyActivities.Domain.UnitTests.csproj",
+              "RelativeDocumentMoniker": "tests\\unit\\dotnet\\FunnyActivities.Domain.UnitTests\\FunnyActivities.Domain.UnitTests.csproj",
+              "ToolTip": "D:\\Projects\\FunnyActivities - Backup\\tests\\unit\\dotnet\\FunnyActivities.Domain.UnitTests\\FunnyActivities.Domain.UnitTests.csproj",
+              "RelativeToolTip": "tests\\unit\\dotnet\\FunnyActivities.Domain.UnitTests\\FunnyActivities.Domain.UnitTests.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-09-24T20:35:14.301Z",
               "EditorCaption": ""
             }
           ]

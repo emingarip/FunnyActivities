@@ -28,6 +28,11 @@ namespace FunnyActivities.Infrastructure
         public DbSet<Activity> Activities { get; set; }
         public DbSet<Step> Steps { get; set; }
         public DbSet<ActivityProductVariant> ActivityProductVariants { get; set; }
+        public DbSet<Favorites> Favorites { get; set; }
+        public DbSet<Survey> Surveys { get; set; }
+        public DbSet<SurveyActivity> SurveyActivities { get; set; }
+        public DbSet<SurveyParticipant> SurveyParticipants { get; set; }
+        public DbSet<SurveyVote> SurveyVotes { get; set; }
         // public DbSet<UnitType> UnitTypes { get; set; } // Commented out - UnitType entity not found
         // public DbSet<Unit> Units { get; set; } // Commented out - Unit entity not found
 
@@ -264,6 +269,7 @@ namespace FunnyActivities.Infrastructure
                 entity.HasKey(a => a.Id);
                 entity.Property(a => a.Name).IsRequired().HasMaxLength(100);
                 entity.Property(a => a.Description).HasMaxLength(500);
+                entity.Property(a => a.IsPublic).IsRequired();
                 // Ignore domain events
                 entity.Ignore(a => a.DomainEvents);
                 // Value converters
@@ -283,10 +289,12 @@ namespace FunnyActivities.Infrastructure
                       .WithOne(apv => apv.Activity)
                       .HasForeignKey(apv => apv.ActivityId)
                       .OnDelete(DeleteBehavior.Cascade);
-                // Add indexes for performance
+                // Optimized indexes for performance
                 entity.HasIndex(a => a.Name);
                 entity.HasIndex(a => a.ActivityCategoryId);
                 entity.HasIndex(a => a.CreatedAt);
+                entity.HasIndex(a => a.IsPublic); // For public activity queries
+                entity.HasIndex(a => new { a.IsPublic, a.CreatedAt }); // Composite index for public sorted queries
             });
 
             // Configure Step entity
@@ -302,6 +310,13 @@ namespace FunnyActivities.Infrastructure
                       .WithMany(a => a.Steps)
                       .HasForeignKey(s => s.ActivityId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                // Configure MediaAttachments property with proper JSON conversion
+                var mediaAttachmentsConverter = new ValueConverter<List<string>, string>(
+                    v => JsonSerializer.Serialize(v ?? new List<string>(), new JsonSerializerOptions()),
+                    v => string.IsNullOrEmpty(v) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>());
+                entity.Property(s => s.MediaAttachments).HasConversion(mediaAttachmentsConverter);
+
                 // Add indexes for performance
                 entity.HasIndex(s => s.ActivityId);
                 entity.HasIndex(s => new { s.ActivityId, s.Order });
@@ -333,6 +348,27 @@ namespace FunnyActivities.Infrastructure
                 entity.HasIndex(apv => apv.ActivityId);
                 entity.HasIndex(apv => apv.ProductVariantId);
                 entity.HasIndex(apv => apv.UnitOfMeasureId);
+            });
+
+            // Configure Favorites entity
+            modelBuilder.Entity<Favorites>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                // Foreign key to User
+                entity.HasOne(f => f.User)
+                      .WithMany()
+                      .HasForeignKey(f => f.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                // Foreign key to Activity
+                entity.HasOne(f => f.Activity)
+                      .WithMany()
+                      .HasForeignKey(f => f.ActivityId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                // Add indexes for performance
+                entity.HasIndex(f => f.UserId);
+                entity.HasIndex(f => f.ActivityId);
+                entity.HasIndex(f => new { f.UserId, f.ActivityId }).IsUnique();
+                entity.HasIndex(f => f.CreatedAt);
             });
         }
     }

@@ -43,5 +43,10 @@ namespace FunnyActivities.Application.DTOs.ActivityManagement
         /// </summary>
         [Range(0, 59, ErrorMessage = "Seconds must be between 0 and 59.")]
         public int? DurationSeconds { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the activity is public.
+        /// </summary>
+        public bool? IsPublic { get; set; }
     }
 }

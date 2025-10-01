@@ -372,6 +372,31 @@ namespace FunnyActivities.WebAPI.Controllers
         }
 
         /// <summary>
+        /// Retrieves a single product variant by its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the product variant.</param>
+        /// <returns>The product variant.</returns>
+        [HttpGet("variants/{id}")]
+        [Authorize(Policy = "CanViewProductVariant")]
+        [ProducesResponseType(typeof(ProductVariantDto), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetProductVariant(Guid id)
+        {
+            _logger.LogInformation("Retrieving product variant with ID: {ProductVariantId}", id);
+
+            var query = new GetProductVariantQuery { Id = id };
+            var result = await _mediator.Send(query);
+
+            if (result == null)
+            {
+                _logger.LogWarning("Product variant with ID {ProductVariantId} not found", id);
+                return this.ApiError("Product variant not found", "NotFound", 404);
+            }
+
+            return this.ApiSuccess(result, "Product variant retrieved successfully");
+        }
+
+        /// <summary>
         /// Retrieves product variants for a specific base product.
         /// </summary>
         /// <param name="baseProductId">The unique identifier of the base product.</param>

@@ -23,6 +23,7 @@ namespace FunnyActivities.Infrastructure
             return await _context.Steps
                 .Where(s => s.ActivityId == activityId)
                 .OrderBy(s => s.Order)
+                .AsNoTracking() // Disable change tracking for public access
                 .ToListAsync();
         }
 

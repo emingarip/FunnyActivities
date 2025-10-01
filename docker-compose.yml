@@ -48,6 +48,7 @@ services:
       ConnectionStrings__DefaultConnection: Host=postgres;Database=funnyactivities;Username=postgres;Password=postgres123
       ConnectionStrings__Redis: redis:6379,abortConnect=false
       MinIO__Endpoint: minio:9000
+      MinIO__ExternalEndpoint: http://localhost:9000
       MinIO__AccessKey: minioadmin
       MinIO__SecretKey: minioadmin123
       MinIO__UseSSL: false
@@ -143,8 +144,12 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
+      # CORS configuration to allow HEAD requests from frontend
+      MINIO_API_REQUESTS_MAX: 1600
+      MINIO_API_REQUESTS_DEADLINE: 10s
     volumes:
       - minio_data:/data
+      - ./minio-cors-config.json:/root/.minio/cors-config.json
     command: server /data --console-address ":9001"
     networks:
       - funnyactivities_network
