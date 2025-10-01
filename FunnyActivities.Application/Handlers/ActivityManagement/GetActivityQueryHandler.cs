@@ -45,6 +45,13 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 return null;
             }
 
+            // If this is a public request, check if the activity is public
+            if (request.IsPublicRequest && !activity.IsPublic)
+            {
+                _logger.LogWarning("Activity with ID {ActivityId} is not public", request.Id);
+                return null;
+            }
+
             var activityDto = new ActivityDto
             {
                 Id = activity.Id,
@@ -53,11 +60,11 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 VideoUrl = activity.VideoUrl?.Value,
                 Duration = activity.Duration?.ToString(),
                 ActivityCategoryId = activity.ActivityCategoryId,
-                ActivityCategoryName = activity.ActivityCategory?.Name ?? "Unknown",
+                ActivityCategoryName = "Unknown", // Temporarily disable navigation property loading
                 CreatedAt = activity.CreatedAt,
                 UpdatedAt = activity.UpdatedAt,
-                StepCount = activity.Steps?.Count ?? 0,
-                ProductVariantCount = activity.ActivityProductVariants?.Count ?? 0
+                StepCount = 0, // Temporarily disable navigation property loading
+                ProductVariantCount = 0 // Temporarily disable navigation property loading
             };
 
             _logger.LogInformation("Successfully retrieved activity with ID: {ActivityId}", request.Id);

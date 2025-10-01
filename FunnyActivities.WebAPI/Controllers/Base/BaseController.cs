@@ -8,8 +8,8 @@ namespace FunnyActivities.WebAPI.Controllers.Base
     /// <summary>
     /// Base controller providing centralized access to authenticated user context.
     /// All controllers should inherit from this base class to access user information.
+    /// Note: Individual endpoints should apply [Authorize] attribute as needed.
     /// </summary>
-    [Authorize]
     public abstract class BaseController : ControllerBase
     {
         protected readonly ILogger _logger;

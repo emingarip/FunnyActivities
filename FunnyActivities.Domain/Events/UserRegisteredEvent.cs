@@ -1,9 +1,10 @@
 using System;
+using MediatR;
 using FunnyActivities.Domain.Entities;
 
 namespace FunnyActivities.Domain.Events
 {
-    public class UserRegisteredEvent : IDomainEvent
+    public class UserRegisteredEvent : IDomainEvent, INotification
     {
         public Guid UserId { get; }
         public string Email { get; }

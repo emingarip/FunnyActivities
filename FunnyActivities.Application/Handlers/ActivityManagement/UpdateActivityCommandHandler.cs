@@ -37,6 +37,8 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
         public async Task<ActivityDto> Handle(UpdateActivityCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Updating activity with ID: {ActivityId}", request.Id);
+            _logger.LogInformation("Update request data - Name: {Name}, Description: {Description}, VideoUrl: {VideoUrl}, DurationHours: {DurationHours}, DurationMinutes: {DurationMinutes}, DurationSeconds: {DurationSeconds}",
+                request.Name, request.Description, request.VideoUrl, request.DurationHours, request.DurationMinutes, request.DurationSeconds);
 
             var activity = await _activityRepository.GetByIdAsync(request.Id);
             if (activity == null)
@@ -45,11 +47,19 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 throw new KeyNotFoundException($"Activity with ID {request.Id} not found");
             }
 
+            _logger.LogInformation("Current activity data - Name: {Name}, VideoUrl: {VideoUrl}, Duration: {Duration}",
+                activity.Name, activity.VideoUrl?.Value, activity.Duration?.ToString());
+
             // Create value objects
             VideoUrl? videoUrl = null;
             if (!string.IsNullOrWhiteSpace(request.VideoUrl))
             {
                 videoUrl = VideoUrl.Create(request.VideoUrl);
+                _logger.LogInformation("Setting VideoUrl to: {VideoUrl}", request.VideoUrl);
+            }
+            else
+            {
+                _logger.LogWarning("VideoUrl is null/empty in request - this will clear the existing video!");
             }
 
             Duration? duration = null;
@@ -59,15 +69,21 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 var minutes = request.DurationMinutes ?? 0;
                 var seconds = request.DurationSeconds ?? 0;
                 duration = Duration.Create(hours, minutes, seconds);
+                _logger.LogInformation("Setting Duration to: {Duration} (from {Hours}:{Minutes}:{Seconds})",
+                    duration.ToString(), hours, minutes, seconds);
+            }
+            else
+            {
+                _logger.LogWarning("No duration values provided in request - this will clear the existing duration!");
             }
 
             // Update the activity
-            activity.UpdateDetails(request.Name, request.Description, videoUrl, duration);
+            activity.UpdateDetails(request.Name, request.Description, videoUrl, duration, request.IsPublic);
 
             // Save to repository
             await _activityRepository.UpdateAsync(activity);
 
-            _logger.LogInformation("Activity updated successfully with ID: {ActivityId}", request.Id);
+            _logger.LogInformation("Activity updated successfully with ID: {ActivityId}, IsPublic: {IsPublic}", request.Id, request.IsPublic);
 
             // Map to DTO
             var activityDto = new ActivityDto

@@ -1,4 +1,5 @@
 using System;
+using MediatR;
 using FunnyActivities.Domain.Entities;
 
 namespace FunnyActivities.Domain.Events
@@ -6,7 +7,7 @@ namespace FunnyActivities.Domain.Events
     /// <summary>
     /// Event raised when an item is added to the shopping cart.
     /// </summary>
-    public class ItemAddedToCartEvent : IDomainEvent
+    public class ItemAddedToCartEvent : IDomainEvent, INotification
     {
         /// <summary>
         /// Gets the shopping cart item that was added.

@@ -25,7 +25,7 @@ namespace FunnyActivities.Domain.ValueObjects
         /// <summary>
         /// Creates a new video URL instance.
         /// </summary>
-        /// <param name="url">The video URL string.</param>
+        /// <param name="url">The video URL string or MinIO object key.</param>
         /// <returns>A new video URL instance.</returns>
         /// <exception cref="ArgumentException">Thrown when the URL is invalid.</exception>
         public static VideoUrl Create(string url)
@@ -33,9 +33,38 @@ namespace FunnyActivities.Domain.ValueObjects
             if (string.IsNullOrWhiteSpace(url))
                 throw new ArgumentException("Video URL cannot be null or empty.", nameof(url));
 
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uriResult) ||
-                (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
-                throw new ArgumentException("Invalid video URL format.", nameof(url));
+            // Allow MinIO object keys (they don't have URL format)
+            // or valid HTTP/HTTPS URLs with more flexible validation
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uriResult))
+            {
+                // If it's not a valid URL, treat it as a MinIO object key
+                // Allow any non-empty string for object keys (MinIO handles validation)
+                // But ensure it's not just whitespace or special characters
+                if (url.Trim().Length == 0 || url.Any(c => char.IsControl(c) && c != '\t' && c != '\n' && c != '\r'))
+                {
+                    throw new ArgumentException("Video URL contains invalid characters.", nameof(url));
+                }
+            }
+            else
+            {
+                // For valid URIs, allow more schemes beyond just HTTP/HTTPS
+                // This includes data URIs, blob URIs, and other valid URI schemes
+                var allowedSchemes = new[] {
+                    Uri.UriSchemeHttp,
+                    Uri.UriSchemeHttps,
+                    "data",    // Data URIs for embedded content
+                    "blob",    // Blob URIs for local content
+                    "file",    // File URIs for local files
+                    "rtmp",    // RTMP streams
+                    "rtsp",    // RTSP streams
+                    "mms"      // MMS streams
+                };
+
+                if (!allowedSchemes.Contains(uriResult.Scheme.ToLower()))
+                {
+                    throw new ArgumentException($"Video URL scheme '{uriResult.Scheme}' is not supported. Supported schemes are: {string.Join(", ", allowedSchemes)}.", nameof(url));
+                }
+            }
 
             return new VideoUrl(url);
         }

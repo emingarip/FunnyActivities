@@ -69,6 +69,11 @@ namespace FunnyActivities.Domain.Entities
         public DateTime UpdatedAt { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether the activity is public (accessible without authentication).
+        /// </summary>
+        public bool IsPublic { get; private set; }
+
+        /// <summary>
         /// Gets the domain events.
         /// </summary>
         public List<IDomainEvent> DomainEvents { get; private set; }
@@ -82,7 +87,8 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="videoUrl">The video URL of the activity.</param>
         /// <param name="duration">The duration of the activity.</param>
         /// <param name="activityCategoryId">The activity category ID.</param>
-        public Activity(Guid id, string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId)
+        /// <param name="isPublic">Whether the activity is public.</param>
+        public Activity(Guid id, string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId, bool isPublic = false)
         {
             Id = id;
             Name = name;
@@ -90,6 +96,7 @@ namespace FunnyActivities.Domain.Entities
             VideoUrl = videoUrl;
             Duration = duration;
             ActivityCategoryId = activityCategoryId;
+            IsPublic = isPublic;
             Steps = new List<Step>();
             ActivityProductVariants = new List<ActivityProductVariant>();
             DomainEvents = new List<IDomainEvent>();
@@ -100,7 +107,11 @@ namespace FunnyActivities.Domain.Entities
         /// <summary>
         /// Private constructor for EF Core.
         /// </summary>
-        private Activity() { }
+        private Activity()
+        {
+            // Set default value for IsPublic when loading from database
+            IsPublic = false;
+        }
 
         /// <summary>
         /// Creates a new activity instance.
@@ -110,10 +121,11 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="videoUrl">The video URL of the activity.</param>
         /// <param name="duration">The duration of the activity.</param>
         /// <param name="activityCategoryId">The activity category ID.</param>
+        /// <param name="isPublic">Whether the activity is public.</param>
         /// <returns>A new activity instance.</returns>
-        public static Activity Create(string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId)
+        public static Activity Create(string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId, bool isPublic = false)
         {
-            var activity = new Activity(Guid.NewGuid(), name, description, videoUrl, duration, activityCategoryId);
+            var activity = new Activity(Guid.NewGuid(), name, description, videoUrl, duration, activityCategoryId, isPublic);
             activity.AddDomainEvent(new ActivityCreatedEvent(activity.Id, name));
             return activity;
         }
@@ -125,14 +137,29 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="description">The new description.</param>
         /// <param name="videoUrl">The new video URL.</param>
         /// <param name="duration">The new duration.</param>
-        public void UpdateDetails(string name, string? description, VideoUrl? videoUrl, Duration? duration)
+        /// <param name="isPublic">The new public status.</param>
+        public void UpdateDetails(string name, string? description, VideoUrl? videoUrl, Duration? duration, bool? isPublic = null)
         {
             Name = name;
             Description = description;
             VideoUrl = videoUrl;
             Duration = duration;
+            if (isPublic.HasValue)
+            {
+                IsPublic = isPublic.Value;
+            }
             UpdatedAt = DateTime.UtcNow;
             AddDomainEvent(new ActivityUpdatedEvent(Id, name));
+        }
+
+        /// <summary>
+        /// Updates the public status of the activity.
+        /// </summary>
+        /// <param name="isPublic">The new public status.</param>
+        public void UpdatePublicStatus(bool isPublic)
+        {
+            IsPublic = isPublic;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         /// <summary>

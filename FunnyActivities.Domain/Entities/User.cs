@@ -13,6 +13,7 @@ namespace FunnyActivities.Domain.Entities
         public UserRole Role { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
+        public DateTime? LastLoginDate { get; private set; }
         public string? ResetToken { get; private set; }
         public DateTime? ResetTokenExpiry { get; private set; }
 
@@ -62,6 +63,12 @@ namespace FunnyActivities.Domain.Entities
         public void AssignRole(UserRole newRole)
         {
             Role = newRole;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void UpdateLastLoginDate()
+        {
+            LastLoginDate = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
         }
     }

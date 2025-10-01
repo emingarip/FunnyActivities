@@ -1,0 +1,153 @@
+{
+  "info": {
+    "name": "FunnyActivities Materials API - Payload Structure Test",
+    "description": "Test collection for Materials API with different payload structures",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwtToken",
+      "value": "YOUR_JWT_TOKEN_HERE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Material - Direct Format (Deprecated)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Copper Wire 14-gauge\",\n  \"description\": \"High-conductivity copper wire for electrical applications\",\n  \"stockQuantity\": 500.0,\n  \"category\": \"Electrical\",\n  \"unit\": \"Meters\",\n  \"usageNotes\": \"UL rated, suitable for indoor wiring\",\n  \"dynamicProperties\": {\n    \"color\": \"red\",\n    \"weight\": 5.5\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/materials",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "materials"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Material - Current Format (Wrapped in Request)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"request\": {\n    \"name\": \"Copper Wire 14-gauge\",\n    \"description\": \"High-conductivity copper wire for electrical applications\",\n    \"stockQuantity\": 500.0,\n    \"category\": \"Electrical\",\n    \"unit\": \"Meters\",\n    \"usageNotes\": \"UL rated, suitable for indoor wiring\",\n    \"dynamicProperties\": {\n      \"color\": \"red\",\n      \"weight\": 5.5\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/materials",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "materials"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Material - Unit Field Validation Test",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Material\",\n  \"stockQuantity\": 100.0,\n  \"unit\": \"kg\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/materials",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "materials"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Material - Invalid Unit Test",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Material\",\n  \"stockQuantity\": 100.0,\n  \"unit\": \"123invalid\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/materials",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "materials"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Materials List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/materials?page=1&pageSize=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "materials"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })
         .AddJwtBearer(options =>
         {
@@ -47,6 +48,10 @@ public static class ServiceCollectionExtensions
                 RoleClaimType = ClaimTypes.Role,
                 NameClaimType = ClaimTypes.NameIdentifier
             };
+
+            // Don't automatically challenge anonymous requests
+            options.Challenge = "Bearer";
+            options.Authority = null;
 
             // Add event handlers for debugging
             options.Events = new JwtBearerEvents
@@ -77,6 +82,17 @@ public static class ServiceCollectionExtensions
                 OnChallenge = context =>
                 {
                     Console.WriteLine($"[JWT] Challenge triggered: {context.AuthenticateFailure?.Message ?? "No failure details"}");
+                    return Task.CompletedTask;
+                },
+                OnMessageReceived = context =>
+                {
+                    // Don't challenge anonymous requests
+                    if (string.IsNullOrEmpty(context.Request.Headers.Authorization))
+                    {
+                        Console.WriteLine($"[JWT] No authorization header found, skipping authentication");
+                        context.NoResult();
+                        return Task.CompletedTask;
+                    }
                     return Task.CompletedTask;
                 }
             };

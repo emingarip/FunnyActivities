@@ -1,8 +1,9 @@
 using System;
+using MediatR;
 
 namespace FunnyActivities.Domain.Events
 {
-    public class StepUpdatedEvent : IDomainEvent
+    public class StepUpdatedEvent : IDomainEvent, INotification
     {
         public Guid StepId { get; }
         public string Description { get; }

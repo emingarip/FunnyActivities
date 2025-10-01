@@ -13,13 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.CrossCuttingConcerns", "FunnyActivities.CrossCuttingConcerns\FunnyActivities.CrossCuttingConcerns.csproj", "{F965A1B5-FEA6-476A-80BB-D76F3F343A91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.Domain.UnitTests", "FunnyActivities.Domain.UnitTests\FunnyActivities.Domain.UnitTests.csproj", "{191660E7-055C-477D-8A0E-B7ED66FC4400}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.Domain.UnitTests", "tests\unit\dotnet\FunnyActivities.Domain.UnitTests\FunnyActivities.Domain.UnitTests.csproj", "{191660E7-055C-477D-8A0E-B7ED66FC4400}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.Application.UnitTests", "FunnyActivities.Application.UnitTests\FunnyActivities.Application.UnitTests.csproj", "{E4BE8D8A-2FEE-4E9B-A4F1-FE7F9D1B107F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.Application.UnitTests", "tests\unit\dotnet\FunnyActivities.Application.UnitTests\FunnyActivities.Application.UnitTests.csproj", "{E4BE8D8A-2FEE-4E9B-A4F1-FE7F9D1B107F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.IntegrationTests", "FunnyActivities.IntegrationTests\FunnyActivities.IntegrationTests.csproj", "{E52FA55B-4BDF-4744-B4D4-53CBD44B28B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.IntegrationTests", "tests\integration\dotnet\FunnyActivities.IntegrationTests\FunnyActivities.IntegrationTests.csproj", "{E52FA55B-4BDF-4744-B4D4-53CBD44B28B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.Api.IntegrationTests", "FunnyActivities.Api.IntegrationTests\FunnyActivities.Api.IntegrationTests.csproj", "{36A17CE6-C838-4124-81AF-468FBD181048}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunnyActivities.Api.IntegrationTests", "tests\integration\dotnet\FunnyActivities.Api.IntegrationTests\FunnyActivities.Api.IntegrationTests.csproj", "{36A17CE6-C838-4124-81AF-468FBD181048}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

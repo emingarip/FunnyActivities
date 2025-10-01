@@ -73,7 +73,10 @@ namespace FunnyActivities.WebAPI.Middleware
                             Serilog.Log.Debug("[AUDIT-MW] Created service scope, CorrelationId: {CorrelationId}", correlationId);
 
                             var auditRepo = scope.ServiceProvider.GetRequiredService<IAuditLogRepository>();
-                            var details = $"{method} {path}";
+
+                            // Enhanced details for survey operations
+                            var details = await GetEnhancedAuditDetails(context, method, path, action, userId, correlationId);
+
                             var auditLog = new AuditLog(userId, action, ipAddress, userAgent, details);
 
                             Serilog.Log.Debug("[AUDIT-MW] About to call auditRepo.AddAsync, CorrelationId: {CorrelationId}", correlationId);
@@ -127,13 +130,128 @@ namespace FunnyActivities.WebAPI.Middleware
 
         private string GetActionFromRequest(string path, string method)
         {
+            // Authentication actions
             if (path.Contains("/api/auth/register") && method == "POST") return "UserRegistered";
             if (path.Contains("/api/auth/login") && method == "POST") return "UserLogin";
             if (path.Contains("/users/profile") && method == "PUT") return "ProfileUpdated";
             if (path.Contains("/users/request-password-reset") && method == "POST") return "PasswordResetRequested";
             if (path.Contains("/users/reset-password") && method == "POST") return "PasswordReset";
+
+            // Survey-specific actions
+            if (path.Contains("/api/surveys") || path.Contains("/api/public-surveys"))
+            {
+                return GetSurveyActionFromRequest(path, method);
+            }
+
             // Add more as needed
             return null;
+        }
+
+        private string GetSurveyActionFromRequest(string path, string method)
+        {
+            // Public survey actions
+            if (path.Contains("/api/public-surveys"))
+            {
+                if (method == "GET")
+                {
+                    if (path.Contains("/activities")) return "PublicSurveyActivitiesViewed";
+                    return "PublicSurveyViewed";
+                }
+                else if (method == "POST")
+                {
+                    return "PublicSurveyVoted";
+                }
+            }
+
+            // Admin survey actions
+            if (path.Contains("/api/surveys"))
+            {
+                if (method == "GET")
+                {
+                    if (path.Contains("/statistics")) return "SurveyStatisticsViewed";
+                    if (path.Contains("/results")) return "SurveyResultsViewed";
+                    if (path.Contains("/activities")) return "SurveyActivitiesViewed";
+                    return "SurveyViewed";
+                }
+                else if (method == "POST")
+                {
+                    return "SurveyCreated";
+                }
+                else if (method == "PUT")
+                {
+                    return "SurveyUpdated";
+                }
+                else if (method == "DELETE")
+                {
+                    return "SurveyDeleted";
+                }
+            }
+
+            return "SurveyAction";
+        }
+
+        private async Task<string> GetEnhancedAuditDetails(HttpContext context, string method, string path, string action, Guid? userId, string correlationId)
+        {
+            var baseDetails = $"{method} {path}";
+
+            // Add survey-specific details
+            if (action.Contains("Survey") || action.Contains("Vote"))
+            {
+                var enhancedDetails = new List<string> { baseDetails };
+
+                // Add user role information if authenticated
+                if (context.User.Identity.IsAuthenticated && userId.HasValue)
+                {
+                    var roleClaim = context.User.FindFirst(System.Security.Claims.ClaimTypes.Role);
+                    if (roleClaim != null)
+                    {
+                        enhancedDetails.Add($"UserRole: {roleClaim.Value}");
+                    }
+                }
+
+                // Add survey-specific metadata
+                if (path.Contains("/api/public-surveys"))
+                {
+                    enhancedDetails.Add("AccessType: Public");
+                    if (method == "POST")
+                    {
+                        enhancedDetails.Add("OperationType: VoteSubmission");
+                    }
+                }
+                else if (path.Contains("/api/surveys"))
+                {
+                    enhancedDetails.Add("AccessType: Admin/Management");
+
+                    if (path.Contains("/statistics"))
+                    {
+                        enhancedDetails.Add("DataType: SurveyStatistics");
+                    }
+                    else if (path.Contains("/results"))
+                    {
+                        enhancedDetails.Add("DataType: SurveyResults");
+                    }
+                    else if (path.Contains("/activities"))
+                    {
+                        enhancedDetails.Add("DataType: SurveyActivities");
+                    }
+                }
+
+                // Add query parameters for GET requests
+                if (method == "GET" && context.Request.Query.Any())
+                {
+                    var queryParams = context.Request.Query
+                        .Select(q => $"{q.Key}: {q.Value}")
+                        .ToList();
+                    if (queryParams.Any())
+                    {
+                        enhancedDetails.Add($"QueryParams: {string.Join(", ", queryParams)}");
+                    }
+                }
+
+                return string.Join(" | ", enhancedDetails);
+            }
+
+            return baseDetails;
         }
     }
 }

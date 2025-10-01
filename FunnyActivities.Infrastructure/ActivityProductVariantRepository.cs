@@ -24,12 +24,9 @@ namespace FunnyActivities.Infrastructure
         public async Task<List<ActivityProductVariant>> GetByActivityIdAsync(Guid activityId)
         {
             return await _context.ActivityProductVariants
-                .Include(apv => apv.ProductVariant)
-                    .ThenInclude(pv => pv.BaseProduct)
-                .Include(apv => apv.UnitOfMeasure)
                 .Where(apv => apv.ActivityId == activityId)
-                .OrderBy(apv => apv.ProductVariant.BaseProduct.Name)
-                .ThenBy(apv => apv.ProductVariant.Name)
+                .OrderBy(apv => apv.CreatedAt) // Simple ordering for public access
+                .AsNoTracking() // Disable change tracking for public access
                 .ToListAsync();
         }
 

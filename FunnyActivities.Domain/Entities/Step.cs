@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using FunnyActivities.Domain.Events;
 
@@ -37,6 +38,26 @@ namespace FunnyActivities.Domain.Entities
         public string Description { get; private set; }
 
         /// <summary>
+        /// Gets the timestamp in seconds for the step.
+        /// </summary>
+        public int? TimestampSeconds { get; private set; }
+
+        /// <summary>
+        /// Gets the duration in seconds for the step.
+        /// </summary>
+        public int? DurationSeconds { get; private set; }
+
+        /// <summary>
+        /// Gets the pause time in seconds for the step.
+        /// </summary>
+        public int? PauseTimeSeconds { get; private set; }
+
+        /// <summary>
+        /// Gets the media attachments for the step.
+        /// </summary>
+        public List<string> MediaAttachments { get; private set; } = new List<string>();
+
+        /// <summary>
         /// Gets the date and time when the step was created.
         /// </summary>
         public DateTime CreatedAt { get; private set; }
@@ -58,12 +79,20 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="activityId">The activity ID.</param>
         /// <param name="order">The order of the step.</param>
         /// <param name="description">The description of the step.</param>
-        public Step(Guid id, Guid activityId, int order, string description)
+        /// <param name="timestampSeconds">The timestamp in seconds.</param>
+        /// <param name="durationSeconds">The duration in seconds.</param>
+        /// <param name="pauseTimeSeconds">The pause time in seconds.</param>
+        /// <param name="mediaAttachments">The media attachments.</param>
+        public Step(Guid id, Guid activityId, int order, string description, int? timestampSeconds = null, int? durationSeconds = null, int? pauseTimeSeconds = null, List<string>? mediaAttachments = null)
         {
             Id = id;
             ActivityId = activityId;
             Order = order;
             Description = description;
+            TimestampSeconds = timestampSeconds ?? 0;
+            DurationSeconds = durationSeconds ?? 0;
+            PauseTimeSeconds = pauseTimeSeconds ?? 0;
+            MediaAttachments = mediaAttachments ?? new List<string>();
             DomainEvents = new List<IDomainEvent>();
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
@@ -80,10 +109,14 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="activityId">The activity ID.</param>
         /// <param name="order">The order of the step.</param>
         /// <param name="description">The description of the step.</param>
+        /// <param name="timestampSeconds">The timestamp in seconds.</param>
+        /// <param name="durationSeconds">The duration in seconds.</param>
+        /// <param name="pauseTimeSeconds">The pause time in seconds.</param>
+        /// <param name="mediaAttachments">The media attachments.</param>
         /// <returns>A new step instance.</returns>
-        public static Step Create(Guid activityId, int order, string description)
+        public static Step Create(Guid activityId, int order, string description, int? timestampSeconds = null, int? durationSeconds = null, int? pauseTimeSeconds = null, List<string>? mediaAttachments = null)
         {
-            var step = new Step(Guid.NewGuid(), activityId, order, description);
+            var step = new Step(Guid.NewGuid(), activityId, order, description, timestampSeconds, durationSeconds, pauseTimeSeconds, mediaAttachments);
             step.AddDomainEvent(new StepCreatedEvent(step.Id, description));
             return step;
         }
@@ -93,10 +126,18 @@ namespace FunnyActivities.Domain.Entities
         /// </summary>
         /// <param name="order">The new order.</param>
         /// <param name="description">The new description.</param>
-        public void UpdateDetails(int order, string description)
+        /// <param name="timestampSeconds">The new timestamp in seconds.</param>
+        /// <param name="durationSeconds">The new duration in seconds.</param>
+        /// <param name="pauseTimeSeconds">The new pause time in seconds.</param>
+        /// <param name="mediaAttachments">The new media attachments.</param>
+        public void UpdateDetails(int order, string description, int? timestampSeconds = null, int? durationSeconds = null, int? pauseTimeSeconds = null, List<string>? mediaAttachments = null)
         {
             Order = order;
             Description = description;
+            TimestampSeconds = timestampSeconds ?? TimestampSeconds;
+            DurationSeconds = durationSeconds ?? DurationSeconds;
+            PauseTimeSeconds = pauseTimeSeconds ?? PauseTimeSeconds;
+            MediaAttachments = mediaAttachments ?? MediaAttachments;
             UpdatedAt = DateTime.UtcNow;
             AddDomainEvent(new StepUpdatedEvent(Id, description));
         }

@@ -1,4 +1,5 @@
 using System;
+using MediatR;
 using FunnyActivities.Domain.Entities;
 
 namespace FunnyActivities.Domain.Events
@@ -6,7 +7,7 @@ namespace FunnyActivities.Domain.Events
     /// <summary>
     /// Event raised when a product variant is deleted.
     /// </summary>
-    public class ProductVariantDeletedEvent : IDomainEvent
+    public class ProductVariantDeletedEvent : IDomainEvent, INotification
     {
         /// <summary>
         /// Gets the product variant that was deleted.
