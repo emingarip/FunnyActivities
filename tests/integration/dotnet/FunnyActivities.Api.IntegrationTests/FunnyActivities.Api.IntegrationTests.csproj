@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FunnyActivities.WebAPI\FunnyActivities.WebAPI.csproj" />
+    <ProjectReference Include="..\..\..\..\FunnyActivities.WebAPI\FunnyActivities.WebAPI.csproj" />
   </ItemGroup>
 
 </Project>
