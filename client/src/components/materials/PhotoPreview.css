@@ -1,0 +1,109 @@
+/* PhotoPreview Component Styles */
+.photo-preview-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-preview {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.photo-preview:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transform: scale(1.05);
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-preview .photo-icon {
+  color: #9e9e9e;
+}
+
+.photo-preview .photo-count {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background-color: rgba(0,0,0,0.7);
+  color: white;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  min-width: 18px;
+  text-align: center;
+}
+
+.photo-preview .loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ddd;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-container,
+.error-container,
+.placeholder-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Size variants */
+.photo-preview-small {
+  width: 40px;
+  height: 40px;
+}
+
+.photo-preview-medium {
+  width: 60px;
+  height: 60px;
+}
+
+.photo-preview-large {
+  width: 80px;
+  height: 80px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .photo-preview-small {
+    width: 32px;
+    height: 32px;
+  }
+
+  .photo-preview-medium {
+    width: 48px;
+    height: 48px;
+  }
+
+  .photo-preview-large {
+    width: 64px;
+    height: 64px;
+  }
+
+  .photo-preview .photo-count {
+    font-size: 0.7rem;
+    padding: 1px 4px;
+  }
+}

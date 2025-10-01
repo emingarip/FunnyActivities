@@ -1,0 +1,875 @@
+/* ProductWizard.css */
+
+/* Accessibility Styles */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.product-wizard-dialog .MuiDialog-paper {
+  maxWidth: 1200px;
+  width: 95vw;
+  maxHeight: 90vh;
+  display: flex;
+  flexDirection: column;
+}
+
+.product-wizard-header {
+  padding: 24px;
+  borderBottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+/* WCAG Color Contrast Compliance */
+.product-wizard-header .MuiTypography-h5 {
+  color: #ffffff; /* White text for high contrast */
+}
+
+.product-wizard-header .MuiTypography-body2 {
+  color: #f5f5f5; /* Light gray for secondary text */
+}
+
+.product-wizard-content .MuiTypography-body2 {
+  color: #424242; /* Dark gray for body text */
+}
+
+.product-wizard-actions {
+  background: #f8f9fa;
+  borderTop: 1px solid #e0e0e0;
+}
+
+/* Ensure sufficient contrast for form elements */
+.product-wizard-content .MuiTextField-root .MuiInputBase-root {
+  background-color: #ffffff;
+}
+
+.product-wizard-content .MuiTextField-root .MuiInputLabel-root {
+  color: #424242;
+}
+
+.product-wizard-content .MuiTextField-root .MuiInputBase-input {
+  color: #212121;
+}
+
+/* Mobile-specific accessibility enhancements */
+@media (max-width: 599px) {
+  /* Ensure minimum touch target sizes */
+  .product-wizard-content .MuiButton-root {
+    min-height: 48px !important;
+    min-width: 48px !important;
+  }
+
+  .product-wizard-content .MuiIconButton-root {
+    min-height: 48px !important;
+    min-width: 48px !important;
+  }
+
+  /* Improve focus indicators for mobile */
+  .product-wizard-content .MuiButton-root:focus-visible,
+  .product-wizard-content .MuiIconButton-root:focus-visible,
+  .product-wizard-content .MuiTextField-root .MuiInputBase-root:focus-visible {
+    outline: 3px solid #1976d2;
+    outline-offset: 2px;
+  }
+
+  /* Better spacing for mobile touch targets */
+  .product-wizard-actions .MuiButton-root {
+    margin: 4px;
+  }
+
+  /* Ensure readable text on mobile */
+  .product-wizard-content .MuiTypography-body1,
+  .product-wizard-content .MuiTypography-body2 {
+    line-height: 1.5;
+  }
+}
+
+/* Button contrast improvements */
+.product-wizard-actions .MuiButton-contained {
+  background-color: #1976d2;
+  color: #ffffff;
+}
+
+.product-wizard-actions .MuiButton-contained:hover {
+  background-color: #1565c0;
+}
+
+.product-wizard-actions .MuiButton-text {
+  color: #1976d2;
+}
+
+.product-wizard-actions .MuiButton-text:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+.product-wizard-header .MuiTypography-h5 {
+  marginBottom: 8px;
+  fontWeight: 600;
+}
+
+.product-wizard-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.product-wizard-actions {
+  padding: 16px 24px;
+  borderTop: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  display: flex;
+  justifyContent: space-between;
+  alignItems: center;
+}
+
+/* Stepper styles */
+.product-wizard-content .MuiStepper-root {
+  marginBottom: 32px;
+}
+
+.product-wizard-content .MuiStep-root {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-wizard-content .MuiStepIcon-root {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.product-wizard-content .MuiStepIcon-root.Mui-active {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+}
+
+.product-wizard-content .MuiStepIcon-root.Mui-completed {
+  transform: scale(1.05);
+}
+
+.product-wizard-content .MuiStepLabel-label {
+  fontSize: 0.875rem;
+  fontWeight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-wizard-content .MuiStepLabel-label.Mui-active {
+  color: #1976d2;
+  fontWeight: 600;
+  transform: translateY(-2px);
+}
+
+.product-wizard-content .MuiStepLabel-label.Mui-completed {
+  color: #2e7d32;
+}
+
+.product-wizard-content .MuiStepConnector-root {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-wizard-content .MuiStepConnector-line {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Form sections */
+.product-wizard-content .MuiPaper-root {
+  marginBottom: 24px;
+}
+
+.product-wizard-content .MuiTextField-root {
+  marginBottom: 16px;
+}
+
+/* Variant cards */
+.variant-card {
+  marginBottom: 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+.variant-card:hover {
+  boxShadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.variant-card.error {
+  borderColor: #d32f2f;
+  backgroundColor: #ffebee;
+}
+
+/* Photo upload area */
+.photo-upload-area {
+  border: 2px dashed #bdbdbd;
+  borderRadius: 8px;
+  padding: 24px;
+  textAlign: center;
+  backgroundColor: #fafafa;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.photo-upload-area:hover {
+  borderColor: #1976d2;
+  backgroundColor: #f3f9ff;
+}
+
+.photo-upload-area.drag-active {
+  borderColor: #1976d2;
+  backgroundColor: #e3f2fd;
+}
+
+/* Summary cards */
+.summary-card {
+  display: flex;
+  alignItems: center;
+  padding: 16px;
+  borderRadius: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border: 1px solid #e0e0e0;
+}
+
+.summary-card .MuiTypography-h6 {
+  marginLeft: 12px;
+  fontWeight: 600;
+  color: #1976d2;
+}
+
+.summary-card .MuiTypography-body2 {
+  marginLeft: 12px;
+  color: #666;
+}
+
+/* Review section */
+.review-section {
+  marginBottom: 24px;
+}
+
+.review-section .MuiTypography-h6 {
+  display: flex;
+  alignItems: center;
+  marginBottom: 16px;
+  color: #1976d2;
+}
+
+.review-section .MuiDivider-root {
+  marginBottom: 16px;
+}
+
+/* Property chips */
+.property-chip {
+  margin: 4px;
+  backgroundColor: #e3f2fd;
+  color: #1976d2;
+}
+
+/* Loading states */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  alignItems: center;
+  justifyContent: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  borderTop: 4px solid #1976d2;
+  borderRadius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error states */
+.error-field {
+  borderColor: #d32f2f !important;
+}
+
+.error-message {
+  color: #d32f2f;
+  fontSize: 0.75rem;
+  marginTop: 4px;
+}
+
+/* Success states */
+.success-message {
+  color: #2e7d32;
+  fontSize: 0.875rem;
+  marginTop: 8px;
+}
+
+/* Responsive design - Mobile First Approach */
+
+/* Extra Small (xs) - Mobile: < 600px */
+@media (max-width: 599px) {
+  .product-wizard-dialog .MuiDialog-paper {
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    max-height: 100vh;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-wizard-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .product-wizard-header .MuiTypography-h6 {
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .product-wizard-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scroll-behavior: smooth;
+    max-height: calc(100vh - 140px); /* Account for header and actions */
+  }
+
+  /* Custom scrollbar for webkit browsers */
+  .product-wizard-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .product-wizard-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .product-wizard-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+
+  .product-wizard-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+
+  /* Ensure content doesn't overflow horizontally */
+  .product-wizard-content * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .product-wizard-actions {
+    padding: 12px 16px;
+    border-top: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product-wizard-actions .MuiButton-root {
+    width: 100%;
+    min-height: 52px; /* Increased for better touch targets */
+    font-size: 1rem;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-wizard-actions .MuiButton-root::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .product-wizard-actions .MuiButton-root:hover::before {
+    left: 100%;
+  }
+
+  .product-wizard-actions .MuiButton-root:active {
+    transform: scale(0.98);
+  }
+
+  /* Primary action button styling */
+  .product-wizard-actions .MuiButton-root.MuiButton-contained {
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    border: none;
+  }
+
+  .product-wizard-actions .MuiButton-root.MuiButton-contained:hover {
+    background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+    box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+    transform: translateY(-2px);
+  }
+
+  /* Secondary action button styling */
+  .product-wizard-actions .MuiButton-root.MuiButton-containedSecondary {
+    background: linear-gradient(135deg, #757575 0%, #616161 100%);
+    box-shadow: 0 4px 12px rgba(117, 117, 117, 0.3);
+  }
+
+  .product-wizard-actions .MuiButton-root.MuiButton-containedSecondary:hover {
+    background: linear-gradient(135deg, #616161 0%, #424242 100%);
+    box-shadow: 0 6px 16px rgba(117, 117, 117, 0.4);
+    transform: translateY(-2px);
+  }
+
+  /* Cancel button styling */
+  .product-wizard-actions .MuiButton-root.MuiButton-text {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e0e0e0;
+    color: #666;
+  }
+
+  .product-wizard-actions .MuiButton-root.MuiButton-text:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: #bdbdbd;
+    color: #424242;
+    transform: translateY(-1px);
+  }
+
+  /* Stepper vertical layout adjustments */
+  .product-wizard-content .MuiStepper-root {
+    margin-bottom: 16px;
+  }
+
+  .product-wizard-content .MuiStepConnector-line {
+    display: none;
+  }
+
+  /* Enhanced mobile stepper transitions */
+  .product-wizard-content .MuiStep-root {
+    margin-bottom: 12px;
+    padding: 8px 0;
+    border-radius: 8px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .product-wizard-content .MuiStep-root:hover {
+    background-color: rgba(25, 118, 210, 0.04);
+    transform: translateX(4px);
+  }
+
+  .product-wizard-content .MuiStep-root.Mui-active {
+    background-color: rgba(25, 118, 210, 0.08);
+    transform: translateX(8px);
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+  }
+
+  .product-wizard-content .MuiStepIcon-root {
+    width: 40px !important;
+    height: 40px !important;
+    margin-right: 12px;
+  }
+
+  .product-wizard-content .MuiStepIcon-root.Mui-active {
+    width: 44px !important;
+    height: 44px !important;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+  }
+
+  .product-wizard-content .MuiStepLabel-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-top: 2px;
+  }
+
+  .product-wizard-content .MuiStepLabel-label.Mui-active {
+    font-weight: 600;
+    color: #1976d2;
+    transform: translateY(-1px);
+  }
+
+  /* Form sections */
+  .product-wizard-content .MuiPaper-root {
+    margin-bottom: 16px;
+  }
+
+  .product-wizard-content .MuiTextField-root {
+    margin-bottom: 12px;
+  }
+
+  /* Touch-friendly form elements */
+  .product-wizard-content .MuiTextField-root .MuiInputBase-root {
+    min-height: 48px;
+  }
+
+  .product-wizard-content .MuiTextField-root .MuiInputBase-input {
+    font-size: 1rem;
+    padding: 14px 16px;
+  }
+
+  .product-wizard-content .MuiSelect-root {
+    min-height: 48px;
+  }
+
+  .product-wizard-content .MuiMenuItem-root {
+    min-height: 48px;
+    font-size: 1rem;
+    padding: 12px 16px;
+  }
+
+  .product-wizard-content .MuiIconButton-root {
+    min-width: 48px;
+    min-height: 48px;
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Variant cards */
+  .variant-card {
+    margin-bottom: 12px;
+  }
+
+  /* Photo upload area */
+  .photo-upload-area {
+    padding: 16px;
+    font-size: 0.875rem;
+  }
+
+  /* Summary cards */
+  .summary-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 12px;
+  }
+
+  .summary-card .MuiTypography-h6 {
+    margin-left: 0;
+    margin-top: 4px;
+    font-size: 1rem;
+  }
+
+  .summary-card .MuiTypography-body2 {
+    margin-left: 0;
+    font-size: 0.875rem;
+  }
+}
+
+/* Small (sm) - Tablet: 600px - 959px */
+@media (min-width: 600px) and (max-width: 959px) {
+  .product-wizard-dialog .MuiDialog-paper {
+    width: 95vw;
+    max-width: 900px;
+    max-height: 90vh;
+    margin: 16px;
+    border-radius: 8px;
+  }
+
+  .product-wizard-header {
+    padding: 20px 24px;
+  }
+
+  .product-wizard-header .MuiTypography-h5 {
+    margin-bottom: 6px;
+    font-size: 1.25rem;
+  }
+
+  .product-wizard-content {
+    padding: 20px 24px;
+  }
+
+  .product-wizard-actions {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .product-wizard-actions .MuiButton-root {
+    width: auto;
+    min-width: 100px;
+    font-size: 0.875rem;
+  }
+
+  /* Stepper horizontal layout */
+  .product-wizard-content .MuiStepper-root {
+    margin-bottom: 24px;
+  }
+
+  .product-wizard-content .MuiStepLabel-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  /* Form sections */
+  .product-wizard-content .MuiPaper-root {
+    margin-bottom: 20px;
+  }
+
+  .product-wizard-content .MuiTextField-root {
+    margin-bottom: 14px;
+  }
+
+  /* Variant cards */
+  .variant-card {
+    margin-bottom: 14px;
+  }
+
+  /* Photo upload area */
+  .photo-upload-area {
+    padding: 20px;
+    font-size: 0.875rem;
+  }
+
+  /* Summary cards */
+  .summary-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 14px;
+  }
+
+  .summary-card .MuiTypography-h6 {
+    margin-left: 8px;
+    margin-top: 0;
+    font-size: 1.1rem;
+  }
+
+  .summary-card .MuiTypography-body2 {
+    margin-left: 8px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Medium (md) - Desktop: 960px - 1279px */
+@media (min-width: 960px) and (max-width: 1279px) {
+  .product-wizard-dialog .MuiDialog-paper {
+    width: 90vw;
+    max-width: 1100px;
+    max-height: 85vh;
+    margin: 24px;
+    border-radius: 12px;
+  }
+
+  .product-wizard-header {
+    padding: 24px;
+  }
+
+  .product-wizard-header .MuiTypography-h5 {
+    margin-bottom: 8px;
+    font-size: 1.4rem;
+  }
+
+  .product-wizard-content {
+    padding: 24px;
+  }
+
+  .product-wizard-actions {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .product-wizard-actions .MuiButton-root {
+    width: auto;
+    min-width: 120px;
+    font-size: 0.9rem;
+  }
+
+  /* Stepper horizontal layout */
+  .product-wizard-content .MuiStepper-root {
+    margin-bottom: 32px;
+  }
+
+  .product-wizard-content .MuiStepLabel-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* Form sections */
+  .product-wizard-content .MuiPaper-root {
+    margin-bottom: 24px;
+  }
+
+  .product-wizard-content .MuiTextField-root {
+    margin-bottom: 16px;
+  }
+
+  /* Variant cards */
+  .variant-card {
+    margin-bottom: 16px;
+  }
+
+  /* Photo upload area */
+  .photo-upload-area {
+    padding: 24px;
+    font-size: 0.9rem;
+  }
+
+  /* Summary cards */
+  .summary-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 16px;
+  }
+
+  .summary-card .MuiTypography-h6 {
+    margin-left: 12px;
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+
+  .summary-card .MuiTypography-body2 {
+    margin-left: 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Large (lg) - Large Desktop: >= 1280px */
+@media (min-width: 1280px) {
+  .product-wizard-dialog .MuiDialog-paper {
+    width: 85vw;
+    max-width: 1200px;
+    max-height: 80vh;
+    margin: 32px;
+    border-radius: 16px;
+  }
+
+  .product-wizard-header {
+    padding: 28px 32px;
+  }
+
+  .product-wizard-header .MuiTypography-h5 {
+    margin-bottom: 8px;
+    font-size: 1.5rem;
+  }
+
+  .product-wizard-content {
+    padding: 28px 32px;
+  }
+
+  .product-wizard-actions {
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .product-wizard-actions .MuiButton-root {
+    width: auto;
+    min-width: 130px;
+    font-size: 0.95rem;
+  }
+
+  /* Stepper horizontal layout */
+  .product-wizard-content .MuiStepper-root {
+    margin-bottom: 36px;
+  }
+
+  .product-wizard-content .MuiStepLabel-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  /* Form sections */
+  .product-wizard-content .MuiPaper-root {
+    margin-bottom: 28px;
+  }
+
+  .product-wizard-content .MuiTextField-root {
+    margin-bottom: 18px;
+  }
+
+  /* Variant cards */
+  .variant-card {
+    margin-bottom: 18px;
+  }
+
+  /* Photo upload area */
+  .photo-upload-area {
+    padding: 28px;
+    font-size: 0.95rem;
+  }
+
+  /* Summary cards */
+  .summary-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 18px;
+  }
+
+  .summary-card .MuiTypography-h6 {
+    margin-left: 14px;
+    margin-top: 0;
+    font-size: 1.25rem;
+  }
+
+  .summary-card .MuiTypography-body2 {
+    margin-left: 14px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .product-wizard-header {
+    background: linear-gradient(135deg, #333 0%, #555 100%);
+  }
+
+  .product-wizard-actions {
+    background: #333;
+    borderTopColor: #555;
+  }
+
+  .photo-upload-area {
+    backgroundColor: #333;
+    borderColor: #555;
+  }
+
+  .photo-upload-area:hover {
+    backgroundColor: #444;
+  }
+
+  .summary-card {
+    background: linear-gradient(135deg, #333 0%, #555 100%);
+    borderColor: #555;
+  }
+}

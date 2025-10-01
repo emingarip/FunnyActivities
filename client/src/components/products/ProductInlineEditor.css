@@ -1,0 +1,154 @@
+/* Product Inline Editor Styles */
+.product-inline-editor {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 8px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.editor-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  align-items: end;
+}
+
+.editor-row:last-child {
+  margin-bottom: 0;
+}
+
+.editor-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.editor-field.full-width {
+  flex: 1 1 100%;
+}
+
+.editor-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.editor-field input,
+.editor-field select,
+.editor-field textarea {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.editor-field input:focus,
+.editor-field select:focus,
+.editor-field textarea:focus {
+  outline: 0;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.editor-field input.error,
+.editor-field select.error,
+.editor-field textarea.error {
+  border-color: #dc3545;
+}
+
+.editor-field input:disabled,
+.editor-field select:disabled,
+.editor-field textarea:disabled {
+  background-color: #e9ecef;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.editor-field textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #dee2e6;
+}
+
+.editor-actions .btn {
+  min-width: 80px;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .editor-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .editor-field {
+    width: 100%;
+  }
+
+  .editor-actions {
+    flex-direction: column;
+  }
+
+  .editor-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .product-inline-editor {
+    background: #343a40;
+    border-color: #495057;
+  }
+
+  .editor-field label {
+    color: #adb5bd;
+  }
+
+  .editor-field input,
+  .editor-field select,
+  .editor-field textarea {
+    background-color: #495057;
+    border-color: #6c757d;
+    color: #fff;
+  }
+
+  .editor-field input:focus,
+  .editor-field select:focus,
+  .editor-field textarea:focus {
+    border-color: #80bdff;
+  }
+
+  .editor-field input:disabled,
+  .editor-field select:disabled,
+  .editor-field textarea:disabled {
+    background-color: #6c757d;
+  }
+
+  .editor-actions {
+    border-top-color: #495057;
+  }
+}

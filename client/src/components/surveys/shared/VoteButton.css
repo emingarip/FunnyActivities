@@ -1,0 +1,203 @@
+/* Vote Button Component */
+.vote-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.vote-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.vote-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.vote-button:disabled,
+.vote-button--loading {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Variants */
+.vote-button--primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.vote-button--primary:hover:not(:disabled):not(.vote-button--loading) {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.vote-button--primary:active:not(:disabled):not(.vote-button--loading) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.vote-button--secondary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.vote-button--secondary:hover:not(:disabled):not(.vote-button--loading) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.vote-button--secondary:active:not(:disabled):not(.vote-button--loading) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.vote-button--outline {
+  background: rgba(255, 255, 255, 0.95);
+  color: #374151;
+  border: 2px solid #d1d5db;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.vote-button--outline:hover:not(:disabled):not(.vote-button--loading) {
+  background: rgba(255, 255, 255, 1);
+  border-color: #9ca3af;
+  color: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.vote-button--outline:active:not(:disabled):not(.vote-button--loading) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Sizes */
+.vote-button--small {
+  padding: 8px 16px;
+  font-size: 14px;
+  min-height: 36px;
+}
+
+.vote-button--medium {
+  padding: 12px 24px;
+  font-size: 16px;
+  min-height: 44px;
+}
+
+.vote-button--large {
+  padding: 16px 32px;
+  font-size: 18px;
+  min-height: 52px;
+}
+
+/* Loading state */
+.vote-button--loading .vote-button__content {
+  opacity: 0.7;
+}
+
+.vote-button__spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Content */
+.vote-button__content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s ease;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .vote-button--outline {
+    background: rgba(17, 24, 39, 0.95);
+    color: #f3f4f6;
+    border-color: #374151;
+  }
+
+  .vote-button--outline:hover:not(:disabled):not(.vote-button--loading) {
+    background: rgba(17, 24, 39, 1);
+    border-color: #4b5563;
+    color: #ffffff;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .vote-button--small {
+    padding: 6px 12px;
+    font-size: 13px;
+    min-height: 32px;
+  }
+
+  .vote-button--medium {
+    padding: 10px 20px;
+    font-size: 15px;
+    min-height: 40px;
+  }
+
+  .vote-button--large {
+    padding: 14px 28px;
+    font-size: 16px;
+    min-height: 48px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .vote-button,
+  .vote-button__content,
+  .vote-button__spinner {
+    transition: none;
+    animation: none;
+  }
+
+  .vote-button:hover:not(:disabled):not(.vote-button--loading) {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .vote-button--primary,
+  .vote-button--secondary {
+    border: 2px solid currentColor;
+  }
+
+  .vote-button--outline {
+    border-width: 3px;
+  }
+}
