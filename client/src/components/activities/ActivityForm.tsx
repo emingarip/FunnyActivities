@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   Box,
@@ -7,27 +7,21 @@ import {
   Button,
   Typography,
   Paper,
-  Grid,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  IconButton,
-  Card,
-  CardContent,
-  Divider,
   Alert,
   CircularProgress,
+  Tabs,
+  Tab,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
   Upload as UploadIcon,
-  PlayArrow as PlayIcon,
 } from '@mui/icons-material';
-import { activitiesAPI, activityCategoriesAPI, productsAPI, stepsAPI, activityProductVariantsAPI } from '../../services/api';
+import { activitiesAPI, stepsAPI, activityProductVariantsAPI } from '../../services/api';
 import EnhancedStepManager from './EnhancedStepManager';
 import { EnhancedStepDto } from '../../services/api.types';
 import { VideoUtils } from '../../services/videoUtils';
@@ -36,12 +30,10 @@ import {
   updateStep,
   deleteStep,
   fetchActivitySteps,
-  fetchActivityMaterials,
   setSteps,
   setMaterials,
   clearError,
   selectStepsForActivity,
-  selectActivityMaterials,
   selectActivityLoading,
   selectActivityErrors
 } from '../../store/slices/activitySlice';
@@ -95,6 +87,28 @@ interface ActivityFormData {
   materials: ActivityMaterial[];
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`activity-form-tabpanel-${index}`}
+      aria-labelledby={`activity-form-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
 interface ActivityFormProps {
   activity?: any; // The activity being edited, if any
   categories: ActivityCategory[];
@@ -115,11 +129,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stepOperationLoading, setStepOperationLoading] = useState(false);
-  const [productVariants, setProductVariants] = useState<ProductVariant[]>([]);
-  const [unitsOfMeasure, setUnitsOfMeasure] = useState<UnitOfMeasure[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | undefined>();
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | undefined>();
+  const [activeTab, setActiveTab] = useState(0);
 
   // Get steps, error, and loading state from Redux using selectors
   const reduxSteps = useAppSelector((state) => {
@@ -168,20 +181,6 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   const loadFormData = useCallback(async () => {
     try {
       setLoading(true);
-
-      // Load product variants and units of measure
-      const [variantsResponse, unitsResponse] = await Promise.all([
-        productsAPI.getProductVariants(undefined, { pageSize: 100 }),
-        productsAPI.getUnitsOfMeasure(),
-      ]);
-
-      if (variantsResponse.data.success) {
-        setProductVariants(variantsResponse.data.data?.items || []);
-      }
-
-      if (unitsResponse.data.success) {
-        setUnitsOfMeasure(unitsResponse.data.data || []);
-      }
 
       // If editing an activity, load its data
       if (activity) {
@@ -375,6 +374,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
    }, [activity?.id, dispatch]);
 
 
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
   const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -552,12 +555,21 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
         </Alert>
       )}
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        {/* Basic Information */}
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Basic Information
-          </Typography>
+      <Paper sx={{ width: '100%' }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            aria-label="activity form tabs"
+            variant={isMobile ? 'fullWidth' : 'standard'}
+          >
+            <Tab label="Basic Information" id="activity-form-tab-0" aria-controls="activity-form-tabpanel-0" />
+            <Tab label="Video & Steps" id="activity-form-tab-1" aria-controls="activity-form-tabpanel-1" />
+          </Tabs>
+        </Box>
+
+        {/* Tab 1: Basic Information */}
+        <TabPanel value={activeTab} index={0}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               <Controller
@@ -666,104 +678,108 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
               />
             </Box>
           </Box>
-        </Paper>
+        </TabPanel>
 
-        {/* Video Upload */}
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Video
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<UploadIcon />}
-            >
-              Upload Video
-              <input
-                type="file"
-                hidden
-                accept="video/*"
-                onChange={handleVideoUpload}
-              />
-            </Button>
-            {videoFile && (
-              <Typography variant="body2">
-                {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
+        {/* Tab 2: Video & Steps */}
+        <TabPanel value={activeTab} index={1}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {/* Video Upload */}
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Video
               </Typography>
-            )}
-          </Box>
-        </Paper>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  startIcon={<UploadIcon />}
+                >
+                  Upload Video
+                  <input
+                    type="file"
+                    hidden
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                  />
+                </Button>
+                {videoFile && (
+                  <Typography variant="body2">
+                    {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                  </Typography>
+                )}
+              </Box>
+            </Paper>
 
-        {/* Enhanced Steps Manager */}
-        <Paper sx={{ p: 3 }}>
-          <EnhancedStepManager
-            activityId={activity?.id || 'new'}
-            videoUrl={videoUrl}
-            steps={existingSteps}
-            onStepsChange={handleStepsChange}
-            onStepCreate={async (step) => {
-              if (activity?.id) {
-                try {
-                  setStepOperationLoading(true);
-                  setError(null);
-                  console.log('[ActivityForm] Creating step via Redux:', step);
-                  await dispatch(createStep({
-                    activityId: activity.id,
-                    stepData: {
-                      order: step.order,
-                      description: step.description,
-                      timestampSeconds: step.timestampSeconds,
-                      durationSeconds: step.durationSeconds,
-                      pauseTimeSeconds: step.pauseTimeSeconds,
+            {/* Enhanced Steps Manager */}
+            <Paper sx={{ p: 3 }}>
+              <EnhancedStepManager
+                activityId={activity?.id || 'new'}
+                videoUrl={videoUrl}
+                steps={existingSteps}
+                onStepsChange={handleStepsChange}
+                onStepCreate={async (step) => {
+                  if (activity?.id) {
+                    try {
+                      setStepOperationLoading(true);
+                      setError(null);
+                      console.log('[ActivityForm] Creating step via Redux:', step);
+                      await dispatch(createStep({
+                        activityId: activity.id,
+                        stepData: {
+                          order: step.order,
+                          description: step.description,
+                          timestampSeconds: step.timestampSeconds,
+                          durationSeconds: step.durationSeconds,
+                          pauseTimeSeconds: step.pauseTimeSeconds,
+                        }
+                      })).unwrap();
+                      console.log('[ActivityForm] Step created successfully via Redux');
+                    } catch (error) {
+                      console.error('Failed to create step:', error);
+                      setError('Failed to create step');
+                    } finally {
+                      setStepOperationLoading(false);
                     }
-                  })).unwrap();
-                  console.log('[ActivityForm] Step created successfully via Redux');
-                } catch (error) {
-                  console.error('Failed to create step:', error);
-                  setError('Failed to create step');
-                } finally {
-                  setStepOperationLoading(false);
-                }
-              }
-            }}
-            onStepUpdate={async (stepId, updates) => {
-              try {
-                setStepOperationLoading(true);
-                setError(null);
-                await dispatch(updateStep({
-                  stepId,
-                  updates: {
-                    order: updates.order,
-                    description: updates.description,
-                    timestampSeconds: updates.timestampSeconds,
-                    durationSeconds: updates.durationSeconds,
-                    pauseTimeSeconds: updates.pauseTimeSeconds,
                   }
-                })).unwrap();
-              } catch (error) {
-                console.error('Failed to update step:', error);
-                setError('Failed to update step');
-              } finally {
-                setStepOperationLoading(false);
-              }
-            }}
-            onStepDelete={async (stepId) => {
-              try {
-                setStepOperationLoading(true);
-                setError(null);
-                await dispatch(deleteStep(stepId)).unwrap();
-              } catch (error) {
-                console.error('Failed to delete step:', error);
-                setError('Failed to delete step');
-              } finally {
-                setStepOperationLoading(false);
-              }
-            }}
-          />
-        </Paper>
-
-      </Box>
+                }}
+                onStepUpdate={async (stepId, updates) => {
+                  try {
+                    setStepOperationLoading(true);
+                    setError(null);
+                    await dispatch(updateStep({
+                      stepId,
+                      updates: {
+                        order: updates.order,
+                        description: updates.description,
+                        timestampSeconds: updates.timestampSeconds,
+                        durationSeconds: updates.durationSeconds,
+                        pauseTimeSeconds: updates.pauseTimeSeconds,
+                      }
+                    })).unwrap();
+                  } catch (error) {
+                    console.error('Failed to update step:', error);
+                    setError('Failed to update step');
+                  } finally {
+                    setStepOperationLoading(false);
+                  }
+                }}
+                onStepDelete={async (stepId) => {
+                  try {
+                    setStepOperationLoading(true);
+                    setError(null);
+                    await dispatch(deleteStep(stepId)).unwrap();
+                  } catch (error) {
+                    console.error('Failed to delete step:', error);
+                    setError('Failed to delete step');
+                  } finally {
+                    setStepOperationLoading(false);
+                  }
+                }}
+              />
+            </Paper>
+          </Box>
+        </TabPanel>
+      </Paper>
 
       <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
         <Button
