@@ -172,11 +172,17 @@ Enhanced validation with detailed error messages and support for multiple video 
 - Separate endpoints for public access without authentication
 - Restricted pagination limits for public endpoints (max 50 items)
 
-### Video Handling Enhancements
-- MinIO integration for video storage
-- Signed URL generation for secure video access
-- Support for multiple video formats and sources
-- Video upload and management capabilities
+  ### Video Handling Enhancements
+  - MinIO integration for video storage
+  - Signed URL generation for secure video access
+  - Support for multiple video formats and sources
+  - Video upload and management capabilities
+
+  ### Intro Video Experience
+  - Activities now support an optional `IntroVideoUrl` that can play before the primary instructional video.
+  - Admin APIs accept intro URLs and the `/api/activities/{id}/upload-video` endpoint exposes a `videoType` parameter (`main` or `intro`) so each asset can be managed independently.
+  - Delete operations likewise accept `videoType`, and upload responses include the persisted type for clarity.
+  - The domain model exposes `UpdateIntroVideo` for consistent state changes, and signed URL helpers can be used for intro clips just like main videos.
 
 ### Enhanced Error Handling
 - Detailed error messages with user-friendly language

@@ -56,6 +56,7 @@ const ActivityPage: React.FC = () => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [materialsDialogOpen, setMaterialsDialogOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [introVideoUrl, setIntroVideoUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState<Map<string, any>>(new Map());
 
   useEffect(() => {
@@ -69,6 +70,8 @@ const ActivityPage: React.FC = () => {
     if (!id) return;
 
     try {
+      setVideoUrl(null);
+      setIntroVideoUrl(null);
       // Fetch activity data
       const activityResult = await dispatch(fetchActivityById(id)).unwrap();
 
@@ -84,41 +87,37 @@ const ActivityPage: React.FC = () => {
         updateLocalProgress(id, existingProgress?.completedSteps || 0, stepsResult.steps.length);
       }
 
-      // Get video URL if available
-      if (activityResult.videoUrl) {
+      const resolveVideoSource = async (rawUrl?: string | null) => {
+        if (!rawUrl) return null;
+
         console.log('ActivityPage: Processing video URL:', {
           activityId: id,
-          videoUrl: activityResult.videoUrl,
-          isMinioObjectKey: VideoUtils.isMinioObjectKey(activityResult.videoUrl)
+          rawUrl,
+          isMinioObjectKey: VideoUtils.isMinioObjectKey(rawUrl)
         });
 
-        try {
-          // Check if it's a MinIO object key that needs a signed URL
-          if (VideoUtils.isMinioObjectKey(activityResult.videoUrl)) {
-            console.log('ActivityPage: Getting signed URL for MinIO object key');
-            const videoUrlResponse = await activitiesAPI.getPublicActivityVideoUrl(id, activityResult.videoUrl, 3600);
+        if (VideoUtils.isMinioObjectKey(rawUrl)) {
+          try {
+            const videoUrlResponse = await activitiesAPI.getPublicActivityVideoUrl(id, rawUrl, 3600);
             console.log('ActivityPage: Signed URL response:', videoUrlResponse.data);
 
             if (videoUrlResponse.data.success && videoUrlResponse.data.data?.signedVideoUrl) {
-              console.log('ActivityPage: Setting signed video URL:', videoUrlResponse.data.data.signedVideoUrl);
-              setVideoUrl(videoUrlResponse.data.data.signedVideoUrl);
-            } else {
-              console.error('ActivityPage: Failed to get signed URL, response:', videoUrlResponse.data);
-              setVideoUrl(null);
+              return videoUrlResponse.data.data.signedVideoUrl;
             }
-          } else {
-            // Direct URL
-            console.log('ActivityPage: Using direct video URL:', activityResult.videoUrl);
-            setVideoUrl(activityResult.videoUrl);
+
+            console.error('ActivityPage: Failed to get signed URL, response:', videoUrlResponse.data);
+            return null;
+          } catch (videoError) {
+            console.error('ActivityPage: Error getting signed URL:', videoError);
+            return null;
           }
-        } catch (videoError) {
-          console.error('ActivityPage: Error getting video URL:', videoError);
-          setVideoUrl(null);
         }
-      } else {
-        console.log('ActivityPage: No video URL available');
-        setVideoUrl(null);
-      }
+
+        return rawUrl;
+      };
+
+      setVideoUrl(await resolveVideoSource(activityResult.videoUrl));
+      setIntroVideoUrl(await resolveVideoSource(activityResult.introVideoUrl));
     } catch (err) {
       // Error is already handled by the Redux slice and will be displayed in the UI
     }
@@ -280,6 +279,7 @@ const ActivityPage: React.FC = () => {
         }}>
           <ActivityVideoPlayer
             videoUrl={videoUrl}
+            introVideoUrl={introVideoUrl}
             steps={steps}
             currentStepIndex={currentStepIndex}
             isPlaying={videoState.isPlaying}

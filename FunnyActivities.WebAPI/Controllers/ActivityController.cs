@@ -8,6 +8,7 @@ using FunnyActivities.Application.Queries.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.DTOs.Shared;
 using FunnyActivities.Application.Interfaces;
+using FunnyActivities.Domain.Enums;
 using FunnyActivities.Domain.ValueObjects;
 using FunnyActivities.WebAPI.Controllers.Base;
 
@@ -271,6 +272,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 Name = sanitizedName,
                 Description = sanitizedDescription,
                 VideoUrl = request.VideoUrl,
+                IntroVideoUrl = request.IntroVideoUrl,
                 DurationHours = request.DurationHours,
                 DurationMinutes = request.DurationMinutes,
                 DurationSeconds = request.DurationSeconds,
@@ -321,6 +323,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 Name = sanitizedName,
                 Description = sanitizedDescription,
                 VideoUrl = request.VideoUrl,
+                IntroVideoUrl = request.IntroVideoUrl,
                 DurationHours = request.DurationHours,
                 DurationMinutes = request.DurationMinutes,
                 DurationSeconds = request.DurationSeconds,
@@ -400,9 +403,15 @@ namespace FunnyActivities.WebAPI.Controllers
         [ProducesResponseType(typeof(UploadActivityVideoResponse), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> UploadActivityVideo(Guid activityId, [FromForm(Name = "videoData")] IFormFile videoFile)
+        public async Task<IActionResult> UploadActivityVideo(Guid activityId, [FromForm(Name = "videoData")] IFormFile videoFile, [FromQuery] string videoType = "main")
         {
-            _logger.LogInformation("Uploading video for activity ID: {ActivityId}", activityId);
+            _logger.LogInformation("Uploading {VideoType} video for activity ID: {ActivityId}", videoType, activityId);
+
+            if (!Enum.TryParse<ActivityVideoType>(videoType, true, out var parsedVideoType))
+            {
+                _logger.LogWarning("Invalid video type '{VideoType}' provided for activity {ActivityId}", videoType, activityId);
+                return this.ApiError("Invalid video type. Allowed values are 'main' or 'intro'.", "ValidationError", 400);
+            }
 
             // Validate that the activity exists
             var activityQuery = new GetActivityQuery { Id = activityId };
@@ -428,21 +437,22 @@ namespace FunnyActivities.WebAPI.Controllers
                 var videoData = memoryStream.ToArray();
 
                 // Upload video to Minio
-                var objectKey = await _minioService.UploadVideoAsync(videoData, videoFile.FileName, videoFile.ContentType, activityId);
-                _logger.LogInformation("Video uploaded to MinIO with object key: {ObjectKey}", objectKey);
+                var objectKey = await _minioService.UploadVideoAsync(videoData, videoFile.FileName, videoFile.ContentType, activityId, parsedVideoType);
+                _logger.LogInformation("Video uploaded to MinIO with object key: {ObjectKey} ({VideoType})", objectKey, parsedVideoType);
 
-                // Update activity's VideoUrl with the object key
+                // Update activity's video references with the object key
                 var updateCommand = new UpdateActivityCommand
                 {
                     Id = activityId,
                     Name = activity.Name, // Keep existing values
                     Description = activity.Description,
-                    VideoUrl = objectKey, // Set VideoUrl to object key
+                    VideoUrl = parsedVideoType == ActivityVideoType.Main ? objectKey : activity.VideoUrl,
+                    IntroVideoUrl = parsedVideoType == ActivityVideoType.Intro ? objectKey : activity.IntroVideoUrl,
                     // Duration fields are optional, keep existing values
                     UserId = CurrentUserId
                 };
 
-                _logger.LogInformation("Updating activity {ActivityId} with video object key: {ObjectKey}", activityId, objectKey);
+                _logger.LogInformation("Updating activity {ActivityId} with {VideoType} video object key: {ObjectKey}", activityId, parsedVideoType, objectKey);
 
                 await _mediator.Send(updateCommand);
 
@@ -453,12 +463,13 @@ namespace FunnyActivities.WebAPI.Controllers
                 {
                     ActivityId = activityId,
                     VideoObjectKey = objectKey,
+                    VideoType = parsedVideoType.ToString().ToLowerInvariant(),
                     SignedVideoUrl = signedUrl,
                     UrlExpirySeconds = 3600, // 1 hour
                     UploadedAt = DateTime.UtcNow
                 };
 
-                _logger.LogInformation("Video uploaded and activity updated successfully for activity ID: {ActivityId}, Object Key: {ObjectKey}", activityId, objectKey);
+                _logger.LogInformation("Video uploaded and activity updated successfully for activity ID: {ActivityId}, Object Key: {ObjectKey}, Type: {VideoType}", activityId, objectKey, parsedVideoType);
                 return this.ApiSuccess(response, "Video uploaded successfully");
             }
             catch (Exception ex)
@@ -710,9 +721,15 @@ namespace FunnyActivities.WebAPI.Controllers
         [Authorize(Policy = "CanUpdateActivity")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> DeleteActivityVideo(Guid activityId, [FromQuery] string videoObjectKey)
+        public async Task<IActionResult> DeleteActivityVideo(Guid activityId, [FromQuery] string videoObjectKey, [FromQuery] string videoType = "main")
         {
             _logger.LogInformation("Deleting video for activity ID: {ActivityId}", activityId);
+
+            if (!Enum.TryParse<ActivityVideoType>(videoType, true, out var parsedVideoType))
+            {
+                _logger.LogWarning("Invalid video type '{VideoType}' provided for delete on activity {ActivityId}", videoType, activityId);
+                return this.ApiError("Invalid video type. Allowed values are 'main' or 'intro'.", "ValidationError", 400);
+            }
 
             // Validate that the activity exists
             var activityQuery = new GetActivityQuery { Id = activityId };
@@ -734,7 +751,19 @@ namespace FunnyActivities.WebAPI.Controllers
                     return this.ApiError("Failed to delete the video", "DeletionFailed", 500);
                 }
 
-                _logger.LogInformation("Video deleted successfully for activity ID: {ActivityId}", activityId);
+                var updateCommand = new UpdateActivityCommand
+                {
+                    Id = activityId,
+                    Name = activity.Name,
+                    Description = activity.Description,
+                    VideoUrl = parsedVideoType == ActivityVideoType.Main ? string.Empty : activity.VideoUrl,
+                    IntroVideoUrl = parsedVideoType == ActivityVideoType.Intro ? string.Empty : activity.IntroVideoUrl,
+                    UserId = CurrentUserId
+                };
+
+                await _mediator.Send(updateCommand);
+
+                _logger.LogInformation("Video deleted successfully for activity ID: {ActivityId} ({VideoType})", activityId, parsedVideoType);
                 return this.ApiSuccess<object>("Video deleted successfully", 204);
             }
             catch (Exception ex)

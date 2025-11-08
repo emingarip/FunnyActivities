@@ -16,6 +16,11 @@ namespace FunnyActivities.Application.DTOs.ActivityManagement
         public string VideoObjectKey { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the type of video that was uploaded (main or intro).
+        /// </summary>
+        public string VideoType { get; set; } = "main";
+
+        /// <summary>
         /// Gets or sets the signed URL for accessing the video.
         /// </summary>
         public string SignedVideoUrl { get; set; } = string.Empty;

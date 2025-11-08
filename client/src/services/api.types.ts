@@ -2,6 +2,8 @@
 
 export {}; // Make this a module
 
+export type ActivityVideoType = 'main' | 'intro';
+
 // User related types
 export interface User {
   id: string;
@@ -138,6 +140,19 @@ export interface UploadImageResponse {
   message: string;
   data: {
     profileImageUrl: string;
+  };
+}
+
+export interface UploadActivityVideoResponse {
+  success: boolean;
+  message: string;
+  data: {
+    activityId: string;
+    videoObjectKey: string;
+    videoType: ActivityVideoType;
+    signedVideoUrl: string;
+    urlExpirySeconds: number;
+    uploadedAt: string;
   };
 }
 

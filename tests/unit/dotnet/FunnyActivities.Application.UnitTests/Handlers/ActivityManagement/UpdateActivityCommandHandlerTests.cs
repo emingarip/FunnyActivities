@@ -40,7 +40,8 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
             var activityId = Guid.NewGuid();
             var existingVideoUrl = VideoUrl.Create("https://example.com/existing-video.mp4");
             var existingDuration = Duration.Create(1, 0, 0);
-            var activity = Activity.Create("Test Activity", "Description", existingVideoUrl, existingDuration, Guid.NewGuid());
+            var existingIntroVideo = VideoUrl.Create("https://example.com/existing-intro.mp4");
+            var activity = Activity.Create("Test Activity", "Description", existingVideoUrl, existingDuration, Guid.NewGuid(), introVideoUrl: existingIntroVideo);
 
             var command = new UpdateActivityCommand
             {
@@ -66,9 +67,11 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
             result.Description.Should().Be(command.Description);
             result.VideoUrl.Should().Be(existingVideoUrl.Value); // Should preserve existing video
             result.Duration.Should().Be("02:30:15"); // Should update duration
+            result.IntroVideoUrl.Should().Be(existingIntroVideo.Value);
 
             _activityRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Activity>(a =>
                 a.VideoUrl == existingVideoUrl && // Video preserved
+                a.IntroVideoUrl == existingIntroVideo &&
                 a.Duration.ToString() == "02:30:15" // Duration updated
             )), Times.Once);
         }
@@ -80,7 +83,8 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
             var activityId = Guid.NewGuid();
             var existingVideoUrl = VideoUrl.Create("https://example.com/old-video.mp4");
             var existingDuration = Duration.Create(1, 30, 45);
-            var activity = Activity.Create("Test Activity", "Description", existingVideoUrl, existingDuration, Guid.NewGuid());
+            var existingIntroVideo = VideoUrl.Create("https://example.com/existing-intro.mp4");
+            var activity = Activity.Create("Test Activity", "Description", existingVideoUrl, existingDuration, Guid.NewGuid(), introVideoUrl: existingIntroVideo);
 
             var newVideoUrl = "https://example.com/new-video.mp4";
             var command = new UpdateActivityCommand
@@ -105,9 +109,11 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
             result.Description.Should().Be(command.Description);
             result.VideoUrl.Should().Be(newVideoUrl); // Should update video
             result.Duration.Should().Be(existingDuration.ToString()); // Should preserve existing duration
+            result.IntroVideoUrl.Should().Be(existingIntroVideo.Value);
 
             _activityRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Activity>(a =>
                 a.VideoUrl.Value == newVideoUrl && // Video updated
+                a.IntroVideoUrl == existingIntroVideo &&
                 a.Duration == existingDuration // Duration preserved
             )), Times.Once);
         }
@@ -150,6 +156,73 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
             _activityRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Activity>(a =>
                 a.VideoUrl.Value == newVideoUrl &&
                 a.Duration.ToString() == "03:45:30"
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_UpdateIntroVideo_ShouldReplaceIntroOnly()
+        {
+            // Arrange
+            var activityId = Guid.NewGuid();
+            var existingVideoUrl = VideoUrl.Create("https://example.com/main.mp4");
+            var existingIntroVideo = VideoUrl.Create("https://example.com/old-intro.mp4");
+            var activity = Activity.Create("Test Activity", "Description", existingVideoUrl, null, Guid.NewGuid(), introVideoUrl: existingIntroVideo);
+
+            var newIntroUrl = "https://example.com/new-intro.mp4";
+            var command = new UpdateActivityCommand
+            {
+                Id = activityId,
+                Name = "Test Activity",
+                Description = "Description",
+                IntroVideoUrl = newIntroUrl,
+                UserId = Guid.NewGuid()
+            };
+
+            _activityRepositoryMock.Setup(r => r.GetByIdAsync(activityId)).ReturnsAsync(activity);
+            _activityRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Activity>())).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IntroVideoUrl.Should().Be(newIntroUrl);
+            result.VideoUrl.Should().Be(existingVideoUrl.Value);
+
+            _activityRepositoryMock.Verify(r => r.UpdateAsync(It.Is<Activity>(a =>
+                a.VideoUrl == existingVideoUrl &&
+                a.IntroVideoUrl != null &&
+                a.IntroVideoUrl.Value == newIntroUrl
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_ClearIntroVideo_WhenEmptyString_ShouldRemoveIntro()
+        {
+            // Arrange
+            var activityId = Guid.NewGuid();
+            var existingIntroVideo = VideoUrl.Create("https://example.com/intro.mp4");
+            var activity = Activity.Create("Test Activity", "Description", null, null, Guid.NewGuid(), introVideoUrl: existingIntroVideo);
+
+            var command = new UpdateActivityCommand
+            {
+                Id = activityId,
+                Name = "Test Activity",
+                Description = "Description",
+                IntroVideoUrl = string.Empty,
+                UserId = Guid.NewGuid()
+            };
+
+            _activityRepositoryMock.Setup(r => r.GetByIdAsync(activityId)).ReturnsAsync(activity);
+            _activityRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Activity>())).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IntroVideoUrl.Should().BeNull();
+
+            _activityRepositoryMock.Verify(r => r.UpdateAsync(It.Is<Activity>(a =>
+                a.IntroVideoUrl == null
             )), Times.Once);
         }
 

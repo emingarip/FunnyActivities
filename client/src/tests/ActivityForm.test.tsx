@@ -108,6 +108,7 @@ describe('ActivityForm Tabs', () => {
 
     // Check if Video & Steps content is visible
     expect(screen.getByText('Upload Video')).toBeInTheDocument();
+    expect(screen.getByText('Upload Intro Video')).toBeInTheDocument();
   });
 
   test('switches back to Basic Information tab when clicked', async () => {

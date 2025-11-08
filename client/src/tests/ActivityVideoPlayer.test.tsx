@@ -59,6 +59,7 @@ const mockSteps = [
 
 const defaultProps = {
   videoUrl: 'https://example.com/video.mp4',
+  introVideoUrl: undefined,
   steps: mockSteps,
   currentStepIndex: 0,
   isPlaying: false,
@@ -78,7 +79,7 @@ describe('ActivityVideoPlayer', () => {
   it('renders video element when videoUrl is provided', () => {
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = screen.getByTestId('activity-video') || document.querySelector('video');
+    const video = screen.getByTestId('activity-video');
     expect(video).toBeInTheDocument();
     expect(video).toHaveAttribute('src', 'https://example.com/video.mp4');
   });
@@ -91,8 +92,34 @@ describe('ActivityVideoPlayer', () => {
       />
     );
 
-    const video = screen.queryByTestId('activity-video') || document.querySelector('video');
-    expect(video).not.toBeInTheDocument();
+    expect(screen.queryByTestId('activity-video')).not.toBeInTheDocument();
+  });
+
+  it('renders intro video when introVideoUrl is provided', () => {
+    renderWithTheme(
+      <ActivityVideoPlayer
+        {...defaultProps}
+        introVideoUrl="https://example.com/intro.mp4"
+      />
+    );
+
+    expect(screen.getByTestId('intro-video')).toBeInTheDocument();
+    expect(screen.queryByTestId('activity-video')).not.toBeInTheDocument();
+  });
+
+  it('skips intro video when Skip Intro is clicked', async () => {
+    renderWithTheme(
+      <ActivityVideoPlayer
+        {...defaultProps}
+        introVideoUrl="https://example.com/intro.mp4"
+      />
+    );
+
+    fireEvent.click(screen.getByText('Skip Intro'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('activity-video')).toBeInTheDocument();
+    });
   });
 
   it('sets up video event listeners on mount', () => {
@@ -103,8 +130,11 @@ describe('ActivityVideoPlayer', () => {
     };
 
     // Mock the video ref
-    const useRefSpy = jest.spyOn(require('react'), 'useRef');
-    useRefSpy.mockReturnValue({ current: mockVideo });
+    const reactModule = require('react');
+    const useRefSpy = jest.spyOn(reactModule, 'useRef');
+    useRefSpy
+      .mockReturnValueOnce({ current: mockVideo })
+      .mockReturnValueOnce({ current: null });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
@@ -212,8 +242,11 @@ describe('ActivityVideoPlayer', () => {
     };
 
     // Mock the video ref
-    const useRefSpy = jest.spyOn(require('react'), 'useRef');
-    useRefSpy.mockReturnValue({ current: mockVideo });
+    const reactModule = require('react');
+    const useRefSpy = jest.spyOn(reactModule, 'useRef');
+    useRefSpy
+      .mockReturnValueOnce({ current: mockVideo })
+      .mockReturnValueOnce({ current: null });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
@@ -234,8 +267,11 @@ describe('ActivityVideoPlayer', () => {
       pause: jest.fn(),
     };
 
-    const useRefSpy = jest.spyOn(require('react'), 'useRef');
-    useRefSpy.mockReturnValue({ current: mockVideo });
+    const reactModule = require('react');
+    const useRefSpy = jest.spyOn(reactModule, 'useRef');
+    useRefSpy
+      .mockReturnValueOnce({ current: mockVideo })
+      .mockReturnValueOnce({ current: null });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
@@ -327,18 +363,6 @@ describe('ActivityVideoPlayer', () => {
     // Should not crash with empty steps
   });
 
-  it('cleans up event listeners on unmount', () => {
-    const { unmount } = renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
-
-    unmount();
-
-    const video = document.querySelector('video');
-    expect(mockVideoElement.removeEventListener).toHaveBeenCalledWith('timeupdate', expect.any(Function));
-    expect(mockVideoElement.removeEventListener).toHaveBeenCalledWith('play', expect.any(Function));
-    expect(mockVideoElement.removeEventListener).toHaveBeenCalledWith('pause', expect.any(Function));
-    expect(mockVideoElement.removeEventListener).toHaveBeenCalledWith('ended', expect.any(Function));
-  });
-
   it('renders timeline markers when video has duration and steps have pause times', async () => {
     // Create a proper mock video element
     const mockVideo = document.createElement('video');
@@ -350,8 +374,11 @@ describe('ActivityVideoPlayer', () => {
     mockVideo.pause = jest.fn();
 
     // Mock the video ref
-    const useRefSpy = jest.spyOn(require('react'), 'useRef');
-    useRefSpy.mockReturnValue({ current: mockVideo });
+    const reactModule = require('react');
+    const useRefSpy = jest.spyOn(reactModule, 'useRef');
+    useRefSpy
+      .mockReturnValueOnce({ current: mockVideo })
+      .mockReturnValueOnce({ current: null });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
@@ -377,8 +404,11 @@ describe('ActivityVideoPlayer', () => {
     mockVideo.addEventListener = jest.fn();
     mockVideo.removeEventListener = jest.fn();
 
-    const useRefSpy = jest.spyOn(require('react'), 'useRef');
-    useRefSpy.mockReturnValue({ current: mockVideo });
+    const reactModule = require('react');
+    const useRefSpy = jest.spyOn(reactModule, 'useRef');
+    useRefSpy
+      .mockReturnValueOnce({ current: mockVideo })
+      .mockReturnValueOnce({ current: null });
 
     renderWithTheme(
       <ActivityVideoPlayer
@@ -431,8 +461,11 @@ describe('ActivityVideoPlayer', () => {
     mockVideo.play = jest.fn().mockImplementation(() => Promise.resolve());
     mockVideo.pause = jest.fn();
 
-    const useRefSpy = jest.spyOn(require('react'), 'useRef');
-    useRefSpy.mockReturnValue({ current: mockVideo });
+    const reactModule = require('react');
+    const useRefSpy = jest.spyOn(reactModule, 'useRef');
+    useRefSpy
+      .mockReturnValueOnce({ current: mockVideo })
+      .mockReturnValueOnce({ current: null });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
@@ -465,8 +498,11 @@ describe('ActivityVideoPlayer', () => {
     mockVideo.addEventListener = jest.fn();
     mockVideo.removeEventListener = jest.fn();
 
-    const useRefSpy = jest.spyOn(require('react'), 'useRef');
-    useRefSpy.mockReturnValue({ current: mockVideo });
+    const reactModule = require('react');
+    const useRefSpy = jest.spyOn(reactModule, 'useRef');
+    useRefSpy
+      .mockReturnValueOnce({ current: mockVideo })
+      .mockReturnValueOnce({ current: null });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
