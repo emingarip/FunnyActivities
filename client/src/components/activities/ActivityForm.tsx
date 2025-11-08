@@ -132,6 +132,9 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | undefined>();
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | undefined>();
+  const [introVideoFile, setIntroVideoFile] = useState<File | null>(null);
+  const [introVideoUrl, setIntroVideoUrl] = useState<string | undefined>();
+  const [existingIntroVideoUrl, setExistingIntroVideoUrl] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState(0);
 
   // Get steps, error, and loading state from Redux using selectors
@@ -181,6 +184,8 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   const loadFormData = useCallback(async () => {
     try {
       setLoading(true);
+      setVideoFile(null);
+      setIntroVideoFile(null);
 
       // If editing an activity, load its data
       if (activity) {
@@ -193,8 +198,13 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
          activityProductVariantsAPI.getActivityProductVariantsByActivityId(activity.id),
        ]);
 
-       if (activityDetailsResponse.data.success) {
+       let detailVideoUrl = activity?.videoUrl;
+       let detailIntroVideoUrl = activity?.introVideoUrl;
+
+       if (activityDetailsResponse.data.success && activityDetailsResponse.data.data) {
          const activityData = activityDetailsResponse.data.data;
+         detailVideoUrl = activityData.videoUrl ?? detailVideoUrl;
+         detailIntroVideoUrl = activityData.introVideoUrl ?? detailIntroVideoUrl;
 
          // Parse duration from string format if needed
          let durationHours = 0, durationMinutes = 0, durationSeconds = 0;
@@ -233,48 +243,59 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
        console.log('[ActivityForm] Fetching steps via Redux for activity:', activity.id);
        await dispatch(fetchActivitySteps(activity.id)).unwrap();
 
-       // Set video URL if available - convert object key to signed URL
-       if (activity.videoUrl) {
-         // Extract object key from signed URLs or use as-is if already an object key
-         const objectKey = VideoUtils.extractObjectKeyFromSignedUrl(activity.videoUrl);
-         console.log('Extracted object key from activity.videoUrl:', {
-           originalUrl: activity.videoUrl,
+       const processVideoReference = async (
+         rawUrl: string | undefined,
+         label: 'main' | 'intro',
+         setExisting: React.Dispatch<React.SetStateAction<string | undefined>>,
+         setPreview: React.Dispatch<React.SetStateAction<string | undefined>>
+       ) => {
+         if (!rawUrl || !activity?.id) {
+           setExisting(undefined);
+           setPreview(undefined);
+           return;
+         }
+
+         const objectKey = VideoUtils.extractObjectKeyFromSignedUrl(rawUrl);
+         console.log(`Extracted object key from activity.${label}VideoUrl:`, {
+           label,
+           originalUrl: rawUrl,
            extractedObjectKey: objectKey,
-           isMinioObjectKey: VideoUtils.isMinioObjectKey(activity.videoUrl)
+           isMinioObjectKey: VideoUtils.isMinioObjectKey(rawUrl)
          });
 
-         // Always use the extracted object key, never pass signed URLs to backend
-         let finalObjectKey = objectKey || (VideoUtils.isMinioObjectKey(activity.videoUrl) ? activity.videoUrl : null);
+         let finalObjectKey = objectKey || (VideoUtils.isMinioObjectKey(rawUrl) ? rawUrl : null);
 
-         // Handle corrupted object keys that may have bucket name prepended
          if (finalObjectKey && finalObjectKey.startsWith('activity-videos/')) {
            finalObjectKey = finalObjectKey.substring('activity-videos/'.length);
-           console.log('Cleaned corrupted object key:', { cleanedObjectKey: finalObjectKey });
+           console.log(`Cleaned corrupted object key for ${label}:`, { cleanedObjectKey: finalObjectKey });
          }
 
          if (finalObjectKey) {
-           setExistingVideoUrl(finalObjectKey); // Store the object key for updates
+           setExisting(finalObjectKey);
 
            try {
-             console.log('Getting signed URL for object key:', finalObjectKey);
+             console.log(`Getting signed URL for ${label} object key:`, finalObjectKey);
              const videoUrlResponse = await activitiesAPI.getActivityVideoUrl(activity.id, finalObjectKey);
              if (videoUrlResponse.data.success) {
                const signedUrl = videoUrlResponse.data.data.signedVideoUrl;
-               console.log('Generated signed URL:', signedUrl);
-               setVideoUrl(signedUrl);
+               console.log(`Generated signed URL for ${label}:`, signedUrl);
+               setPreview(signedUrl);
              } else {
-               console.warn('Failed to get signed video URL:', videoUrlResponse.data);
-               setVideoUrl(activity.videoUrl); // Fallback to original URL
+               console.warn(`Failed to get signed ${label} video URL:`, videoUrlResponse.data);
+               setPreview(rawUrl);
              }
            } catch (error) {
-             console.error('Error getting signed video URL:', error);
-             setVideoUrl(activity.videoUrl); // Fallback to original URL
+             console.error(`Error getting signed ${label} video URL:`, error);
+             setPreview(rawUrl);
            }
          } else {
-           console.warn('Could not extract valid object key from video URL:', activity.videoUrl);
-           setVideoUrl(activity.videoUrl); // Fallback to original URL
+           console.warn(`Could not extract valid object key from ${label} video URL:`, rawUrl);
+           setPreview(rawUrl);
          }
-       }
+       };
+
+       await processVideoReference(detailVideoUrl, 'main', setExistingVideoUrl, setVideoUrl);
+       await processVideoReference(detailIntroVideoUrl, 'intro', setExistingIntroVideoUrl, setIntroVideoUrl);
 
        if (materialsResponse.data.success) {
          const materials = materialsResponse.data.data || [];
@@ -398,6 +419,24 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
     }
   };
 
+  const handleIntroVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('video/')) {
+        setError('Please select a valid video file');
+        return;
+      }
+
+      if (file.size > 100 * 1024 * 1024) {
+        setError('Video file size must be less than 100MB');
+        return;
+      }
+
+      setIntroVideoFile(file);
+      setError(null);
+    }
+  };
+
 
   const onSubmit = async (data: ActivityFormData) => {
     try {
@@ -435,6 +474,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
       // Include existing videoUrl if not uploading a new video
       if (!videoFile && existingVideoUrl) {
         updatePayload.videoUrl = existingVideoUrl;
+      }
+
+      if (!introVideoFile && existingIntroVideoUrl) {
+        updatePayload.introVideoUrl = existingIntroVideoUrl;
       }
 
       console.log('[ActivityForm] API update payload:', updatePayload);
@@ -475,6 +518,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
           durationHours,
           durationMinutes,
           durationSeconds,
+          introVideoUrl: existingIntroVideoUrl,
         });
 
         if (createResponse.data.success) {
@@ -491,6 +535,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
       // Upload video if provided
       if (videoFile) {
         await activitiesAPI.uploadActivityVideo(activityId, videoFile);
+      }
+
+      if (introVideoFile) {
+        await activitiesAPI.uploadActivityVideo(activityId, introVideoFile, 'intro');
       }
 
       // Save steps if this is a new activity or if there are unsaved steps
@@ -686,9 +734,12 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
             {/* Video Upload */}
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
-                Video
+                Main Video
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                This video contains the primary walkthrough used by the step manager.
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   variant="outlined"
                   component="label"
@@ -707,7 +758,79 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                     {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
                   </Typography>
                 )}
+                {!videoFile && videoUrl && (
+                  <Button
+                    component="a"
+                    href={videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    size="small"
+                  >
+                    Preview Current Video
+                  </Button>
+                )}
               </Box>
+              {!videoFile && !videoUrl && existingVideoUrl && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Stored video object: {existingVideoUrl}
+                </Typography>
+              )}
+              {!videoFile && !existingVideoUrl && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  No main video uploaded yet.
+                </Typography>
+              )}
+            </Paper>
+
+            {/* Intro Video Upload */}
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Intro Video
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Optional clip that plays before the main video to introduce the activity.
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  startIcon={<UploadIcon />}
+                >
+                  Upload Intro Video
+                  <input
+                    type="file"
+                    hidden
+                    accept="video/*"
+                    onChange={handleIntroVideoUpload}
+                  />
+                </Button>
+                {introVideoFile && (
+                  <Typography variant="body2">
+                    {introVideoFile.name} ({(introVideoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                  </Typography>
+                )}
+                {!introVideoFile && introVideoUrl && (
+                  <Button
+                    component="a"
+                    href={introVideoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    size="small"
+                  >
+                    Preview Intro Video
+                  </Button>
+                )}
+              </Box>
+              {!introVideoFile && !introVideoUrl && existingIntroVideoUrl && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Stored intro video object: {existingIntroVideoUrl}
+                </Typography>
+              )}
+              {!introVideoFile && !existingIntroVideoUrl && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  No intro video uploaded yet.
+                </Typography>
+              )}
             </Paper>
 
             {/* Enhanced Steps Manager */}

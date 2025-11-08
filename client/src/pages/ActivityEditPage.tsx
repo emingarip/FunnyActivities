@@ -24,6 +24,7 @@ interface Activity {
   description?: string;
   activityCategoryId?: string;
   videoUrl?: string;
+  introVideoUrl?: string;
   durationHours?: number;
   durationMinutes?: number;
   durationSeconds?: number;

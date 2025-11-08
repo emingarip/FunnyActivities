@@ -30,6 +30,11 @@ namespace FunnyActivities.Application.Commands.ActivityManagement
         public string? VideoUrl { get; set; }
 
         /// <summary>
+        /// Gets or sets the intro video URL of the activity.
+        /// </summary>
+        public string? IntroVideoUrl { get; set; }
+
+        /// <summary>
         /// Gets or sets the duration of the activity in hours.
         /// </summary>
         public int? DurationHours { get; set; }

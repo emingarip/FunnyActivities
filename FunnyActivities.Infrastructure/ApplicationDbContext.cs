@@ -275,6 +275,7 @@ namespace FunnyActivities.Infrastructure
                 entity.Ignore(a => a.DomainEvents);
                 // Value converters
                 entity.Property(a => a.VideoUrl).HasConversion(videoUrlConverter);
+                entity.Property(a => a.IntroVideoUrl).HasConversion(videoUrlConverter);
                 entity.Property(a => a.Duration).HasConversion(durationConverter);
                 // Foreign key to ActivityCategory
                 entity.HasOne(a => a.ActivityCategory)

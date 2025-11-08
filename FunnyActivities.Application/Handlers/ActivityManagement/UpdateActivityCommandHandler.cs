@@ -93,8 +93,29 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 _logger.LogWarning("No duration values provided in request - this will clear the existing duration!");
             }
 
+            // Determine intro video changes
+            VideoUrl? introVideoUrl = activity.IntroVideoUrl;
+            if (request.IntroVideoUrl != null)
+            {
+                if (!string.IsNullOrWhiteSpace(request.IntroVideoUrl))
+                {
+                    introVideoUrl = VideoUrl.Create(request.IntroVideoUrl);
+                    _logger.LogInformation("Setting IntroVideoUrl to: {IntroVideoUrl}", request.IntroVideoUrl);
+                }
+                else
+                {
+                    introVideoUrl = null;
+                    _logger.LogInformation("IntroVideoUrl set to empty string - clearing intro video");
+                }
+            }
+
             // Update the activity
             activity.UpdateDetails(request.Name, request.Description, videoUrl, duration, request.IsPublic);
+
+            if (request.IntroVideoUrl != null)
+            {
+                activity.UpdateIntroVideo(introVideoUrl);
+            }
 
             // Save to repository
             await _activityRepository.UpdateAsync(activity);
@@ -111,6 +132,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 Name = activity.Name,
                 Description = activity.Description,
                 VideoUrl = activity.VideoUrl?.Value,
+                IntroVideoUrl = activity.IntroVideoUrl?.Value,
                 Duration = activity.Duration?.ToString(),
                 ActivityCategoryId = activity.ActivityCategoryId,
                 ActivityCategoryName = activity.ActivityCategory?.Name ?? "Unknown",

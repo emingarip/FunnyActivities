@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { BulkUpdateProductVariantsRequest } from './api.types';
+import { BulkUpdateProductVariantsRequest, ActivityVideoType, UploadActivityVideoResponse } from './api.types';
 
 // API Base URL - pointing to .NET WebAPI
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
@@ -697,6 +697,7 @@ export const activitiesAPI = {
     name: string;
     description?: string;
     videoUrl?: string;
+    introVideoUrl?: string;
     durationHours?: number;
     durationMinutes?: number;
     durationSeconds?: number;
@@ -708,6 +709,7 @@ export const activitiesAPI = {
     name?: string;
     description?: string;
     videoUrl?: string;
+    introVideoUrl?: string;
     durationHours?: number;
     durationMinutes?: number;
     durationSeconds?: number;
@@ -718,14 +720,16 @@ export const activitiesAPI = {
   deleteActivity: (id: string) => api.delete(`/activities/${id}`),
 
   // Upload video for activity
-  uploadActivityVideo: (activityId: string, videoData: File) => {
+  uploadActivityVideo: (activityId: string, videoData: File, videoType: ActivityVideoType = 'main') => {
     const formData = new FormData();
     formData.append('videoData', videoData);
     formData.append('fileName', videoData.name);
     formData.append('contentType', videoData.type);
     formData.append('activityId', activityId);
 
-    return api.post(`/activities/${activityId}/upload-video`, formData, {
+    const params = new URLSearchParams({ videoType });
+
+    return api.post<UploadActivityVideoResponse>(`/activities/${activityId}/upload-video?${params.toString()}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -745,8 +749,8 @@ export const activitiesAPI = {
     }),
 
   // Delete activity video
-  deleteActivityVideo: (activityId: string, videoObjectKey: string) =>
-    api.delete(`/activities/${activityId}/video`, { params: { videoObjectKey } }),
+  deleteActivityVideo: (activityId: string, videoObjectKey: string, videoType: 'main' | 'intro' = 'main') =>
+    api.delete(`/activities/${activityId}/video`, { params: { videoObjectKey, videoType } }),
 
   // Get public activities (no authentication required)
   getPublicActivities: (params?: {

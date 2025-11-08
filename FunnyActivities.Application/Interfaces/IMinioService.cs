@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using FunnyActivities.Domain.Entities;
+using FunnyActivities.Domain.Enums;
 using FunnyActivities.Domain.ValueObjects;
 
 namespace FunnyActivities.Application.Interfaces
@@ -12,7 +13,7 @@ namespace FunnyActivities.Application.Interfaces
         Task<Image> SaveImageMetadataAsync(Image image);
 
         // Video-specific methods
-        Task<string> UploadVideoAsync(byte[] videoData, string fileName, string contentType, Guid activityId);
+        Task<string> UploadVideoAsync(byte[] videoData, string fileName, string contentType, Guid activityId, ActivityVideoType videoType = ActivityVideoType.Main);
         Task<string> GenerateVideoPreSignedUrlAsync(string objectKey, int expiryInSeconds = 3600);
         Task<bool> DeleteVideoAsync(string objectKey);
 

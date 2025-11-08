@@ -58,6 +58,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 Name = activity.Name,
                 Description = activity.Description,
                 VideoUrl = activity.VideoUrl?.Value,
+                IntroVideoUrl = activity.IntroVideoUrl?.Value,
                 Duration = activity.Duration?.ToString(),
                 ActivityCategoryId = activity.ActivityCategoryId,
                 ActivityCategoryName = "Unknown", // Temporarily disable navigation property loading

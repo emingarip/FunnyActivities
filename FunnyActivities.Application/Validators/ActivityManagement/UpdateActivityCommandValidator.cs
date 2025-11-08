@@ -30,6 +30,11 @@ namespace FunnyActivities.Application.Validators.ActivityManagement
                 .WithMessage("Invalid video URL format. Please provide a valid video URL (e.g., https://youtube.com/watch?v=...) or leave empty to remove the current video.")
                 .When(x => !string.IsNullOrEmpty(x.VideoUrl));
 
+            RuleFor(x => x.IntroVideoUrl)
+                .Must(url => string.IsNullOrEmpty(url) || IsValidVideoUrl(url))
+                .WithMessage("Invalid intro video URL format. Please provide a valid video URL or leave empty to remove the existing intro.")
+                .When(x => !string.IsNullOrEmpty(x.IntroVideoUrl));
+
             RuleFor(x => x.DurationHours)
                 .InclusiveBetween(0, 23).WithMessage("Hours must be between 0 and 23. For activities longer than 24 hours, consider breaking them into multiple sessions.")
                 .When(x => x.DurationHours.HasValue);

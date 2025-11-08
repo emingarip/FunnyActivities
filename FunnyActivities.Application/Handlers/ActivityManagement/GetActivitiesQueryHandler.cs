@@ -72,6 +72,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             foreach (var activity in activities)
             {
                 string videoUrl = null;
+                string introVideoUrl = null;
 
                 // Check if the activity has a video URL and if it's a MinIO object key
                 if (activity.VideoUrl != null && IsMinioObjectKey(activity.VideoUrl.Value))
@@ -105,12 +106,40 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                     videoUrl = activity.VideoUrl?.Value;
                 }
 
+                // Resolve intro video URL if available
+                if (activity.IntroVideoUrl != null && IsMinioObjectKey(activity.IntroVideoUrl.Value))
+                {
+                    try
+                    {
+                        if (_minioService != null)
+                        {
+                            introVideoUrl = await _minioService.GenerateVideoPreSignedUrlAsync(activity.IntroVideoUrl.Value);
+                            _logger.LogInformation("Generated signed URL for intro video object key: {ObjectKey}", activity.IntroVideoUrl.Value);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("MinIO service is not available for intro object key: {ObjectKey}", activity.IntroVideoUrl.Value);
+                            introVideoUrl = activity.IntroVideoUrl.Value;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to generate signed URL for intro video object key: {ObjectKey}", activity.IntroVideoUrl.Value);
+                        introVideoUrl = activity.IntroVideoUrl.Value;
+                    }
+                }
+                else
+                {
+                    introVideoUrl = activity.IntroVideoUrl?.Value;
+                }
+
                 activityDtos.Add(new ActivityDto
                 {
                     Id = activity.Id,
                     Name = activity.Name,
                     Description = activity.Description,
                     VideoUrl = videoUrl,
+                    IntroVideoUrl = introVideoUrl,
                     Duration = activity.Duration?.ToString(),
                     ActivityCategoryId = activity.ActivityCategoryId,
                     ActivityCategoryName = activity.ActivityCategory?.Name ?? "Unknown",

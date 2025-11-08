@@ -40,6 +40,11 @@ namespace FunnyActivities.Domain.Entities
         public Duration? Duration { get; private set; }
 
         /// <summary>
+        /// Gets the optional intro video URL that can be played before the main activity video.
+        /// </summary>
+        public VideoUrl? IntroVideoUrl { get; private set; }
+
+        /// <summary>
         /// Gets the activity category ID.
         /// </summary>
         public Guid ActivityCategoryId { get; private set; }
@@ -94,8 +99,9 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="videoUrl">The video URL of the activity.</param>
         /// <param name="duration">The duration of the activity.</param>
         /// <param name="activityCategoryId">The activity category ID.</param>
+        /// <param name="introVideoUrl">The intro video URL.</param>
         /// <param name="isPublic">Whether the activity is public.</param>
-        public Activity(Guid id, string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId, bool isPublic = false)
+        public Activity(Guid id, string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId, bool isPublic = false, VideoUrl? introVideoUrl = null)
         {
             Id = id;
             Name = name;
@@ -104,6 +110,7 @@ namespace FunnyActivities.Domain.Entities
             Duration = duration;
             ActivityCategoryId = activityCategoryId;
             IsPublic = isPublic;
+            IntroVideoUrl = introVideoUrl;
             Steps = new List<Step>();
             ActivityProductVariants = new List<ActivityProductVariant>();
             ActivityUsers = new List<ActivityUser>();
@@ -122,6 +129,7 @@ namespace FunnyActivities.Domain.Entities
             Steps = new List<Step>();
             ActivityProductVariants = new List<ActivityProductVariant>();
             ActivityUsers = new List<ActivityUser>();
+            IntroVideoUrl = null;
         }
 
         /// <summary>
@@ -132,11 +140,12 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="videoUrl">The video URL of the activity.</param>
         /// <param name="duration">The duration of the activity.</param>
         /// <param name="activityCategoryId">The activity category ID.</param>
+        /// <param name="introVideoUrl">The intro video URL.</param>
         /// <param name="isPublic">Whether the activity is public.</param>
         /// <returns>A new activity instance.</returns>
-        public static Activity Create(string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId, bool isPublic = false)
+        public static Activity Create(string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId, bool isPublic = false, VideoUrl? introVideoUrl = null)
         {
-            var activity = new Activity(Guid.NewGuid(), name, description, videoUrl, duration, activityCategoryId, isPublic);
+            var activity = new Activity(Guid.NewGuid(), name, description, videoUrl, duration, activityCategoryId, isPublic, introVideoUrl);
             activity.AddDomainEvent(new ActivityCreatedEvent(activity.Id, name));
             return activity;
         }
@@ -161,6 +170,16 @@ namespace FunnyActivities.Domain.Entities
             }
             UpdatedAt = DateTime.UtcNow;
             AddDomainEvent(new ActivityUpdatedEvent(Id, name));
+        }
+
+        /// <summary>
+        /// Updates the intro video reference.
+        /// </summary>
+        /// <param name="introVideoUrl">The intro video URL to set. Pass null to clear the intro video.</param>
+        public void UpdateIntroVideo(VideoUrl? introVideoUrl)
+        {
+            IntroVideoUrl = introVideoUrl;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         /// <summary>

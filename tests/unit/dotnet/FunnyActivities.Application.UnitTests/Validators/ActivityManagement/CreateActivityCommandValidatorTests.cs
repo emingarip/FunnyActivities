@@ -160,6 +160,47 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
         }
 
         [Fact]
+        public void Should_Have_Error_When_IntroVideoUrl_Is_Invalid()
+        {
+            // Arrange
+            var command = new CreateActivityCommand
+            {
+                Name = "Valid Name",
+                IntroVideoUrl = "not-a-valid-url",
+                ActivityCategoryId = Guid.NewGuid(),
+                UserId = Guid.NewGuid()
+            };
+
+            // Act
+            var result = _validator.TestValidate(command);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.IntroVideoUrl)
+                .WithErrorMessage("Invalid intro video URL format. Please provide a valid video URL or leave empty if you don't need an intro.");
+        }
+
+        [Theory]
+        [InlineData("https://cdn.example.com/intro.mp4")]
+        [InlineData("videos/activity-123/intro/video.mp4")]
+        public void Should_Not_Have_Error_When_IntroVideoUrl_Is_Valid(string introUrl)
+        {
+            // Arrange
+            var command = new CreateActivityCommand
+            {
+                Name = "Valid Name",
+                IntroVideoUrl = introUrl,
+                ActivityCategoryId = Guid.NewGuid(),
+                UserId = Guid.NewGuid()
+            };
+
+            // Act
+            var result = _validator.TestValidate(command);
+
+            // Assert
+            result.ShouldNotHaveValidationErrorFor(x => x.IntroVideoUrl);
+        }
+
+        [Fact]
         public void Should_Have_Error_When_DurationHours_Is_Less_Than_Zero()
         {
             // Arrange

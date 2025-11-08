@@ -50,6 +50,12 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 videoUrl = VideoUrl.Create(request.VideoUrl);
             }
 
+            VideoUrl? introVideoUrl = null;
+            if (!string.IsNullOrWhiteSpace(request.IntroVideoUrl))
+            {
+                introVideoUrl = VideoUrl.Create(request.IntroVideoUrl);
+            }
+
             Duration? duration = null;
             if (request.DurationHours.HasValue || request.DurationMinutes.HasValue || request.DurationSeconds.HasValue)
             {
@@ -60,7 +66,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             }
 
             // Create the activity
-            var activity = Activity.Create(request.Name, request.Description, videoUrl, duration, request.ActivityCategoryId);
+            var activity = Activity.Create(request.Name, request.Description, videoUrl, duration, request.ActivityCategoryId, introVideoUrl: introVideoUrl);
 
             // Save to repository
             await _activityRepository.AddAsync(activity);
@@ -77,6 +83,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 Name = activity.Name,
                 Description = activity.Description,
                 VideoUrl = activity.VideoUrl?.Value,
+                IntroVideoUrl = activity.IntroVideoUrl?.Value,
                 Duration = activity.Duration?.ToString(),
                 ActivityCategoryId = activity.ActivityCategoryId,
                 ActivityCategoryName = activity.ActivityCategory?.Name ?? "Unknown",

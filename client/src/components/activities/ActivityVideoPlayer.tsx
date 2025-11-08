@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import {
+  Alert,
   Box,
   Card,
   CardContent,
@@ -21,6 +22,7 @@ interface ActivityStep {
 
 interface ActivityVideoPlayerProps {
   videoUrl: string | null;
+  introVideoUrl?: string | null;
   steps: ActivityStep[];
   currentStepIndex: number;
   isPlaying: boolean;
@@ -34,6 +36,7 @@ interface ActivityVideoPlayerProps {
 
 const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
   videoUrl,
+  introVideoUrl,
   steps,
   currentStepIndex,
   isPlaying,
@@ -47,100 +50,100 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const videoRef = useRef<HTMLVideoElement>(null);
+  const introVideoRef = useRef<HTMLVideoElement>(null);
   const [videoDuration, setVideoDuration] = useState<number>(0);
+  const [introCompleted, setIntroCompleted] = useState(!introVideoUrl);
+  const [shouldAutoPlayMain, setShouldAutoPlayMain] = useState(false);
 
-  console.log('ActivityVideoPlayer: Component rendered with props:', {
+  useEffect(() => {
+    setIntroCompleted(!introVideoUrl);
+    setShouldAutoPlayMain(false);
+  }, [introVideoUrl]);
+
+  const isIntroPhase = Boolean(introVideoUrl) && !introCompleted;
+
+  console.log('ActivityVideoPlayer: Render', {
     videoUrl: videoUrl ? `${videoUrl.substring(0, 50)}...` : null,
+    introVideoUrl: introVideoUrl ? `${introVideoUrl.substring(0, 50)}...` : null,
     stepsCount: steps.length,
     currentStepIndex,
     isPlaying,
     isPausedAtStep,
+    isIntroPhase,
   });
 
   useEffect(() => {
-    if (videoRef.current && steps.length > 0) {
-      console.log('ActivityVideoPlayer: Setting up video listeners for steps:', steps.length);
-      const cleanup = setupVideoListeners();
-      return cleanup;
-    } else {
-      console.log('ActivityVideoPlayer: Skipping video listeners setup - videoRef:', !!videoRef.current, 'steps:', steps.length);
-    }
-  }, [steps]);
-
-  // Control video playback based on isPlaying prop
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) {
-      console.log('ActivityVideoPlayer: No video element ref for playback control');
+    if (isIntroPhase) {
       return;
     }
 
-    console.log('ActivityVideoPlayer: Playback control - isPlaying:', isPlaying, 'isPausedAtStep:', isPausedAtStep, 'video.readyState:', video.readyState);
+    if (videoRef.current && steps.length > 0) {
+      const cleanup = setupVideoListeners();
+      return cleanup;
+    }
+  }, [steps, isIntroPhase]);
+
+  useEffect(() => {
+    if (isIntroPhase) {
+      return;
+    }
+
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
 
     if (isPlaying && !isPausedAtStep) {
-      console.log('ActivityVideoPlayer: Attempting to play video');
-      video.play().catch(error => {
-        console.error('ActivityVideoPlayer: Failed to play video:', error);
-      });
+      video.play().catch(error => console.error('ActivityVideoPlayer: play failed', error));
     } else if (!isPlaying) {
-      console.log('ActivityVideoPlayer: Pausing video');
       video.pause();
-    } else {
-      console.log('ActivityVideoPlayer: Video paused at step, not controlling playback');
     }
-  }, [isPlaying, isPausedAtStep]);
+  }, [isPlaying, isPausedAtStep, isIntroPhase]);
+
+  useEffect(() => {
+    if (!isIntroPhase && shouldAutoPlayMain) {
+      const timer = setTimeout(() => {
+        const video = videoRef.current;
+        if (video) {
+          video.play().catch(error => console.error('ActivityVideoPlayer: auto play failed', error));
+        }
+        setShouldAutoPlayMain(false);
+      }, 0);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isIntroPhase, shouldAutoPlayMain]);
 
   const setupVideoListeners = () => {
     const video = videoRef.current;
     if (!video) {
-      console.log('ActivityVideoPlayer: No video element for listeners');
       return;
     }
 
-    console.log('ActivityVideoPlayer: Setting up video event listeners');
-
     const handleTimeUpdate = () => {
       const currentTime = video.currentTime;
-      console.log('ActivityVideoPlayer: Time update - currentTime:', currentTime);
       onTimeUpdate(currentTime);
 
       const currentStep = steps[currentStepIndex];
       if (currentStep && currentStep.pauseTimeSeconds) {
-        // Check if we're approaching the pause time (within 0.5 seconds)
         const timeToPause = currentStep.pauseTimeSeconds - currentTime;
-        console.log('ActivityVideoPlayer: Checking pause time - step:', currentStep.order, 'pauseTime:', currentStep.pauseTimeSeconds, 'timeToPause:', timeToPause, 'isPausedAtStep:', isPausedAtStep);
         if (timeToPause >= 0 && timeToPause < 0.5 && !isPausedAtStep) {
-          console.log(`ActivityVideoPlayer: Pausing video at step ${currentStep.order} (time: ${currentTime}s, pause time: ${currentStep.pauseTimeSeconds}s)`);
           video.pause();
           onPause();
         }
       }
     };
 
-    const handlePlay = () => {
-      console.log('ActivityVideoPlayer: Video play event triggered');
-      onPlay();
-    };
-
-    const handlePause = () => {
-      console.log('ActivityVideoPlayer: Video pause event triggered');
-      onPause();
-    };
-
-    const handleEnded = () => {
-      console.log('ActivityVideoPlayer: Video ended event triggered');
-      onEnded();
-    };
+    const handlePlay = () => onPlay();
+    const handlePause = () => onPause();
+    const handleEnded = () => onEnded();
 
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('ended', handleEnded);
 
-    console.log('ActivityVideoPlayer: Video listeners added');
-
     return () => {
-      console.log('ActivityVideoPlayer: Cleaning up video listeners');
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
@@ -148,9 +151,102 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
     };
   };
 
-  if (!videoUrl) {
-    console.log('ActivityVideoPlayer: No video URL provided, component will not render');
+  if (!videoUrl && !introVideoUrl) {
     return null;
+  }
+
+  const handleIntroComplete = (autoPlayMain: boolean) => {
+    if (introVideoRef.current) {
+      introVideoRef.current.pause();
+    }
+    setIntroCompleted(true);
+    setShouldAutoPlayMain(autoPlayMain);
+  };
+
+  if (isIntroPhase && introVideoUrl) {
+    return (
+      <Card sx={{ mb: 3 }}>
+        <CardContent sx={{ p: isMobile ? 1 : 2 }}>
+          <Box sx={{ position: 'relative' }}>
+            <video
+              data-testid="intro-video"
+              ref={introVideoRef}
+              src={introVideoUrl}
+              controls
+              autoPlay
+              crossOrigin="anonymous"
+              preload="auto"
+              style={{
+                width: '100%',
+                maxHeight: isMobile ? '300px' : '500px',
+                aspectRatio: isMobile ? undefined : '16/9',
+                borderRadius: theme.shape.borderRadius,
+              }}
+              onEnded={() => handleIntroComplete(true)}
+            />
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                p: 2,
+                gap: 1,
+                pointerEvents: 'none',
+              }}
+            >
+              <Box
+                sx={{
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                  color: 'white',
+                  borderRadius: theme.shape.borderRadius,
+                  p: 2,
+                  pointerEvents: 'auto',
+                  display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  alignItems: isMobile ? 'flex-start' : 'center',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                }}
+              >
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    Intro Video
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    A short introduction will play before the main activity.
+                  </Typography>
+                </Box>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  onClick={() => handleIntroComplete(false)}
+                >
+                  Skip Intro
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!videoUrl) {
+    return (
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Alert severity="warning">
+            The main activity video is not available.
+          </Alert>
+        </CardContent>
+      </Card>
+    );
   }
 
   const currentStep = steps[currentStepIndex];
@@ -164,28 +260,18 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
   const handleMarkerClick = (pauseTimeSeconds: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime = pauseTimeSeconds;
-      console.log('ActivityVideoPlayer: Seeking to step time:', pauseTimeSeconds);
     }
   };
-
-  console.log('ActivityVideoPlayer: Rendering video element with:', {
-    src: videoUrl ? `${videoUrl.substring(0, 50)}...` : null,
-    controls: !isPausedAtStep,
-    crossOrigin: 'anonymous',
-    preload: 'none',
-    isPausedAtStep,
-    currentStep: currentStep ? { id: currentStep.id, order: currentStep.order, description: currentStep.description.substring(0, 50) } : null
-  });
 
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent sx={{ p: isMobile ? 1 : 2 }}>
         <Box sx={{ position: 'relative' }}>
           <video
+            data-testid="activity-video"
             ref={videoRef}
             src={videoUrl}
             controls={!isPausedAtStep}
-            data-testid="activity-video"
             crossOrigin="anonymous"
             preload="none"
             style={{
@@ -194,71 +280,27 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
               aspectRatio: isMobile ? undefined : '16/9',
               borderRadius: theme.shape.borderRadius,
             }}
+            onLoadedMetadata={() => {
+              if (videoRef.current) {
+                setVideoDuration(videoRef.current.duration || 0);
+              }
+            }}
             onClick={() => {
               if (!isPlaying && !isPausedAtStep) {
                 onPlay();
               }
             }}
-            onLoadedData={() => {
-              // Video loaded, can start playing
-              const duration = videoRef.current?.duration || 0;
-              setVideoDuration(duration);
-              console.log('ActivityVideoPlayer: Video loaded successfully - duration:', duration, 'readyState:', videoRef.current?.readyState);
-            }}
-            onError={(e) => {
-              const video = e.target as HTMLVideoElement;
-              console.error('ActivityVideoPlayer: Video failed to load:', {
-                error: e,
-                videoSrc: video.src,
-                errorCode: video.error?.code,
-                errorMessage: video.error?.message,
-                networkState: video.networkState,
-                readyState: video.readyState
-              });
-              // Could dispatch an error action here if needed
-            }}
-            onLoadStart={() => {
-              console.log('ActivityVideoPlayer: Video load started - src:', videoRef.current?.src);
-            }}
-            onCanPlay={() => {
-              console.log('ActivityVideoPlayer: Video can play - duration:', videoRef.current?.duration, 'videoWidth:', videoRef.current?.videoWidth, 'videoHeight:', videoRef.current?.videoHeight);
-            }}
-            onStalled={() => {
-              console.warn('ActivityVideoPlayer: Video stalled - networkState:', videoRef.current?.networkState, 'readyState:', videoRef.current?.readyState);
-            }}
-            onSuspend={() => {
-              console.log('ActivityVideoPlayer: Video loading suspended');
-            }}
-            onWaiting={() => {
-              console.log('ActivityVideoPlayer: Video waiting for data');
-            }}
-            onPlaying={() => {
-              console.log('ActivityVideoPlayer: Video started playing');
-            }}
-            onSeeking={() => {
-              console.log('ActivityVideoPlayer: Video seeking to:', videoRef.current?.currentTime);
-            }}
-            onSeeked={() => {
-              console.log('ActivityVideoPlayer: Video seeked to:', videoRef.current?.currentTime);
-            }}
-            onProgress={() => {
-              console.log('ActivityVideoPlayer: Video progress - buffered:', videoRef.current?.buffered);
-            }}
-            onAbort={() => {
-              console.warn('ActivityVideoPlayer: Video loading aborted');
-            }}
           />
 
-          {/* Timeline markers for step timestamps */}
           {!isPausedAtStep && videoDuration > 0 && steps.some(step => step.pauseTimeSeconds) && (
             <Box
               sx={{
                 position: 'absolute',
-                bottom: isMobile ? '60px' : '50px', // Position above video controls
+                bottom: isMobile ? '60px' : '50px',
                 left: 0,
                 right: 0,
                 height: '20px',
-                pointerEvents: 'none', // Allow clicks to pass through to video controls
+                pointerEvents: 'none',
                 zIndex: 1,
               }}
             >
@@ -296,7 +338,7 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
                           height: isMobile ? '16px' : '20px',
                           minWidth: 'auto',
                           padding: 0,
-                          pointerEvents: 'auto', // Enable clicks on markers
+                          pointerEvents: 'auto',
                           '&:hover': {
                             backgroundColor: theme.palette.primary.main,
                             color: 'white',
@@ -320,7 +362,7 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
 
           {isPausedAtStep && currentStep && (
             <Box
-              data-cy="step-overlay"
+              data-testid="step-overlay"
               sx={{
                 position: 'absolute',
                 top: 0,

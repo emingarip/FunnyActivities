@@ -17,16 +17,18 @@ namespace FunnyActivities.Domain.UnitTests
             var description = "Test Description";
             var videoUrl = VideoUrl.Create("https://example.com/video.mp4");
             var duration = Duration.Create(1, 30, 0);
+            var introVideoUrl = VideoUrl.Create("https://example.com/intro.mp4");
             var activityCategoryId = Guid.NewGuid();
 
             // Act
-            var activity = Activity.Create(name, description, videoUrl, duration, activityCategoryId);
+            var activity = Activity.Create(name, description, videoUrl, duration, activityCategoryId, introVideoUrl: introVideoUrl);
 
             // Assert
             activity.Name.Should().Be(name);
             activity.Description.Should().Be(description);
             activity.VideoUrl.Should().Be(videoUrl);
             activity.Duration.Should().Be(duration);
+            activity.IntroVideoUrl.Should().Be(introVideoUrl);
             activity.ActivityCategoryId.Should().Be(activityCategoryId);
             activity.Steps.Should().NotBeNull().And.BeEmpty();
             activity.ActivityProductVariants.Should().NotBeNull().And.BeEmpty();
@@ -48,12 +50,13 @@ namespace FunnyActivities.Domain.UnitTests
         public void UpdateDetails_ShouldUpdatePropertiesAndAddDomainEvent()
         {
             // Arrange
-            var activity = Activity.Create("Original Name", "Original Description", null, null, Guid.NewGuid());
+            var activity = Activity.Create("Original Name", "Original Description", null, null, Guid.NewGuid(), introVideoUrl: VideoUrl.Create("https://example.com/original-intro.mp4"));
             activity.ClearDomainEvents();
             var newName = "Updated Name";
             var newDescription = "Updated Description";
             var newVideoUrl = VideoUrl.Create("https://example.com/new-video.mp4");
             var newDuration = Duration.Create(2, 0, 0);
+            var existingIntro = activity.IntroVideoUrl;
 
             // Act
             activity.UpdateDetails(newName, newDescription, newVideoUrl, newDuration);
@@ -63,7 +66,24 @@ namespace FunnyActivities.Domain.UnitTests
             activity.Description.Should().Be(newDescription);
             activity.VideoUrl.Should().Be(newVideoUrl);
             activity.Duration.Should().Be(newDuration);
+            activity.IntroVideoUrl.Should().Be(existingIntro);
             activity.DomainEvents.Should().ContainSingle(e => e is ActivityUpdatedEvent);
+        }
+
+        [Fact]
+        public void UpdateIntroVideo_ShouldReplaceIntroVideoAndRefreshTimestamp()
+        {
+            // Arrange
+            var activity = Activity.Create("Test Activity", null, null, null, Guid.NewGuid());
+            var initialUpdatedAt = activity.UpdatedAt;
+            var newIntro = VideoUrl.Create("https://example.com/new-intro.mp4");
+
+            // Act
+            activity.UpdateIntroVideo(newIntro);
+
+            // Assert
+            activity.IntroVideoUrl.Should().Be(newIntro);
+            activity.UpdatedAt.Should().BeAfter(initialUpdatedAt);
         }
 
         [Fact]

@@ -7,6 +7,7 @@ using Minio;
 using Minio.DataModel.Args;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Entities;
+using FunnyActivities.Domain.Enums;
 using FunnyActivities.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 
@@ -263,12 +264,15 @@ public class MinioService : IMinioService
             return image;
         }
 
-        public async Task<string> UploadVideoAsync(byte[] videoData, string fileName, string contentType, Guid activityId)
+        public async Task<string> UploadVideoAsync(byte[] videoData, string fileName, string contentType, Guid activityId, ActivityVideoType videoType = ActivityVideoType.Main)
         {
             // Sanitize filename to prevent double URL encoding issues
             // Remove or replace special characters that cause problems in URLs
             var sanitizedFileName = SanitizeFileName(fileName);
-            var objectKey = $"videos/activity-{activityId}/{Guid.NewGuid()}_{sanitizedFileName}";
+            var folder = videoType == ActivityVideoType.Intro
+                ? $"videos/activity-{activityId}/intro"
+                : $"videos/activity-{activityId}";
+            var objectKey = $"{folder}/{Guid.NewGuid()}_{sanitizedFileName}";
 
             using var stream = new MemoryStream(videoData);
             var putObjectArgs = new PutObjectArgs()

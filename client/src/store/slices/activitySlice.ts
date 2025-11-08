@@ -128,6 +128,7 @@ export interface Activity {
     name: string;
   };
   videoUrl?: string;
+  introVideoUrl?: string;
 }
 
 export interface ActivityStep {

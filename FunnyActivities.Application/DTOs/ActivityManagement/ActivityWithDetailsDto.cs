@@ -29,6 +29,11 @@ namespace FunnyActivities.Application.DTOs.ActivityManagement
         public string? VideoUrl { get; set; }
 
         /// <summary>
+        /// Gets or sets the optional intro video URL of the activity.
+        /// </summary>
+        public string? IntroVideoUrl { get; set; }
+
+        /// <summary>
         /// Gets or sets the duration of the activity in HH:MM:SS format.
         /// </summary>
         public string? Duration { get; set; }
