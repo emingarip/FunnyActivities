@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState, useCallback, forwardRef } from 'rea
 import {
   Box,
   IconButton,
-  Slider,
   Typography,
   Paper,
   Tooltip,
@@ -19,6 +18,7 @@ import {
   SkipNext as SkipNextIcon,
   SkipPrevious as SkipPreviousIcon,
   Add as AddIcon,
+  RadioButtonChecked as MarkerIcon,
 } from '@mui/icons-material';
 import { TimelineMarker, VideoPlayerState } from '../../services/api.types';
 
@@ -63,7 +63,6 @@ const VideoPlayerWithScrubber = forwardRef<HTMLVideoElement, VideoPlayerWithScru
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [isScrubbing, setIsScrubbing] = useState(false);
 
   // Update player state
   const updatePlayerState = useCallback((updates: Partial<VideoPlayerState>) => {
@@ -87,12 +86,10 @@ const VideoPlayerWithScrubber = forwardRef<HTMLVideoElement, VideoPlayerWithScru
     };
 
     const handleTimeUpdate = () => {
-      if (!isScrubbing) {
-        updatePlayerState({
-          currentTime: video.currentTime,
-        });
-        onTimeChange(video.currentTime);
-      }
+      updatePlayerState({
+        currentTime: video.currentTime,
+      });
+      onTimeChange(video.currentTime);
     };
 
     const handlePlay = () => {
@@ -184,7 +181,7 @@ const VideoPlayerWithScrubber = forwardRef<HTMLVideoElement, VideoPlayerWithScru
       video.removeEventListener('ratechange', handleRateChange);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isScrubbing, updatePlayerState, onTimeChange, playerState.duration]);
+  }, [updatePlayerState, onTimeChange, playerState.duration]);
 
   // Fullscreen handling
   useEffect(() => {
@@ -220,23 +217,6 @@ const VideoPlayerWithScrubber = forwardRef<HTMLVideoElement, VideoPlayerWithScru
     }
   };
 
-  const handleSeek = (_: Event, newValue: number | number[]) => {
-    const time = Array.isArray(newValue) ? newValue[0] : newValue;
-    const video = (ref as React.RefObject<HTMLVideoElement>)?.current;
-    if (video) {
-      video.currentTime = time;
-      updatePlayerState({ currentTime: time });
-      onTimeChange(time);
-    }
-  };
-
-  const handleScrubStart = () => {
-    setIsScrubbing(true);
-  };
-
-  const handleScrubEnd = () => {
-    setIsScrubbing(false);
-  };
 
   const toggleMute = () => {
     const video = (ref as React.RefObject<HTMLVideoElement>)?.current;
@@ -307,48 +287,159 @@ const VideoPlayerWithScrubber = forwardRef<HTMLVideoElement, VideoPlayerWithScru
         onClick={togglePlay}
       />
 
-      {/* Timeline Markers Overlay */}
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: showControls ? '80px' : '40px',
-          left: 0,
-          right: 0,
-          height: '20px',
-          pointerEvents: 'none',
-        }}
-      >
-        {markers.map((marker) => (
-          <Tooltip key={marker.id} title={marker.label} arrow>
+      {/* Video Timeline Bar */}
+      {playerState.duration > 0 && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: showControls ? (isMobile ? '80px' : '70px') : (isMobile ? '60px' : '50px'),
+            left: 0,
+            right: 0,
+            height: '40px',
+            bgcolor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            px: 2,
+            zIndex: 1,
+          }}
+        >
+          {/* Timeline Progress Bar */}
+          <Box sx={{ flex: 1, position: 'relative', height: '6px', bgcolor: 'rgba(255, 255, 255, 0.3)', borderRadius: '3px' }}>
+            {/* Progress Fill */}
             <Box
               sx={{
                 position: 'absolute',
-                left: `${getMarkerPosition(marker.time)}%`,
+                left: 0,
                 top: 0,
-                width: '4px',
-                height: '20px',
-                bgcolor: marker.color || theme.palette.primary.main,
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                transform: 'translateX(-50%)',
-                borderRadius: '2px',
-                '&:hover': {
-                  width: '6px',
-                  height: '24px',
-                },
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onMarkerClick(marker);
-                const video = (ref as React.RefObject<HTMLVideoElement>)?.current;
-                if (video) {
-                  video.currentTime = marker.time;
-                }
+                height: '100%',
+                width: `${(playerState.currentTime / playerState.duration) * 100}%`,
+                bgcolor: theme.palette.primary.main,
+                borderRadius: '3px',
+                transition: 'width 0.1s ease-out',
               }}
             />
-          </Tooltip>
-        ))}
-      </Box>
+
+            {/* Step Markers on Timeline */}
+            {markers.map((marker) => (
+              <Tooltip
+                key={marker.id}
+                title={
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      {marker.label}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {formatTime(marker.time)} ({marker.time.toFixed(1)}s)
+                    </Typography>
+                    {marker.data && (
+                      <Typography variant="body2" sx={{ mt: 0.5, fontSize: '0.75rem', color: 'text.secondary' }}>
+                        {marker.data.description?.substring(0, 50)}{marker.data.description?.length > 50 ? '...' : ''}
+                      </Typography>
+                    )}
+                  </Box>
+                }
+                arrow
+                placement="top"
+              >
+                <IconButton
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    left: `${getMarkerPosition(marker.time)}%`,
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: marker.color || theme.palette.primary.main,
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    border: `2px solid ${marker.color || theme.palette.primary.main}`,
+                    width: isMobile ? '14px' : '18px',
+                    height: isMobile ? '14px' : '18px',
+                    minWidth: 'auto',
+                    padding: 0,
+                    pointerEvents: 'auto',
+                    '&:hover': {
+                      backgroundColor: marker.color || theme.palette.primary.main,
+                      color: 'white',
+                      transform: 'translate(-50%, -50%) scale(1.3)',
+                      zIndex: 2,
+                    },
+                    transition: 'all 0.2s ease-in-out',
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMarkerClick(marker);
+                    const video = (ref as React.RefObject<HTMLVideoElement>)?.current;
+                    if (video) {
+                      video.currentTime = marker.time;
+                      updatePlayerState({ currentTime: marker.time });
+                      onTimeChange(marker.time);
+                    }
+                  }}
+                  aria-label={`Jump to ${marker.label} at ${formatTime(marker.time)}`}
+                >
+                  <MarkerIcon sx={{ fontSize: isMobile ? '10px' : '12px' }} />
+                </IconButton>
+              </Tooltip>
+            ))}
+
+            {/* Clickable Timeline for Seeking */}
+            <Box
+              sx={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                width: '100%',
+                height: '100%',
+                cursor: 'pointer',
+                '&:hover': {
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '-4px',
+                    height: '14px',
+                    width: '2px',
+                    bgcolor: 'white',
+                    left: 'var(--hover-position, 0%)',
+                    transform: 'translateX(-50%)',
+                  }
+                }
+              }}
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const percentage = clickX / rect.width;
+                const newTime = percentage * playerState.duration;
+
+                const video = (ref as React.RefObject<HTMLVideoElement>)?.current;
+                if (video) {
+                  video.currentTime = newTime;
+                  updatePlayerState({ currentTime: newTime });
+                  onTimeChange(newTime);
+                }
+              }}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const hoverX = e.clientX - rect.left;
+                const percentage = hoverX / rect.width;
+                e.currentTarget.style.setProperty('--hover-position', `${percentage * 100}%`);
+              }}
+            />
+          </Box>
+
+          {/* Timeline Time Display */}
+          <Typography
+            variant="caption"
+            sx={{
+              ml: 2,
+              color: 'white',
+              fontSize: isMobile ? '0.7rem' : '0.75rem',
+              minWidth: '80px',
+              textAlign: 'right'
+            }}
+          >
+            {formatTime(playerState.currentTime)} / {formatTime(playerState.duration)}
+          </Typography>
+        </Box>
+      )}
 
       {/* Controls Overlay */}
       {controls && showControls && (
@@ -365,41 +456,6 @@ const VideoPlayerWithScrubber = forwardRef<HTMLVideoElement, VideoPlayerWithScru
           role="region"
           aria-label="Video player controls"
         >
-          {/* Progress Bar */}
-          <Box sx={{ mb: 2 }}>
-            <Slider
-              value={playerState.currentTime}
-              max={playerState.duration || 100}
-              onChange={handleSeek}
-              onChangeCommitted={handleScrubEnd}
-              onMouseDown={handleScrubStart}
-              aria-label="Video progress"
-              sx={{
-                color: theme.palette.primary.main,
-                '& .MuiSlider-thumb': {
-                  width: 16,
-                  height: 16,
-                },
-              }}
-            />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-              <Typography
-                variant="caption"
-                color="white"
-                aria-live="polite"
-                aria-label={`Current time: ${formatTime(playerState.currentTime)}`}
-              >
-                {formatTime(playerState.currentTime)}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="white"
-                aria-label={`Total duration: ${formatTime(playerState.duration)}`}
-              >
-                {formatTime(playerState.duration)}
-              </Typography>
-            </Box>
-          </Box>
 
           {/* Control Buttons */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>

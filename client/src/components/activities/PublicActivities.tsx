@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -27,6 +27,7 @@ import {
 import { activitiesAPI, favoritesAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import VideoPreview from './VideoPreview';
+import { getJsonItem } from '../../utils/storage';
 
 interface Activity {
   id: string;
@@ -101,7 +102,7 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
 
         if (hasChanges) {
           setActivities(newActivities);
-          console.log('🔄 Activities updated via polling:', newActivities.length, 'activities');
+          console.log('ðŸ”„ Activities updated via polling:', newActivities.length, 'activities');
         }
       }
     } catch (err: any) {
@@ -231,7 +232,7 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
         });
 
         // Enhanced video URL logging
-        console.log('🎬 PublicActivities: Activities loaded from API:', {
+        console.log('ðŸŽ¬ PublicActivities: Activities loaded from API:', {
           totalActivities: processedActivities.length,
           activitiesWithVideoUrls: processedActivities.filter((activity: Activity) => activity.videoUrl).length,
           activitiesWithoutVideoUrls: processedActivities.filter((activity: Activity) => !activity.videoUrl).length,
@@ -255,7 +256,7 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
         // Log activities without video URLs for debugging
         const activitiesWithoutVideo = newActivities.filter((activity: Activity) => !activity.videoUrl);
         if (activitiesWithoutVideo.length > 0) {
-          console.log('🚫 PublicActivities: Activities without video URLs:', activitiesWithoutVideo.map((activity: Activity) => ({
+          console.log('ðŸš« PublicActivities: Activities without video URLs:', activitiesWithoutVideo.map((activity: Activity) => ({
             activityId: activity.id,
             activityName: activity.name,
             hasCategory: !!activity.activityCategory,
@@ -287,45 +288,45 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
 
   const loadUserData = async () => {
     try {
-      console.log('🔄 Loading user favorites in PublicActivities...');
+      console.log('ðŸ”„ Loading user favorites in PublicActivities...');
       // Load favorites from API
       const favoritesResponse = await favoritesAPI.getUserFavorites();
       if (favoritesResponse.data.success) {
         const favoriteActivityIds = favoritesResponse.data.data?.map((fav: any) => fav.activityId) || [];
-        console.log('✅ Loaded favorites from API in PublicActivities:', favoriteActivityIds);
+        console.log('âœ… Loaded favorites from API in PublicActivities:', favoriteActivityIds);
         setFavorites(new Set(favoriteActivityIds));
       } else {
-        console.warn('⚠️ API response not successful in PublicActivities:', favoritesResponse.data);
+        console.warn('âš ï¸ API response not successful in PublicActivities:', favoritesResponse.data);
       }
     } catch (err) {
-      console.error('❌ Error loading user favorites in PublicActivities:', err);
+      console.error('�?O Error loading user favorites in PublicActivities:', err);
       // Fallback to localStorage if API fails
-      const savedFavorites = localStorage.getItem('activityFavorites');
-      if (savedFavorites) {
-        console.log('🔄 Loading favorites from localStorage fallback in PublicActivities');
-        setFavorites(new Set(JSON.parse(savedFavorites)));
+      const storedFavorites = getJsonItem<string[]>('activityFavorites', []);
+      if (storedFavorites.length > 0) {
+        console.log('dY", Loading favorites from localStorage fallback in PublicActivities');
+        setFavorites(new Set(storedFavorites));
       } else {
-        console.log('ℹ️ No favorites found in localStorage in PublicActivities');
+        console.log('�,1�,? No favorites found in localStorage in PublicActivities');
       }
     }
   };
 
   const toggleFavorite = async (activityId: string) => {
-    console.log('💖 Toggle favorite clicked for activity in PublicActivities:', activityId);
-    console.log('🔐 Is authenticated:', isAuthenticated);
-    console.log('⏳ Is loading:', favoritesLoading.has(activityId));
-    console.log('❤️ Is currently favorited:', favorites.has(activityId));
+    console.log('ðŸ’– Toggle favorite clicked for activity in PublicActivities:', activityId);
+    console.log('ðŸ” Is authenticated:', isAuthenticated);
+    console.log('â³ Is loading:', favoritesLoading.has(activityId));
+    console.log('â¤ï¸ Is currently favorited:', favorites.has(activityId));
 
     // Check if user is authenticated
     if (!isAuthenticated) {
-      console.log('🚫 User not authenticated, redirecting to login');
+      console.log('ðŸš« User not authenticated, redirecting to login');
       navigate('/login');
       return;
     }
 
     // Check if already loading this activity
     if (favoritesLoading.has(activityId)) {
-      console.log('⏳ Already loading this activity, ignoring click');
+      console.log('â³ Already loading this activity, ignoring click');
       return;
     }
 
@@ -334,40 +335,40 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
 
     try {
       // Add to loading state
-      console.log('⏳ Adding to loading state in PublicActivities');
+      console.log('â³ Adding to loading state in PublicActivities');
       setFavoritesLoading(prev => new Set(prev).add(activityId));
 
       if (isCurrentlyFavorited) {
-        console.log('💔 Removing from favorites in PublicActivities');
+        console.log('ðŸ’” Removing from favorites in PublicActivities');
         // Remove from favorites
         await favoritesAPI.removeFromFavorites(activityId);
         newFavorites.delete(activityId);
-        console.log('✅ Successfully removed from favorites in PublicActivities');
+        console.log('âœ… Successfully removed from favorites in PublicActivities');
       } else {
-        console.log('❤️ Adding to favorites in PublicActivities');
+        console.log('â¤ï¸ Adding to favorites in PublicActivities');
         // Add to favorites
         await favoritesAPI.addToFavorites(activityId);
         newFavorites.add(activityId);
-        console.log('✅ Successfully added to favorites in PublicActivities');
+        console.log('âœ… Successfully added to favorites in PublicActivities');
       }
 
-      console.log('🔄 Updating favorites state in PublicActivities');
+      console.log('ðŸ”„ Updating favorites state in PublicActivities');
       setFavorites(newFavorites);
     } catch (err: any) {
-      console.error('❌ Error toggling favorite in PublicActivities:', err);
+      console.error('âŒ Error toggling favorite in PublicActivities:', err);
       let errorMessage = 'Failed to update favorites';
 
       if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
-        console.error('❌ API Error in PublicActivities:', err.response.data);
+        console.error('âŒ API Error in PublicActivities:', err.response.data);
       } else if (err.message) {
         errorMessage = err.message;
       }
 
-      console.error('❌ Error message in PublicActivities:', errorMessage);
+      console.error('âŒ Error message in PublicActivities:', errorMessage);
 
       // Revert optimistic update on error
-      console.log('🔄 Reverting optimistic update due to error in PublicActivities');
+      console.log('ðŸ”„ Reverting optimistic update due to error in PublicActivities');
       if (isCurrentlyFavorited) {
         newFavorites.add(activityId);
       } else {
@@ -376,7 +377,7 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
       setFavorites(newFavorites);
     } finally {
       // Remove from loading state
-      console.log('⏳ Removing from loading state in PublicActivities');
+      console.log('â³ Removing from loading state in PublicActivities');
       setFavoritesLoading(prev => {
         const newSet = new Set(prev);
         newSet.delete(activityId);
@@ -519,7 +520,7 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
               {/* Video Preview Section */}
               {(() => {
                 const shouldRenderVideo = !!activity.videoUrl;
-                console.log('🎬 PublicActivities: VideoPreview rendering decision:', {
+                console.log('ðŸŽ¬ PublicActivities: VideoPreview rendering decision:', {
                   activityId: activity.id,
                   activityName: activity.name,
                   videoUrl: activity.videoUrl,
@@ -707,3 +708,4 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
 };
 
 export default PublicActivities;
+

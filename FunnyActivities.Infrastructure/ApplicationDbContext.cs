@@ -26,6 +26,7 @@ namespace FunnyActivities.Infrastructure
         public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
         public DbSet<ActivityCategory> ActivityCategories { get; set; }
         public DbSet<Activity> Activities { get; set; }
+        public DbSet<ActivityUser> ActivityUsers { get; set; }
         public DbSet<Step> Steps { get; set; }
         public DbSet<ActivityProductVariant> ActivityProductVariants { get; set; }
         public DbSet<Favorites> Favorites { get; set; }
@@ -295,6 +296,22 @@ namespace FunnyActivities.Infrastructure
                 entity.HasIndex(a => a.CreatedAt);
                 entity.HasIndex(a => a.IsPublic); // For public activity queries
                 entity.HasIndex(a => new { a.IsPublic, a.CreatedAt }); // Composite index for public sorted queries
+            });
+
+            // Configure ActivityUser entity (many-to-many between Activity and User)
+            modelBuilder.Entity<ActivityUser>(entity =>
+            {
+                entity.HasKey(au => new { au.ActivityId, au.UserId });
+
+                entity.HasOne(au => au.Activity)
+                      .WithMany(a => a.ActivityUsers)
+                      .HasForeignKey(au => au.ActivityId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(au => au.User)
+                      .WithMany()
+                      .HasForeignKey(au => au.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             // Configure Step entity

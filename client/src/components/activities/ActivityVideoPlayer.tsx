@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   Box,
   Card,
@@ -7,8 +7,10 @@ import {
   Button,
   useTheme,
   useMediaQuery,
+  Tooltip,
+  IconButton,
 } from '@mui/material';
-import { PlayArrow as PlayIcon } from '@mui/icons-material';
+import { PlayArrow as PlayIcon, RadioButtonChecked as MarkerIcon } from '@mui/icons-material';
 
 interface ActivityStep {
   id: string;
@@ -45,6 +47,7 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoDuration, setVideoDuration] = useState<number>(0);
 
   console.log('ActivityVideoPlayer: Component rendered with props:', {
     videoUrl: videoUrl ? `${videoUrl.substring(0, 50)}...` : null,
@@ -152,6 +155,19 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
 
   const currentStep = steps[currentStepIndex];
 
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleMarkerClick = (pauseTimeSeconds: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = pauseTimeSeconds;
+      console.log('ActivityVideoPlayer: Seeking to step time:', pauseTimeSeconds);
+    }
+  };
+
   console.log('ActivityVideoPlayer: Rendering video element with:', {
     src: videoUrl ? `${videoUrl.substring(0, 50)}...` : null,
     controls: !isPausedAtStep,
@@ -175,11 +191,19 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
             style={{
               width: '100%',
               maxHeight: isMobile ? '300px' : '500px',
+              aspectRatio: isMobile ? undefined : '16/9',
               borderRadius: theme.shape.borderRadius,
+            }}
+            onClick={() => {
+              if (!isPlaying && !isPausedAtStep) {
+                onPlay();
+              }
             }}
             onLoadedData={() => {
               // Video loaded, can start playing
-              console.log('ActivityVideoPlayer: Video loaded successfully - duration:', videoRef.current?.duration, 'readyState:', videoRef.current?.readyState);
+              const duration = videoRef.current?.duration || 0;
+              setVideoDuration(duration);
+              console.log('ActivityVideoPlayer: Video loaded successfully - duration:', duration, 'readyState:', videoRef.current?.readyState);
             }}
             onError={(e) => {
               const video = e.target as HTMLVideoElement;
@@ -224,6 +248,75 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
               console.warn('ActivityVideoPlayer: Video loading aborted');
             }}
           />
+
+          {/* Timeline markers for step timestamps */}
+          {!isPausedAtStep && videoDuration > 0 && steps.some(step => step.pauseTimeSeconds) && (
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: isMobile ? '60px' : '50px', // Position above video controls
+                left: 0,
+                right: 0,
+                height: '20px',
+                pointerEvents: 'none', // Allow clicks to pass through to video controls
+                zIndex: 1,
+              }}
+            >
+              {steps
+                .filter(step => step.pauseTimeSeconds && step.pauseTimeSeconds <= videoDuration)
+                .map((step) => {
+                  const positionPercent = (step.pauseTimeSeconds! / videoDuration) * 100;
+                  return (
+                    <Tooltip
+                      key={step.id}
+                      title={
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                            Step {step.order}: {formatTime(step.pauseTimeSeconds!)}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mt: 0.5 }}>
+                            {step.description}
+                          </Typography>
+                        </Box>
+                      }
+                      arrow
+                      placement="top"
+                    >
+                      <IconButton
+                        size="small"
+                        sx={{
+                          position: 'absolute',
+                          left: `${positionPercent}%`,
+                          top: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          color: theme.palette.primary.main,
+                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                          border: `2px solid ${theme.palette.primary.main}`,
+                          width: isMobile ? '16px' : '20px',
+                          height: isMobile ? '16px' : '20px',
+                          minWidth: 'auto',
+                          padding: 0,
+                          pointerEvents: 'auto', // Enable clicks on markers
+                          '&:hover': {
+                            backgroundColor: theme.palette.primary.main,
+                            color: 'white',
+                            transform: 'translate(-50%, -50%) scale(1.2)',
+                          },
+                          transition: 'all 0.2s ease-in-out',
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMarkerClick(step.pauseTimeSeconds!);
+                        }}
+                        aria-label={`Jump to step ${step.order} at ${formatTime(step.pauseTimeSeconds!)}`}
+                      >
+                        <MarkerIcon sx={{ fontSize: isMobile ? '12px' : '14px' }} />
+                      </IconButton>
+                    </Tooltip>
+                  );
+                })}
+            </Box>
+          )}
 
           {isPausedAtStep && currentStep && (
             <Box

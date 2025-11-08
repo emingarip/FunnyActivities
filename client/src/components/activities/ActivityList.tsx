@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -41,6 +41,7 @@ import {
 } from '@mui/icons-material';
 import { activitiesAPI, activityCategoriesAPI, favoritesAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { getJsonItem } from '../../utils/storage';
 
 interface Activity {
   id: string;
@@ -163,52 +164,49 @@ const ActivityList: React.FC<ActivityListProps> = ({ onActivitySelect }) => {
 
   const loadUserData = async () => {
     try {
-      console.log('🔄 Loading user favorites...');
+      console.log('dY", Loading user favorites...');
       // Load favorites from API
       const favoritesResponse = await favoritesAPI.getUserFavorites();
       if (favoritesResponse.data.success) {
         const favoriteActivityIds = favoritesResponse.data.data?.map((fav: any) => fav.activityId) || [];
-        console.log('✅ Loaded favorites from API:', favoriteActivityIds);
+        console.log('�o. Loaded favorites from API:', favoriteActivityIds);
         setFavorites(new Set(favoriteActivityIds));
       } else {
-        console.warn('⚠️ API response not successful:', favoritesResponse.data);
+        console.warn('�s��,? API response not successful:', favoritesResponse.data);
       }
     } catch (err) {
-      console.error('❌ Error loading user favorites:', err);
+      console.error('�?O Error loading user favorites:', err);
       // Fallback to localStorage if API fails
-      const savedFavorites = localStorage.getItem('activityFavorites');
-      if (savedFavorites) {
-        console.log('🔄 Loading favorites from localStorage fallback');
-        setFavorites(new Set(JSON.parse(savedFavorites)));
+      const storedFavorites = getJsonItem<string[]>('activityFavorites', []);
+      if (storedFavorites.length > 0) {
+        console.log('dY", Loading favorites from localStorage fallback');
+        setFavorites(new Set(storedFavorites));
       } else {
-        console.log('ℹ️ No favorites found in localStorage');
+        console.log('�,1�,? No favorites found in localStorage');
       }
     }
 
     // Load progress from localStorage (in a real app, this would come from API)
-    const savedProgress = localStorage.getItem('activityProgress');
-    if (savedProgress) {
-      const progressData = JSON.parse(savedProgress);
-      setProgress(new Map(Object.entries(progressData)));
-    }
+    const storedProgress = getJsonItem<Record<string, ActivityProgress>>('activityProgress', {});
+    setProgress(new Map(Object.entries(storedProgress)));
   };
 
   const toggleFavorite = async (activityId: string) => {
-    console.log('💖 Toggle favorite clicked for activity:', activityId);
-    console.log('🔐 Is authenticated:', isAuthenticated);
-    console.log('⏳ Is loading:', favoritesLoading.has(activityId));
-    console.log('❤️ Is currently favorited:', favorites.has(activityId));
+    console.log('ðŸ’– Toggle favorite clicked for activity:', activityId);
+    console.log('ðŸ” Is authenticated:', isAuthenticated);
+    console.log('â³ Is loading:', favoritesLoading.has(activityId));
+    console.log('â¤ï¸ Is currently favorited:', favorites.has(activityId));
 
     // Check if user is authenticated
     if (!isAuthenticated) {
-      console.log('🚫 User not authenticated, redirecting to login');
+      console.log('ðŸš« User not authenticated, redirecting to login');
       navigate('/login');
       return;
     }
 
     // Check if already loading this activity
     if (favoritesLoading.has(activityId)) {
-      console.log('⏳ Already loading this activity, ignoring click');
+      console.log('â³ Already loading this activity, ignoring click');
       return;
     }
 
@@ -217,43 +215,43 @@ const ActivityList: React.FC<ActivityListProps> = ({ onActivitySelect }) => {
 
     try {
       // Add to loading state
-      console.log('⏳ Adding to loading state');
+      console.log('â³ Adding to loading state');
       setFavoritesLoading(prev => new Set(prev).add(activityId));
 
       if (isCurrentlyFavorited) {
-        console.log('💔 Removing from favorites');
+        console.log('ðŸ’” Removing from favorites');
         // Remove from favorites
         await favoritesAPI.removeFromFavorites(activityId);
         newFavorites.delete(activityId);
-        console.log('✅ Successfully removed from favorites');
+        console.log('âœ… Successfully removed from favorites');
         showSnackbar('Removed from favorites', 'success');
       } else {
-        console.log('❤️ Adding to favorites');
+        console.log('â¤ï¸ Adding to favorites');
         // Add to favorites
         await favoritesAPI.addToFavorites(activityId);
         newFavorites.add(activityId);
-        console.log('✅ Successfully added to favorites');
+        console.log('âœ… Successfully added to favorites');
         showSnackbar('Added to favorites', 'success');
       }
 
-      console.log('🔄 Updating favorites state');
+      console.log('ðŸ”„ Updating favorites state');
       setFavorites(newFavorites);
     } catch (err: any) {
-      console.error('❌ Error toggling favorite:', err);
+      console.error('âŒ Error toggling favorite:', err);
       let errorMessage = 'Failed to update favorites';
 
       if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
-        console.error('❌ API Error:', err.response.data);
+        console.error('âŒ API Error:', err.response.data);
       } else if (err.message) {
         errorMessage = err.message;
       }
 
-      console.error('❌ Error message:', errorMessage);
+      console.error('âŒ Error message:', errorMessage);
       showSnackbar(errorMessage, 'error');
 
       // Revert optimistic update on error
-      console.log('🔄 Reverting optimistic update due to error');
+      console.log('ðŸ”„ Reverting optimistic update due to error');
       if (isCurrentlyFavorited) {
         newFavorites.add(activityId);
       } else {
@@ -262,7 +260,7 @@ const ActivityList: React.FC<ActivityListProps> = ({ onActivitySelect }) => {
       setFavorites(newFavorites);
     } finally {
       // Remove from loading state
-      console.log('⏳ Removing from loading state');
+      console.log('â³ Removing from loading state');
       setFavoritesLoading(prev => {
         const newSet = new Set(prev);
         newSet.delete(activityId);

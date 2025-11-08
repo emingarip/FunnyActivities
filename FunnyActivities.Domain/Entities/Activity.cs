@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using FunnyActivities.Domain.Events;
 using FunnyActivities.Domain.ValueObjects;
 
@@ -59,6 +60,12 @@ namespace FunnyActivities.Domain.Entities
         public List<ActivityProductVariant> ActivityProductVariants { get; private set; }
 
         /// <summary>
+        /// Gets the user links for this activity.
+        /// </summary>
+        [JsonIgnore]
+        public List<ActivityUser> ActivityUsers { get; private set; }
+
+        /// <summary>
         /// Gets the date and time when the activity was created.
         /// </summary>
         public DateTime CreatedAt { get; private set; }
@@ -99,6 +106,7 @@ namespace FunnyActivities.Domain.Entities
             IsPublic = isPublic;
             Steps = new List<Step>();
             ActivityProductVariants = new List<ActivityProductVariant>();
+            ActivityUsers = new List<ActivityUser>();
             DomainEvents = new List<IDomainEvent>();
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
@@ -111,6 +119,9 @@ namespace FunnyActivities.Domain.Entities
         {
             // Set default value for IsPublic when loading from database
             IsPublic = false;
+            Steps = new List<Step>();
+            ActivityProductVariants = new List<ActivityProductVariant>();
+            ActivityUsers = new List<ActivityUser>();
         }
 
         /// <summary>
