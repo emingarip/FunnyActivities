@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -83,6 +84,7 @@ function TabPanel(props: TabPanelProps) {
 const ActivityAdmin: React.FC = () => {
   console.log('[ActivityAdmin] Component rendered');
 
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -92,7 +94,6 @@ const ActivityAdmin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [categoryFormOpen, setCategoryFormOpen] = useState(false);
   const [categoryFormData, setCategoryFormData] = useState({
     name: '',
@@ -188,13 +189,11 @@ const ActivityAdmin: React.FC = () => {
   };
 
   const handleCreateActivity = () => {
-    setEditingActivity(null);
     setFormOpen(true);
   };
 
   const handleEditActivity = (activity: Activity) => {
-    setEditingActivity(activity);
-    setFormOpen(true);
+    navigate(`/admin/activities/${activity.id}/edit`);
   };
 
   const handleDeleteActivity = async (activity: Activity) => {
@@ -213,12 +212,10 @@ const ActivityAdmin: React.FC = () => {
 
   const handleFormClose = () => {
     setFormOpen(false);
-    setEditingActivity(null);
   };
 
   const handleFormSuccess = async () => {
     setFormOpen(false);
-    setEditingActivity(null);
     await loadData(); // Refresh the list
   };
 
@@ -593,11 +590,11 @@ const ActivityAdmin: React.FC = () => {
         fullScreen={isMobile}
       >
         <DialogTitle>
-          {editingActivity ? 'Edit Activity' : 'Create New Activity'}
+          Create New Activity
         </DialogTitle>
         <DialogContent>
           <ActivityForm
-            activity={editingActivity}
+            activity={null}
             categories={categories}
             onSuccess={handleFormSuccess}
             onCancel={handleFormClose}

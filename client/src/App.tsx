@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import AdminDashboard from './pages/AdminDashboard';
 import ActivityAdmin from './pages/ActivityAdmin';
+import ActivityEditPage from './pages/ActivityEditPage';
 import ActivityPage from './pages/ActivityPage';
 import UserDashboard from './pages/UserDashboard';
 import Wallet from './pages/Wallet';
@@ -57,6 +58,7 @@ function AppContent() {
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/activities" element={<AdminRoute><ActivityAdmin /></AdminRoute>} />
+          <Route path="/admin/activities/:id/edit" element={<AdminRoute><ActivityEditPage /></AdminRoute>} />
           <Route path="/admin/materials" element={<AdminRoute><MaterialsAdmin /></AdminRoute>} />
           <Route path="/admin/products" element={<AdminRoute><ProductsOverview /></AdminRoute>} />
           <Route path="/admin/product-wizard-demo" element={<AdminRoute><ProductWizardDemo /></AdminRoute>} />
