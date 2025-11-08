@@ -1,4 +1,4 @@
-﻿using FunnyActivities.CrossCuttingConcerns;
+using FunnyActivities.CrossCuttingConcerns;
 using FunnyActivities.CrossCuttingConcerns.APIDocumentation;
 using FunnyActivities.Infrastructure;
 using FunnyActivities.WebAPI.Extensions;
@@ -14,56 +14,56 @@ var builder = WebApplication.CreateBuilder(args);
 
 // --- 1. SERVIS YAPILANDIRMASI (DEPENDENCY INJECTION) ---
 
-// Serilog'u yapılandır
+// Serilog'u yapilandir
 SerilogConfiguration.ConfigureSerilog(builder.Configuration);
 builder.Host.UseSerilog();
 
-// Controller'ları ekle
+// Controller'lari ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddControllers(builder.Services);  
 
-// Application Insights'ı yapılandır
+// Application Insights'i yapilandir
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddApplicationInsights(builder.Services);
 
 // HttpClient servislerini ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddHttpClientServices(builder.Services);
 
-// Health check'leri yapılandır
+// Health check'leri yapilandir
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddHealthChecks(builder.Services, builder.Configuration);
 
-// JWT ile kimlik doğrulamayı (Authentication) ekle
+// JWT ile kimlik dogrulamayi (Authentication) ekle
 FunnyActivities.CrossCuttingConcerns.ServiceCollectionExtensions.AddJwtAuthentication(builder.Services, builder.Configuration);
 
-// Yetkilendirme (Authorization) politikalarını ekle
+// Yetkilendirme (Authorization) politikalarini ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddAuthorizationPolicies(builder.Services);
 
-// Özel yetkilendirme handler'larını kaydet
+// �zel yetkilendirme handler'larini kaydet
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddAuthorizationHandlers(builder.Services);
 
-// API versiyonlamayı ekle
+// API versiyonlamayi ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddApiVersioning(builder.Services);
 
-// Swagger (API dokümantasyonu) ekle
+// Swagger (API dok�mantasyonu) ekle
 builder.Services.AddSwagger();
 
-// CORS (Cross-Origin Resource Sharing) politikasını ekle
+// CORS (Cross-Origin Resource Sharing) politikasini ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddCors(builder.Services);
 
-// Veritabanı DbContext'ini ekle
+// Veritabani DbContext'ini ekle
 builder.Services.AddDatabase(builder.Configuration);
 
 // Repository'leri ekle
 builder.Services.AddRepositories();
 
-// MinIO client'ını ekle
+// MinIO client'ini ekle
 builder.Services.AddMinio(builder.Configuration);
 
-// Resim işleme ve MinIO servislerini ekle
+// Resim isleme ve MinIO servislerini ekle
 builder.Services.AddImageProcessingServices();
 
-// Dosya yükleme ayarlarını ekle
+// Dosya y�kleme ayarlarini ekle
 builder.Services.AddFileUploadConfiguration(builder.Configuration);
 
-// Dosya yükleme servislerini ekle
+// Dosya y�kleme servislerini ekle
 builder.Services.AddFileUploadServices();
 
 // Bildirim servislerini ekle
@@ -78,13 +78,13 @@ builder.Services.AddDomainServices();
 // Loglama servislerini ekle
 builder.Services.AddLoggingServices();
 
-// MediatR'ı ekle
+// MediatR'i ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddMediatR(builder.Services);
 
-// HttpContextAccessor'ı ekle (Audit loglama gibi işlemler için)
+// HttpContextAccessor'i ekle (Audit loglama gibi islemler i�in)
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddHttpContextAccessor(builder.Services);
 
-// Redis (caching için) ekle
+// Redis (caching i�in) ekle
 builder.Services.AddRedis(builder.Configuration);
 
 
@@ -92,7 +92,7 @@ builder.Services.AddRedis(builder.Configuration);
 
 var app = builder.Build();
 
-// Veritabanı migration'larını uygula (sadece ilişkisel veritabanları için)
+// Veritabani migration'larini uygula (sadece iliskisel veritabanlari i�in)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -107,59 +107,60 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Veritabanı migrate edilirken bir hata oluştu.");
-        throw; // Uygulamanın başlamasını engelle
+        logger.LogError(ex, "Veritabani migrate edilirken bir hata olustu.");
+        throw; // Uygulamanin baslamasini engelle
     }
 }
 
-// HTTP istek işleme hattını (pipeline) yapılandır
-// Geliştirme ortamındaysa Swagger ve geliştirici hata sayfasını kullan
+// HTTP istek isleme hattini (pipeline) yapilandir
+// Gelistirme ortamindaysa Swagger ve gelistirici hata sayfasini kullan
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwaggerDocumentation(); // Özel Swagger extension metodunuz
+    app.UseSwaggerDocumentation(); // �zel Swagger extension metodunuz
 }
 
-// Hataları merkezi olarak yakalamak için custom exception middleware'ını kullan
+// Hatalari merkezi olarak yakalamak i�in custom exception middleware'ini kullan
 app.UseCustomExceptionHandling();
 
-// Gelen istekleri HTTP'den HTTPS'e yönlendir
+// Gelen istekleri HTTP'den HTTPS'e y�nlendir
 app.UseHttpsRedirection();
 
-// Yönlendirme (Routing) middleware'ını ekle. Bu, isteğin hangi endpoint'e gideceğini belirler.
+// Y�nlendirme (Routing) middleware'ini ekle. Bu, istegin hangi endpoint'e gidecegini belirler.
 app.UseRouting();
 
-// Prometheus metriklerini toplamak için (UseRouting'den sonra gelmeli)
+// Prometheus metriklerini toplamak i�in (UseRouting'den sonra gelmeli)
 app.UseHttpMetrics();
 
-// CORS middleware'ını ekle. Tarayıcıların farklı domain'lerden API'ye erişimine izin verir.
-// Güvenlik middleware'larından (Authentication/Authorization) önce gelmelidir.
-app.UseCors("AllowAllOrigins"); // Development için tüm origin'lere izin ver
+// CORS middleware'ini ekle. Tarayicilarin farkli domain'lerden API'ye erisimine izin verir.
+// G�venlik middleware'larindan (Authentication/Authorization) �nce gelmelidir.
+app.UseCors("AllowAllOrigins"); // Development i�in t�m origin'lere izin ver
 
-// Kimlik doğrulama (Authentication) middleware'ını ekle. Gelen JWT'yi doğrular.
-app.UseAuthenticationMiddleware(); // Sizin custom middleware'ınız
+// Kimlik dogrulama (Authentication) middleware'ini ekle. Gelen JWT'yi dogrular.
+app.UseAuthentication();
+app.UseAuthenticationMiddleware(); // Sizin custom middleware'iniz
 
-// Yetkilendirme (Authorization) middleware'ını ekle. [Authorize] attributelarını denetler.
+// Yetkilendirme (Authorization) middleware'ini ekle. [Authorize] attributelarini denetler.
 app.UseAuthorization();
 
-// Yanıtları önbelleğe almak için (isteğe bağlı)
+// Yanitlari �nbellege almak i�in (istege bagli)
 app.UseResponseCaching();
 
-// Diğer özel middleware'larınız (rol doğrulama, loglama vb.)
+// Diger �zel middleware'lariniz (rol dogrulama, loglama vb.)
 app.UseMiddleware<RoleValidationMiddleware>();
 app.UseMiddleware<AuditLoggingMiddleware>();
 
 // Prometheus metrik sunucusunu endpoint olarak ekle
 app.UseMetricServer();
 
-// Controller endpoint'lerini haritala. Bu, gelen isteği doğru Controller Action'ına yönlendirir.
+// Controller endpoint'lerini haritala. Bu, gelen istegi dogru Controller Action'ina y�nlendirir.
 app.MapControllers();
 
 // Health check endpoint'ini haritala
 app.MapHealthChecks("/health");
 
-// Uygulamayı çalıştır
+// Uygulamayi �alistir
 await app.RunAsync();
 
 
-// Entegrasyon testleri için Program sınıfını public yap
+// Entegrasyon testleri i�in Program sinifini public yap
 public partial class Program { }

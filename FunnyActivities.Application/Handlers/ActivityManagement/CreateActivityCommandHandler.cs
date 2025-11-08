@@ -7,6 +7,7 @@ using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Entities;
 using FunnyActivities.Domain.ValueObjects;
+using FunnyActivities.CrossCuttingConcerns.Caching;
 
 namespace FunnyActivities.Application.Handlers.ActivityManagement
 {
@@ -16,16 +17,19 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
     public class CreateActivityCommandHandler : IRequestHandler<CreateActivityCommand, ActivityDto>
     {
         private readonly IActivityRepository _activityRepository;
+        private readonly ICacheService _cache;
         private readonly ILogger<CreateActivityCommandHandler> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateActivityCommandHandler"/> class.
         /// </summary>
         /// <param name="activityRepository">The activity repository.</param>
+        /// <param name="cache">The cache service.</param>
         /// <param name="logger">The logger.</param>
-        public CreateActivityCommandHandler(IActivityRepository activityRepository, ILogger<CreateActivityCommandHandler> logger)
+        public CreateActivityCommandHandler(IActivityRepository activityRepository, ICacheService cache, ILogger<CreateActivityCommandHandler> logger)
         {
             _activityRepository = activityRepository;
+            _cache = cache;
             _logger = logger;
         }
 
@@ -61,6 +65,9 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             // Save to repository
             await _activityRepository.AddAsync(activity);
 
+            // Invalidate public activities cache since new activity might be public
+            await InvalidatePublicActivitiesCacheAsync();
+
             _logger.LogInformation("Activity created successfully with ID: {Id}", activity.Id);
 
             // Map to DTO
@@ -80,6 +87,33 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             };
 
             return activityDto;
+        }
+
+        private async Task InvalidatePublicActivitiesCacheAsync()
+        {
+            try
+            {
+                // Clear all public activities cache keys (simplified approach)
+                // In a production system, you might want to use a pattern-based invalidation
+                // For now, we'll clear a few common cache keys
+                var commonCacheKeys = new[]
+                {
+                    "public_activities_1_10_name_asc",
+                    "public_activities_1_20_name_asc",
+                    "public_activities_1_50_name_asc"
+                };
+
+                foreach (var key in commonCacheKeys)
+                {
+                    await _cache.RemoveAsync(key);
+                }
+
+                _logger.LogInformation("Invalidated public activities cache");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error invalidating public activities cache");
+            }
         }
     }
 }

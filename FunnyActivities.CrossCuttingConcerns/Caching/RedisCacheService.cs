@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,6 +11,11 @@ public class RedisCacheService : ICacheService
 {
     private readonly IDistributedCache _cache;
     private readonly ILogger<RedisCacheService> _logger;
+    private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.General)
+    {
+        ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        WriteIndented = false
+    };
 
     public RedisCacheService(IDistributedCache cache, ILogger<RedisCacheService> logger)
     {
@@ -29,7 +35,7 @@ public class RedisCacheService : ICacheService
             }
 
             _logger.LogDebug("Cache hit for key: {Key}", key);
-            return JsonSerializer.Deserialize<T>(value);
+            return JsonSerializer.Deserialize<T>(value, _serializerOptions);
         }
         catch (Exception ex)
         {
@@ -53,7 +59,7 @@ public class RedisCacheService : ICacheService
                 options.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
             }
 
-            var serializedValue = JsonSerializer.Serialize(value);
+            var serializedValue = JsonSerializer.Serialize(value, _serializerOptions);
             await _cache.SetStringAsync(key, serializedValue, options).ConfigureAwait(false);
             _logger.LogDebug("Cache set for key: {Key} with expiry: {Expiry}", key, expiry ?? TimeSpan.FromMinutes(30));
         }

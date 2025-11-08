@@ -5,45 +5,45 @@ using FunnyActivities.Application.Commands.ActivityManagement;
 namespace FunnyActivities.Application.Validators.ActivityManagement
 {
     /// <summary>
-    /// Validator for CreateActivityCommand.
+    /// Validator for UpdateActivityCommand.
     /// </summary>
-    public class CreateActivityCommandValidator : AbstractValidator<CreateActivityCommand>
+    public class UpdateActivityCommandValidator : AbstractValidator<UpdateActivityCommand>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateActivityCommandValidator"/> class.
+        /// Initializes a new instance of the <see cref="UpdateActivityCommandValidator"/> class.
         /// </summary>
-        public CreateActivityCommandValidator()
+        public UpdateActivityCommandValidator()
         {
+            RuleFor(x => x.Id)
+                .NotEmpty().WithMessage("Activity ID is required. Please provide a valid activity identifier.");
+
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Activity name is required. Please provide a descriptive name for your activity.")
-                .Length(1, 200).WithMessage("Activity name must be between 1 and 200 characters. Choose a clear, concise name that describes what participants will do.");
+                .NotEmpty().WithMessage("Activity name is required. Please enter a name for the activity.")
+                .Length(1, 200).WithMessage("Activity name must be between 1 and 200 characters. For example: 'Morning Yoga Session' or 'Basic Cooking Class'.");
 
             RuleFor(x => x.Description)
-                .MaximumLength(1000).WithMessage("Activity description cannot exceed 1000 characters. Please summarize the activity's purpose, materials needed, and expected outcomes.")
+                .MaximumLength(1000).WithMessage("Activity description cannot exceed 1000 characters. Please keep your description concise and informative.")
                 .When(x => !string.IsNullOrEmpty(x.Description));
 
             RuleFor(x => x.VideoUrl)
                 .Must(url => string.IsNullOrEmpty(url) || IsValidVideoUrl(url))
-                .WithMessage("Invalid video URL format. Please provide a valid video URL (e.g., https://youtube.com/watch?v=...) or leave empty if no video is needed.")
+                .WithMessage("Invalid video URL format. Please provide a valid video URL (e.g., https://youtube.com/watch?v=...) or leave empty to remove the current video.")
                 .When(x => !string.IsNullOrEmpty(x.VideoUrl));
 
             RuleFor(x => x.DurationHours)
-                .InclusiveBetween(0, 23).WithMessage("Hours must be between 0 and 23. For longer activities, consider breaking them into multiple sessions.")
+                .InclusiveBetween(0, 23).WithMessage("Hours must be between 0 and 23. For activities longer than 24 hours, consider breaking them into multiple sessions.")
                 .When(x => x.DurationHours.HasValue);
 
             RuleFor(x => x.DurationMinutes)
-                .InclusiveBetween(0, 59).WithMessage("Minutes must be between 0 and 59. Use this to specify additional time beyond the hours.")
+                .InclusiveBetween(0, 59).WithMessage("Minutes must be between 0 and 59. Use this field to specify additional minutes beyond the hours.")
                 .When(x => x.DurationMinutes.HasValue);
 
             RuleFor(x => x.DurationSeconds)
-                .InclusiveBetween(0, 59).WithMessage("Seconds must be between 0 and 59. This field is typically used for very short activities or precise timing requirements.")
+                .InclusiveBetween(0, 59).WithMessage("Seconds must be between 0 and 59. This is typically used for very short activities or precise timing.")
                 .When(x => x.DurationSeconds.HasValue);
 
-            RuleFor(x => x.ActivityCategoryId)
-                .NotEmpty().WithMessage("Activity category is required. Please select an appropriate category that best describes your activity type.");
-
             RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User authentication is required. Please ensure you are logged in before creating activities.");
+                .NotEmpty().WithMessage("User ID is required. Please ensure you are properly authenticated.");
         }
 
         /// <summary>

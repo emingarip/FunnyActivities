@@ -30,6 +30,7 @@ namespace FunnyActivities.WebAPI.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger<ActivityController> _logger;
         private readonly IMinioService _minioService;
+        private readonly IInputSanitizer _inputSanitizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivityController"/> class.
@@ -37,12 +38,14 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="minioService">The Minio service for file operations.</param>
-        public ActivityController(IMediator mediator, ILogger<ActivityController> logger, IMinioService minioService)
+        /// <param name="inputSanitizer">The input sanitizer for security.</param>
+        public ActivityController(IMediator mediator, ILogger<ActivityController> logger, IMinioService minioService, IInputSanitizer inputSanitizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
             _minioService = minioService;
+            _inputSanitizer = inputSanitizer;
         }
 
         /// <summary>
@@ -187,7 +190,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", id);
-                return this.ApiError("Activity not found", "NotFound", 404);
+                return this.ApiError("The requested activity could not be found. Please check the activity ID and try again.", "NotFound", 404);
             }
 
             return this.ApiSuccess(activity, "Activity retrieved successfully");
@@ -213,7 +216,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found or not public", id);
-                return this.ApiError("Activity not found", "NotFound", 404);
+                return this.ApiError("The requested activity could not be found or is not publicly available. Please check the activity ID or contact the activity creator.", "NotFound", 404);
             }
 
             _logger.LogInformation("=== PUBLIC ACTIVITY RETRIEVED SUCCESSFULLY ===");
@@ -240,7 +243,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", id);
-                return this.ApiError("Activity not found", "NotFound", 404);
+                return this.ApiError("The requested activity could not be found. Please check the activity ID and try again.", "NotFound", 404);
             }
 
             return this.ApiSuccess(activity, "Activity with details retrieved successfully");
@@ -259,10 +262,14 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             _logger.LogInformation("Creating new activity: {Name}", request.Name);
 
+            // Sanitize user inputs
+            var sanitizedName = _inputSanitizer.SanitizeString(request.Name, 200);
+            var sanitizedDescription = request.Description != null ? _inputSanitizer.SanitizeString(request.Description, 1000) : null;
+
             var command = new CreateActivityCommand
             {
-                Name = request.Name,
-                Description = request.Description,
+                Name = sanitizedName,
+                Description = sanitizedDescription,
                 VideoUrl = request.VideoUrl,
                 DurationHours = request.DurationHours,
                 DurationMinutes = request.DurationMinutes,
@@ -280,12 +287,12 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity creation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError($"Unable to create activity: {ex.Message}. Please check your input and try again.", "ValidationError", 400);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating activity");
-                return this.ApiError("An error occurred while creating the activity", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while creating activity");
+                return this.ApiError("We encountered an issue while creating your activity. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
 
@@ -304,11 +311,15 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             _logger.LogInformation("Updating activity with ID: {ActivityId}", id);
 
+            // Sanitize user inputs
+            var sanitizedName = request.Name != null ? _inputSanitizer.SanitizeString(request.Name, 200) : null;
+            var sanitizedDescription = request.Description != null ? _inputSanitizer.SanitizeString(request.Description, 1000) : null;
+
             var command = new UpdateActivityCommand
             {
                 Id = id,
-                Name = request.Name,
-                Description = request.Description,
+                Name = sanitizedName,
+                Description = sanitizedDescription,
                 VideoUrl = request.VideoUrl,
                 DurationHours = request.DurationHours,
                 DurationMinutes = request.DurationMinutes,
@@ -326,17 +337,17 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError($"The activity you're trying to update could not be found. Please verify the activity ID and try again.", "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError($"Unable to update activity: {ex.Message}. Please review your changes and try again.", "ValidationError", 400);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating activity");
-                return this.ApiError("An error occurred while updating the activity", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while updating activity");
+                return this.ApiError("We encountered an issue while updating your activity. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
 
@@ -368,12 +379,12 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity deletion failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError("The activity you're trying to delete could not be found. Please verify the activity ID and try again.", "NotFound", 404);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while deleting activity");
-                return this.ApiError("An error occurred while deleting the activity", "InternalError", 500);
+                _logger.LogError(ex, "An unexpected error occurred while deleting activity");
+                return this.ApiError("We encountered an issue while deleting your activity. Please try again later or contact support if the problem persists.", "InternalError", 500);
             }
         }
 
@@ -400,7 +411,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", activityId);
-                return this.ApiError("Activity not found", "NotFound", 404);
+                return this.ApiError("The requested activity could not be found. Please check the activity ID and try again.", "NotFound", 404);
             }
 
             try

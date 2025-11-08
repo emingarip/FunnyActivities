@@ -57,50 +57,15 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
         {
             _logger.LogInformation("Retrieving activities with page: {PageNumber}, pageSize: {PageSize}", request.PageNumber, request.PageSize);
 
-            // Get all activities (in a real implementation, you'd want a more efficient repository method)
-            var allActivities = await _activityRepository.GetAllAsync();
-
-            // Apply filtering
-            var filteredActivities = allActivities.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-            {
-                filteredActivities = filteredActivities.Where(a => a.Name.Contains(request.SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                                                                 (a.Description != null && a.Description.Contains(request.SearchTerm, StringComparison.OrdinalIgnoreCase)));
-            }
-
-            if (request.ActivityCategoryId.HasValue)
-            {
-                filteredActivities = filteredActivities.Where(a => a.ActivityCategoryId == request.ActivityCategoryId.Value);
-            }
-
-            // Apply IsPublic filtering if specified
-            if (request.IsPublic)
-            {
-                filteredActivities = filteredActivities.Where(a => a.IsPublic);
-            }
-
-            // Apply sorting
-            filteredActivities = request.SortBy?.ToLower() switch
-            {
-                "name" => request.SortOrder?.ToLower() == "desc"
-                    ? filteredActivities.OrderByDescending(a => a.Name)
-                    : filteredActivities.OrderBy(a => a.Name),
-                "createdat" => request.SortOrder?.ToLower() == "desc"
-                    ? filteredActivities.OrderByDescending(a => a.CreatedAt)
-                    : filteredActivities.OrderBy(a => a.CreatedAt),
-                "updatedat" => request.SortOrder?.ToLower() == "desc"
-                    ? filteredActivities.OrderByDescending(a => a.UpdatedAt)
-                    : filteredActivities.OrderBy(a => a.UpdatedAt),
-                _ => filteredActivities.OrderBy(a => a.Name)
-            };
-
-            // Apply pagination
-            var totalCount = filteredActivities.Count();
-            var activities = filteredActivities
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
+            // Get filtered and paginated activities from the database
+            var (activities, totalCount) = await _activityRepository.GetFilteredAsync(
+                request.SearchTerm,
+                request.ActivityCategoryId,
+                request.IsPublic,
+                request.SortBy,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize);
 
             // Map to DTOs and process video URLs
             var activityDtos = new List<ActivityDto>();
@@ -158,7 +123,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
 
             var result = new PagedResult<ActivityDto>(activityDtos, request.PageNumber, request.PageSize, totalCount);
 
-            _logger.LogInformation("Retrieved {Count} activities out of {TotalCount} total", activities.Count, totalCount);
+            _logger.LogInformation("Retrieved {Count} activities out of {TotalCount} total", activityDtos.Count, totalCount);
 
             return result;
         }

@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.Interfaces;
+using FunnyActivities.CrossCuttingConcerns.Caching;
 
 namespace FunnyActivities.Application.Handlers.ActivityManagement
 {
@@ -13,16 +14,19 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
     public class DeleteActivityCommandHandler : IRequestHandler<DeleteActivityCommand, Unit>
     {
         private readonly IActivityRepository _activityRepository;
+        private readonly ICacheService _cache;
         private readonly ILogger<DeleteActivityCommandHandler> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteActivityCommandHandler"/> class.
         /// </summary>
         /// <param name="activityRepository">The activity repository.</param>
+        /// <param name="cache">The cache service.</param>
         /// <param name="logger">The logger.</param>
-        public DeleteActivityCommandHandler(IActivityRepository activityRepository, ILogger<DeleteActivityCommandHandler> logger)
+        public DeleteActivityCommandHandler(IActivityRepository activityRepository, ICacheService cache, ILogger<DeleteActivityCommandHandler> logger)
         {
             _activityRepository = activityRepository;
+            _cache = cache;
             _logger = logger;
         }
 
@@ -46,9 +50,39 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             // Delete the activity
             await _activityRepository.DeleteAsync(activity);
 
+            // Invalidate public activities cache since deleted activity might have been public
+            await InvalidatePublicActivitiesCacheAsync();
+
             _logger.LogInformation("Activity deleted successfully with ID: {ActivityId}", request.Id);
 
             return Unit.Value;
+        }
+
+        private async Task InvalidatePublicActivitiesCacheAsync()
+        {
+            try
+            {
+                // Clear all public activities cache keys (simplified approach)
+                // In a production system, you might want to use a pattern-based invalidation
+                // For now, we'll clear a few common cache keys
+                var commonCacheKeys = new[]
+                {
+                    "public_activities_1_10_name_asc",
+                    "public_activities_1_20_name_asc",
+                    "public_activities_1_50_name_asc"
+                };
+
+                foreach (var key in commonCacheKeys)
+                {
+                    await _cache.RemoveAsync(key);
+                }
+
+                _logger.LogInformation("Invalidated public activities cache");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error invalidating public activities cache");
+            }
         }
     }
 }

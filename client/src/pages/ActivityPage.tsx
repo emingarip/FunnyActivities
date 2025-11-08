@@ -34,6 +34,7 @@ import ActivityVideoPlayer from '../components/activities/ActivityVideoPlayer';
 import ActivityLayout from '../components/activities/ActivityLayout';
 import ActivityMaterialsDialog from '../components/activities/ActivityMaterialsDialog';
 import ActivityMaterialsPanel from '../components/activities/ActivityMaterialsPanel';
+import { getJsonItem, setJsonItem } from '../utils/storage';
 
 
 const ActivityPage: React.FC = () => {
@@ -124,17 +125,11 @@ const ActivityPage: React.FC = () => {
   }, [id, dispatch]);
 
   const loadUserData = useCallback(() => {
-    // Load favorites from localStorage
-    const savedFavorites = localStorage.getItem('activityFavorites');
-    if (savedFavorites) {
-      setFavorites(new Set(JSON.parse(savedFavorites)));
-    }
+    const storedFavorites = getJsonItem<string[]>('activityFavorites', []);
+    setFavorites(new Set(storedFavorites));
 
-    // Load progress from localStorage
-    const savedProgress = localStorage.getItem('activityProgress');
-    if (savedProgress) {
-      setProgress(new Map(Object.entries(JSON.parse(savedProgress))));
-    }
+    const storedProgress = getJsonItem<Record<string, any>>('activityProgress', {});
+    setProgress(new Map(Object.entries(storedProgress)));
   }, []);
 
   const toggleFavorite = useCallback(() => {
@@ -147,7 +142,7 @@ const ActivityPage: React.FC = () => {
       newFavorites.add(currentActivity.id);
     }
     setFavorites(newFavorites);
-    localStorage.setItem('activityFavorites', JSON.stringify(Array.from(newFavorites)));
+    setJsonItem('activityFavorites', Array.from(newFavorites));
   }, [currentActivity, favorites]);
 
   const handleStepClick = useCallback((stepIndex: number) => {
@@ -171,7 +166,7 @@ const ActivityPage: React.FC = () => {
     setProgress(prevProgress => {
       const newProgress = new Map(prevProgress);
       newProgress.set(activityId, progressData);
-      localStorage.setItem('activityProgress', JSON.stringify(Object.fromEntries(newProgress)));
+      setJsonItem('activityProgress', Object.fromEntries(newProgress));
       return newProgress;
     });
   }, []);

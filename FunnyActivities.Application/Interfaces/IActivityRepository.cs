@@ -30,6 +30,26 @@ namespace FunnyActivities.Application.Interfaces
         Task<List<Activity>> GetAllAsync();
 
         /// <summary>
+        /// Gets filtered and paginated activities.
+        /// </summary>
+        /// <param name="searchTerm">The search term for filtering by name or description.</param>
+        /// <param name="activityCategoryId">The activity category ID for filtering.</param>
+        /// <param name="isPublic">Whether to filter for public activities only.</param>
+        /// <param name="sortBy">The field to sort by.</param>
+        /// <param name="sortOrder">The sort order (asc or desc).</param>
+        /// <param name="pageNumber">The page number (1-based).</param>
+        /// <param name="pageSize">The number of items per page.</param>
+        /// <returns>A tuple with filtered activities and total count.</returns>
+        Task<(IEnumerable<Activity> Activities, int TotalCount)> GetFilteredAsync(
+            string? searchTerm,
+            Guid? activityCategoryId,
+            bool isPublic,
+            string? sortBy,
+            string? sortOrder,
+            int pageNumber,
+            int pageSize);
+
+        /// <summary>
         /// Adds a new activity.
         /// </summary>
         /// <param name="activity">The activity to add.</param>

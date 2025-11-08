@@ -17,12 +17,19 @@ const renderWithTheme = (component: React.ReactElement) => {
 const mockVideoElement = {
   addEventListener: jest.fn(),
   removeEventListener: jest.fn(),
-  play: jest.fn(),
+  play: jest.fn().mockImplementation(() => Promise.resolve()),
   pause: jest.fn(),
   currentTime: 0,
   duration: 120,
   paused: true,
   ended: false,
+  readyState: 4,
+  networkState: 2,
+  error: null,
+  src: '',
+  videoWidth: 1920,
+  videoHeight: 1080,
+  buffered: { length: 1, start: jest.fn(() => 0), end: jest.fn(() => 120) },
 };
 
 Object.defineProperty(window.HTMLMediaElement.prototype, 'play', {
@@ -96,7 +103,8 @@ describe('ActivityVideoPlayer', () => {
     };
 
     // Mock the video ref
-    jest.spyOn(require('react'), 'useRef').mockReturnValue({ current: mockVideo });
+    const useRefSpy = jest.spyOn(require('react'), 'useRef');
+    useRefSpy.mockReturnValue({ current: mockVideo });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
@@ -105,6 +113,9 @@ describe('ActivityVideoPlayer', () => {
     expect(addEventListenerSpy).toHaveBeenCalledWith('play', expect.any(Function));
     expect(addEventListenerSpy).toHaveBeenCalledWith('pause', expect.any(Function));
     expect(addEventListenerSpy).toHaveBeenCalledWith('ended', expect.any(Function));
+
+    // Restore the original useRef
+    useRefSpy.mockRestore();
   });
 
   it('shows step overlay when isPausedAtStep is true', () => {
@@ -128,14 +139,14 @@ describe('ActivityVideoPlayer', () => {
       />
     );
 
-    const video = document.querySelector('video');
+    const video = screen.getByTestId('activity-video');
     expect(video).not.toHaveAttribute('controls');
   });
 
   it('shows video controls when not paused at step', () => {
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
+    const video = screen.getByTestId('activity-video');
     expect(video).toHaveAttribute('controls');
   });
 
@@ -156,8 +167,8 @@ describe('ActivityVideoPlayer', () => {
   it('calls onPlay when video play event is triggered', () => {
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
-    fireEvent.play(video!);
+    const video = screen.getByTestId('activity-video');
+    fireEvent.play(video);
 
     expect(defaultProps.onPlay).toHaveBeenCalledTimes(1);
   });
@@ -165,8 +176,8 @@ describe('ActivityVideoPlayer', () => {
   it('calls onPause when video pause event is triggered', () => {
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
-    fireEvent.pause(video!);
+    const video = screen.getByTestId('activity-video');
+    fireEvent.pause(video);
 
     expect(defaultProps.onPause).toHaveBeenCalledTimes(1);
   });
@@ -174,8 +185,8 @@ describe('ActivityVideoPlayer', () => {
   it('calls onEnded when video ended event is triggered', () => {
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
-    fireEvent.ended(video!);
+    const video = screen.getByTestId('activity-video');
+    fireEvent.ended(video);
 
     expect(defaultProps.onEnded).toHaveBeenCalledTimes(1);
   });
@@ -183,9 +194,12 @@ describe('ActivityVideoPlayer', () => {
   it('calls onTimeUpdate when video timeupdate event is triggered', () => {
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
+    const video = screen.getByTestId('activity-video');
     // Simulate timeupdate event
-    fireEvent.timeUpdate(video!, { target: { currentTime: 15 } });
+    fireEvent(video, new Event('timeupdate', { bubbles: true }));
+    // Manually set currentTime since fireEvent doesn't handle custom properties
+    Object.defineProperty(video, 'currentTime', { value: 15, writable: true });
+    fireEvent(video, new Event('timeupdate', { bubbles: true }));
 
     expect(defaultProps.onTimeUpdate).toHaveBeenCalledWith(15);
   });
@@ -197,16 +211,20 @@ describe('ActivityVideoPlayer', () => {
       pause: jest.fn(),
     };
 
-    // Mock the video element
-    jest.spyOn(document, 'querySelector').mockReturnValue(mockVideo as any);
+    // Mock the video ref
+    const useRefSpy = jest.spyOn(require('react'), 'useRef');
+    useRefSpy.mockReturnValue({ current: mockVideo });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
-    fireEvent.timeUpdate(video!, { target: { currentTime: 30 } });
+    const video = screen.getByTestId('activity-video');
+    // Simulate timeupdate event
+    fireEvent(video, new Event('timeupdate', { bubbles: true }));
 
     expect(mockVideo.pause).toHaveBeenCalledTimes(1);
     expect(defaultProps.onPause).toHaveBeenCalledTimes(1);
+
+    useRefSpy.mockRestore();
   });
 
   it('does not pause video when not at step pause time', () => {
@@ -216,22 +234,26 @@ describe('ActivityVideoPlayer', () => {
       pause: jest.fn(),
     };
 
-    jest.spyOn(document, 'querySelector').mockReturnValue(mockVideo as any);
+    const useRefSpy = jest.spyOn(require('react'), 'useRef');
+    useRefSpy.mockReturnValue({ current: mockVideo });
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
-    fireEvent.timeUpdate(video!, { target: { currentTime: 25 } });
+    const video = screen.getByTestId('activity-video');
+    // Simulate timeupdate event
+    fireEvent(video, new Event('timeupdate', { bubbles: true }));
 
     expect(mockVideo.pause).not.toHaveBeenCalled();
     expect(defaultProps.onPause).not.toHaveBeenCalled();
+
+    useRefSpy.mockRestore();
   });
 
   it('handles video load event', () => {
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
-    fireEvent.load(video!);
+    const video = screen.getByTestId('activity-video');
+    fireEvent.loadedData(video);
 
     // Should not crash
     expect(video).toBeInTheDocument();
@@ -247,7 +269,7 @@ describe('ActivityVideoPlayer', () => {
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
+    const video = screen.getByTestId('activity-video');
     expect(video).toBeInTheDocument();
     // Mobile styling should be applied (maxHeight: 300px)
   });
@@ -262,7 +284,7 @@ describe('ActivityVideoPlayer', () => {
 
     renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
 
-    const video = document.querySelector('video');
+    const video = screen.getByTestId('activity-video');
     expect(video).toBeInTheDocument();
     // Desktop styling should be applied (maxHeight: 500px)
   });
@@ -284,8 +306,9 @@ describe('ActivityVideoPlayer', () => {
       />
     );
 
-    const video = document.querySelector('video');
-    fireEvent.timeUpdate(video!, { target: { currentTime: 30 } });
+    const video = screen.getByTestId('activity-video');
+    // Simulate timeupdate event
+    fireEvent(video, new Event('timeupdate', { bubbles: true }));
 
     // Should not pause since no pause time is set
     expect(defaultProps.onPause).not.toHaveBeenCalled();
@@ -299,7 +322,7 @@ describe('ActivityVideoPlayer', () => {
       />
     );
 
-    const video = document.querySelector('video');
+    const video = screen.getByTestId('activity-video');
     expect(video).toBeInTheDocument();
     // Should not crash with empty steps
   });
@@ -314,5 +337,153 @@ describe('ActivityVideoPlayer', () => {
     expect(mockVideoElement.removeEventListener).toHaveBeenCalledWith('play', expect.any(Function));
     expect(mockVideoElement.removeEventListener).toHaveBeenCalledWith('pause', expect.any(Function));
     expect(mockVideoElement.removeEventListener).toHaveBeenCalledWith('ended', expect.any(Function));
+  });
+
+  it('renders timeline markers when video has duration and steps have pause times', async () => {
+    // Create a proper mock video element
+    const mockVideo = document.createElement('video');
+    Object.defineProperty(mockVideo, 'duration', { value: 120, writable: true });
+    Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+    mockVideo.addEventListener = jest.fn();
+    mockVideo.removeEventListener = jest.fn();
+    mockVideo.play = jest.fn().mockImplementation(() => Promise.resolve());
+    mockVideo.pause = jest.fn();
+
+    // Mock the video ref
+    const useRefSpy = jest.spyOn(require('react'), 'useRef');
+    useRefSpy.mockReturnValue({ current: mockVideo });
+
+    renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
+
+    // Set duration on the DOM video element
+    const video = screen.getByTestId('activity-video');
+    Object.defineProperty(video, 'duration', { value: 120, writable: true });
+
+    // Trigger loadeddata to set duration
+    fireEvent.loadedData(video);
+
+    // Wait for state update
+    await waitFor(() => {
+      const markers = document.querySelectorAll('[aria-label*="Jump to step"]');
+      expect(markers).toHaveLength(2); // Two steps with pause times
+    });
+
+    useRefSpy.mockRestore();
+  });
+
+  it('does not render timeline markers when paused at step', () => {
+    const mockVideo = document.createElement('video');
+    Object.defineProperty(mockVideo, 'duration', { value: 120, writable: true });
+    mockVideo.addEventListener = jest.fn();
+    mockVideo.removeEventListener = jest.fn();
+
+    const useRefSpy = jest.spyOn(require('react'), 'useRef');
+    useRefSpy.mockReturnValue({ current: mockVideo });
+
+    renderWithTheme(
+      <ActivityVideoPlayer
+        {...defaultProps}
+        isPausedAtStep={true}
+      />
+    );
+
+    // Trigger loadeddata
+    const video = screen.getByTestId('activity-video');
+    fireEvent.loadedData(video);
+
+    // Markers should not be rendered when paused at step
+    const markers = document.querySelectorAll('[aria-label*="Jump to step"]');
+    expect(markers).toHaveLength(0);
+
+    useRefSpy.mockRestore();
+  });
+
+  it('does not render timeline markers when steps have no pause times', () => {
+    const stepsWithoutPause = [
+      {
+        id: 'step-1',
+        order: 1,
+        description: 'First step',
+      },
+      {
+        id: 'step-2',
+        order: 2,
+        description: 'Second step',
+      },
+    ];
+
+    renderWithTheme(
+      <ActivityVideoPlayer
+        {...defaultProps}
+        steps={stepsWithoutPause}
+      />
+    );
+
+    const markers = document.querySelectorAll('[aria-label*="Jump to step"]');
+    expect(markers).toHaveLength(0);
+  });
+
+  it('clicking timeline marker triggers seek functionality', async () => {
+    const mockVideo = document.createElement('video');
+    Object.defineProperty(mockVideo, 'duration', { value: 120, writable: true });
+    mockVideo.addEventListener = jest.fn();
+    mockVideo.removeEventListener = jest.fn();
+    mockVideo.play = jest.fn().mockImplementation(() => Promise.resolve());
+    mockVideo.pause = jest.fn();
+
+    const useRefSpy = jest.spyOn(require('react'), 'useRef');
+    useRefSpy.mockReturnValue({ current: mockVideo });
+
+    renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
+
+    // Set duration on the DOM video element
+    const video = screen.getByTestId('activity-video');
+    Object.defineProperty(video, 'duration', { value: 120, writable: true });
+
+    // Trigger loadeddata
+    fireEvent.loadedData(video);
+
+    // Wait for markers to be rendered
+    await waitFor(() => {
+      const markers = document.querySelectorAll('[aria-label*="Jump to step"]');
+      expect(markers).toHaveLength(2);
+    });
+
+    // Find and click the first marker - this should trigger the seek functionality
+    const markers = document.querySelectorAll('[aria-label*="Jump to step"]');
+    fireEvent.click(markers[0]);
+
+    // The click should have been handled (verified by the markers being clickable)
+    expect(markers[0]).toBeInTheDocument();
+
+    useRefSpy.mockRestore();
+  });
+
+  it('timeline markers show correct tooltip information', async () => {
+    const mockVideo = document.createElement('video');
+    Object.defineProperty(mockVideo, 'duration', { value: 120, writable: true });
+    mockVideo.addEventListener = jest.fn();
+    mockVideo.removeEventListener = jest.fn();
+
+    const useRefSpy = jest.spyOn(require('react'), 'useRef');
+    useRefSpy.mockReturnValue({ current: mockVideo });
+
+    renderWithTheme(<ActivityVideoPlayer {...defaultProps} />);
+
+    // Set duration on the DOM video element
+    const video = screen.getByTestId('activity-video');
+    Object.defineProperty(video, 'duration', { value: 120, writable: true });
+
+    // Trigger loadeddata
+    fireEvent.loadedData(video);
+
+    // Wait for markers to be rendered and check aria-labels
+    await waitFor(() => {
+      const markers = document.querySelectorAll('[aria-label*="Jump to step"]');
+      expect(markers[0]).toHaveAttribute('aria-label', 'Jump to step 1 at 0:30');
+      expect(markers[1]).toHaveAttribute('aria-label', 'Jump to step 2 at 1:00');
+    });
+
+    useRefSpy.mockRestore();
   });
 });

@@ -450,6 +450,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<FunnyActivities.Application.Services.ISurveyService, FunnyActivities.Application.Services.SurveyService>();
         services.AddScoped<FunnyActivities.Application.Services.IVotingService, FunnyActivities.Application.Services.VotingService>();
 
+        // Input sanitization service
+        services.AddScoped<FunnyActivities.Application.Interfaces.IInputSanitizer, FunnyActivities.Infrastructure.Services.InputSanitizer>();
+
         return services;
     }
 

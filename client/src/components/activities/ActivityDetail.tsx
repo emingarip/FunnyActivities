@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -26,6 +26,7 @@ import {
   Category as CategoryIcon,
 } from '@mui/icons-material';
 import { activitiesAPI, stepsAPI, activityProductVariantsAPI } from '../../services/api';
+import { getJsonItem, setJsonItem } from '../../utils/storage';
 
 // Helper function to check if user is authenticated
 const isAuthenticated = (): boolean => {
@@ -162,17 +163,12 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activityId, onBack }) =
 
   const loadUserData = () => {
     // Load favorites from localStorage
-    const savedFavorites = localStorage.getItem('activityFavorites');
-    if (savedFavorites) {
-      setFavorites(new Set(JSON.parse(savedFavorites)));
-    }
+    const favoriteIds = getJsonItem<string[]>('activityFavorites', []);
+    setFavorites(new Set(favoriteIds));
 
     // Load progress from localStorage
-    const savedProgress = localStorage.getItem('activityProgress');
-    if (savedProgress) {
-      const progressData = JSON.parse(savedProgress);
-      setProgress(new Map(Object.entries(progressData)));
-    }
+    const storedProgress = getJsonItem<Record<string, any>>('activityProgress', {});
+    setProgress(new Map(Object.entries(storedProgress)));
   };
 
   const setupVideoListeners = () => {
@@ -229,7 +225,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activityId, onBack }) =
       newFavorites.add(activity.id);
     }
     setFavorites(newFavorites);
-    localStorage.setItem('activityFavorites', JSON.stringify(Array.from(newFavorites)));
+    setJsonItem('activityFavorites', Array.from(newFavorites));
   };
 
   const updateProgress = (activityId: string, completedSteps: number, totalSteps: number) => {
@@ -244,7 +240,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activityId, onBack }) =
     newProgress.set(activityId, progressData);
     setProgress(newProgress);
 
-    localStorage.setItem('activityProgress', JSON.stringify(Object.fromEntries(newProgress)));
+    setJsonItem('activityProgress', Object.fromEntries(newProgress));
   };
 
   const handleContinue = () => {
@@ -473,3 +469,4 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activityId, onBack }) =
 };
 
 export default ActivityDetail;
+
