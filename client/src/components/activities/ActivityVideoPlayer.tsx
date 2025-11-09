@@ -11,7 +11,7 @@ import {
   Tooltip,
   IconButton,
 } from '@mui/material';
-import { PlayArrow as PlayIcon, RadioButtonChecked as MarkerIcon } from '@mui/icons-material';
+import { PlayArrow as PlayIcon, RadioButtonChecked as MarkerIcon, VolumeUp as VolumeIcon, VolumeOff as VolumeOffIcon, Fullscreen as FullscreenIcon } from '@mui/icons-material';
 
 interface ActivityStep {
   id: string;
@@ -54,8 +54,14 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const introVideoRef = useRef<HTMLVideoElement>(null);
   const [videoDuration, setVideoDuration] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState<number>(0);
   const [introCompleted, setIntroCompleted] = useState(!introVideoUrl);
   const [shouldAutoPlayMain, setShouldAutoPlayMain] = useState(false);
+  const [showUnmuteButton, setShowUnmuteButton] = useState(false);
+  const [introVideoPlaying, setIntroVideoPlaying] = useState(false);
+  const [introAutoplayAllowed, setIntroAutoplayAllowed] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const nextPauseIndexRef = useRef(0);
 
   useEffect(() => {
@@ -68,6 +74,7 @@ useEffect(() => {
 }, [steps]);
 
   const isIntroPhase = Boolean(introVideoUrl) && !introCompleted;
+  const showControls = !isPausedAtStep && !isIntroPhase;
 
   console.log('ActivityVideoPlayer: Render', {
     videoUrl: videoUrl ? `${videoUrl.substring(0, 50)}...` : null,
@@ -89,6 +96,16 @@ useEffect(() => {
       return cleanup;
     }
   }, [steps, isIntroPhase]);
+
+  // Handle fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   useEffect(() => {
     if (isIntroPhase) {
@@ -129,6 +146,7 @@ useEffect(() => {
 
     const handleTimeUpdate = () => {
       const currentTime = video.currentTime;
+      setCurrentTime(currentTime);
       onTimeUpdate(currentTime);
 
       if (isPausedAtStep) {
@@ -175,75 +193,79 @@ useEffect(() => {
     }
     setIntroCompleted(true);
     setShouldAutoPlayMain(autoPlayMain);
+    setShowUnmuteButton(true);
+  };
+
+  const handleIntroPlay = () => {
+    setIntroVideoPlaying(true);
+  };
+
+  const handleIntroPlayClick = () => {
+    if (introVideoRef.current) {
+      introVideoRef.current.play().catch(error => console.error('ActivityVideoPlayer: intro play failed', error));
+      setIntroVideoPlaying(true);
+    }
+  };
+
+  const handleUnmute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = false;
+      videoRef.current.volume = 1;
+      setShowUnmuteButton(false);
+    }
   };
 
   if (isIntroPhase && introVideoUrl) {
     return (
       <Card sx={{ mb: 3 }}>
         <CardContent sx={{ p: isMobile ? 1 : 2 }}>
-          <Box sx={{ position: 'relative' }}>
+          <Box sx={{
+            position: 'relative',
+            width: '100%',
+            height: isMobile ? '300px' : '500px',
+            overflow: 'hidden',
+            bgcolor: 'black',
+          }}>
             <video
               data-testid="intro-video"
               ref={introVideoRef}
               src={introVideoUrl}
-              controls
               autoPlay
               crossOrigin="anonymous"
               preload="auto"
               style={{
                 width: '100%',
-                maxHeight: isMobile ? '300px' : '500px',
-                aspectRatio: isMobile ? undefined : '16/9',
+                height: '100%',
+                aspectRatio: '16/9',
                 borderRadius: theme.shape.borderRadius,
+                objectFit: 'contain',
               }}
               onEnded={() => handleIntroComplete(true)}
+              onPlay={handleIntroPlay}
             />
             <Box
               sx={{
                 position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                p: 2,
-                gap: 1,
+                bottom: 16,
+                right: 10,
                 pointerEvents: 'none',
               }}
             >
-              <Box
+              <Button
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => handleIntroComplete(false)}
                 sx={{
-                  backgroundColor: 'rgba(0,0,0,0.6)',
-                  color: 'white',
-                  borderRadius: theme.shape.borderRadius,
-                  p: 2,
                   pointerEvents: 'auto',
-                  display: 'flex',
-                  flexDirection: isMobile ? 'column' : 'row',
-                  alignItems: isMobile ? 'flex-start' : 'center',
-                  justifyContent: 'space-between',
-                  gap: 2,
+                  fontSize: { xs: '0.625rem', sm: '0.875rem' },
+                  padding: { xs: '2px 6px', sm: '6px 16px' },
+                  minWidth: { xs: 'auto', sm: '64px' },
+                  height: { xs: '24px', sm: '32px' },
                 }}
               >
-                <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    Intro Video
-                  </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    A short introduction will play before the main activity.
-                  </Typography>
-                </Box>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  onClick={() => handleIntroComplete(false)}
-                >
-                  Skip Intro
-                </Button>
-              </Box>
+                Skip Intro
+              </Button>
             </Box>
           </Box>
         </CardContent>
@@ -284,19 +306,25 @@ useEffect(() => {
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent sx={{ p: isMobile ? 1 : 2 }}>
-        <Box sx={{ position: 'relative' }}>
+        <Box sx={{
+          position: 'relative',
+          width: '100%',
+          height: isFullscreen ? '100vh' : (isMobile ? '300px' : '500px'),
+          overflow: 'hidden',
+          bgcolor: 'black',
+        }}>
           <video
             data-testid="activity-video"
             ref={videoRef}
             src={videoUrl}
-            controls={!isPausedAtStep}
             crossOrigin="anonymous"
             preload="none"
             style={{
               width: '100%',
-              maxHeight: isMobile ? '300px' : '500px',
-              aspectRatio: isMobile ? undefined : '16/9',
-              borderRadius: theme.shape.borderRadius,
+              height: '100%',
+              aspectRatio: '16/9',
+              borderRadius: isFullscreen ? 0 : theme.shape.borderRadius,
+              objectFit: 'contain',
             }}
             onLoadedMetadata={() => {
               if (videoRef.current) {
@@ -310,73 +338,242 @@ useEffect(() => {
             }}
           />
 
-          {!isPausedAtStep && videoDuration > 0 && steps.some(step => typeof step.timestampSeconds === 'number') && (
+          {/* Bottom Controls Bar - Timeline and Custom Controls in same row */}
+          {showControls && videoDuration > 0 && (
             <Box
               sx={{
                 position: 'absolute',
-                bottom: isMobile ? '60px' : '50px',
-                left: 0,
-                right: 0,
-                height: '20px',
-                pointerEvents: 'none',
-                zIndex: 1,
+                bottom: 16,
+                left: 16,
+                right: 16,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                zIndex: 10,
               }}
             >
-              {steps
-                .filter(step => step.timestampSeconds <= videoDuration)
-                .map((step) => {
-                  const positionPercent = (step.timestampSeconds / videoDuration) * 100;
-                  return (
-                    <Tooltip
-                      key={step.id}
-                      title={
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            Step {step.order}: {formatTime(step.timestampSeconds)}
-                          </Typography>
-                          <Typography variant="body2" sx={{ mt: 0.5 }}>
-                            {step.description}
-                          </Typography>
-                        </Box>
-                      }
-                      arrow
-                      placement="top"
-                    >
-                      <IconButton
-                        size="small"
+              {/* Timeline */}
+              <Box sx={{ flex: 1 }}>
+                <Box
+                  sx={{
+                    position: 'relative',
+                    height: '8px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                    },
+                  }}
+                  onClick={(e) => {
+                    if (videoRef.current && videoDuration > 0) {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const clickX = e.clientX - rect.left;
+                      const percentage = clickX / rect.width;
+                      const newTime = percentage * videoDuration;
+                      videoRef.current.currentTime = Math.max(0, Math.min(newTime, videoDuration));
+                    }
+                  }}
+                >
+                  {/* Progress bar */}
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      height: '100%',
+                      backgroundColor: theme.palette.primary.main,
+                      borderRadius: '4px',
+                      width: videoDuration > 0 ? `${(currentTime / videoDuration) * 100}%` : '0%',
+                      transition: 'width 0.1s ease',
+                    }}
+                  />
+
+                  {/* Step markers */}
+                  {steps.map((step, index) => {
+                    if (!step.timestampSeconds) return null;
+                    const position = (step.timestampSeconds / videoDuration) * 100;
+                    return (
+                      <Box
+                        key={`timeline-marker-${index}`}
                         sx={{
                           position: 'absolute',
-                          left: `${positionPercent}%`,
+                          left: `${position}%`,
                           top: '50%',
                           transform: 'translate(-50%, -50%)',
-                          color: theme.palette.primary.main,
-                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                          width: '12px',
+                          height: '12px',
+                          backgroundColor: currentStepIndex === index ? theme.palette.secondary.main : 'white',
                           border: `2px solid ${theme.palette.primary.main}`,
-                          width: isMobile ? '16px' : '20px',
-                          height: isMobile ? '16px' : '20px',
-                          minWidth: 'auto',
-                          padding: 0,
-                          pointerEvents: 'auto',
+                          borderRadius: '50%',
+                          cursor: 'pointer',
+                          zIndex: 2,
                           '&:hover': {
-                            backgroundColor: theme.palette.primary.main,
-                            color: 'white',
                             transform: 'translate(-50%, -50%) scale(1.2)',
                           },
-                          transition: 'all 0.2s ease-in-out',
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleMarkerClick(step.timestampSeconds);
+                          if (videoRef.current) {
+                            videoRef.current.currentTime = step.timestampSeconds;
+                            if (onStepReached) {
+                              onStepReached(index);
+                            }
+                          }
                         }}
-                        aria-label={`Jump to step ${step.order} at ${formatTime(step.timestampSeconds)}`}
-                      >
-                        <MarkerIcon sx={{ fontSize: isMobile ? '12px' : '14px' }} />
-                      </IconButton>
-                    </Tooltip>
-                  );
-                })}
+                        title={`Jump to step ${index + 1} at ${Math.floor(step.timestampSeconds / 60)}:${(step.timestampSeconds % 60).toFixed(0).padStart(2, '0')}`}
+                      />
+                    );
+                  })}
+                </Box>
+
+                {/* Time display removed as requested */}
+              </Box>
+
+              {/* Custom Controls */}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <IconButton
+                  onClick={() => {
+                    if (videoRef.current) {
+                      const newMuted = !videoRef.current.muted;
+                      videoRef.current.muted = newMuted;
+                      setIsMuted(newMuted);
+                    }
+                  }}
+                  sx={{
+                    bgcolor: 'rgba(0, 0, 0, 0.6)',
+                    color: 'white',
+                    '&:hover': {
+                      bgcolor: 'rgba(0, 0, 0, 0.8)',
+                    },
+                    width: 40,
+                    height: 40,
+                  }}
+                  size="small"
+                >
+                  {isMuted ? <VolumeOffIcon fontSize="small" /> : <VolumeIcon fontSize="small" />}
+                </IconButton>
+                <IconButton
+                  onClick={() => {
+                    if (videoRef.current) {
+                      if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                        setIsFullscreen(false);
+                      } else {
+                        // Create a container for fullscreen that includes video and timeline
+                        const container = videoRef.current.parentElement;
+                        if (container) {
+                          container.requestFullscreen();
+                          setIsFullscreen(true);
+                        }
+                      }
+                    }
+                  }}
+                  sx={{
+                    bgcolor: 'rgba(0, 0, 0, 0.6)',
+                    color: 'white',
+                    '&:hover': {
+                      bgcolor: 'rgba(0, 0, 0, 0.8)',
+                    },
+                    width: 40,
+                    height: 40,
+                  }}
+                  size="small"
+                >
+                  <FullscreenIcon fontSize="small" />
+                </IconButton>
+              </Box>
             </Box>
           )}
+
+          {/* Timeline only when controls are hidden */}
+          {videoDuration > 0 && !showControls && (
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 16,
+                left: 16,
+                right: 16,
+                zIndex: 5,
+              }}
+            >
+              <Box
+                sx={{
+                  position: 'relative',
+                  height: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                }}
+                onClick={(e) => {
+                  if (videoRef.current && videoDuration > 0) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const percentage = clickX / rect.width;
+                    const newTime = percentage * videoDuration;
+                    videoRef.current.currentTime = Math.max(0, Math.min(newTime, videoDuration));
+                  }
+                }}
+              >
+                {/* Progress bar */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    height: '100%',
+                    backgroundColor: theme.palette.primary.main,
+                    borderRadius: '4px',
+                    width: videoDuration > 0 ? `${(currentTime / videoDuration) * 100}%` : '0%',
+                    transition: 'width 0.1s ease',
+                  }}
+                />
+
+                {/* Step markers */}
+                {steps.map((step, index) => {
+                  if (!step.timestampSeconds) return null;
+                  const position = (step.timestampSeconds / videoDuration) * 100;
+                  return (
+                    <Box
+                      key={`timeline-marker-${index}`}
+                      sx={{
+                        position: 'absolute',
+                        left: `${position}%`,
+                        top: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '12px',
+                        height: '12px',
+                        backgroundColor: currentStepIndex === index ? theme.palette.secondary.main : 'white',
+                        border: `2px solid ${theme.palette.primary.main}`,
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        zIndex: 2,
+                        '&:hover': {
+                          transform: 'translate(-50%, -50%) scale(1.2)',
+                        },
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (videoRef.current) {
+                          videoRef.current.currentTime = step.timestampSeconds;
+                          if (onStepReached) {
+                            onStepReached(index);
+                          }
+                        }
+                      }}
+                      title={`Jump to step ${index + 1} at ${Math.floor(step.timestampSeconds / 60)}:${(step.timestampSeconds % 60).toFixed(0).padStart(2, '0')}`}
+                    />
+                  );
+                })}
+              </Box>
+
+              {/* Time display removed as requested */}
+            </Box>
+          )}
+
 
           {isPausedAtStep && currentStep && (
             <Box
