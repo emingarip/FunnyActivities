@@ -98,10 +98,6 @@ namespace FunnyActivities.WebAPI.Controllers
             _logger.LogInformation("Creating new step for activity: {ActivityId}", request.ActivityId);
             _logger.LogInformation("CreateStep request data: {@Request}", request);
 
-            // Log individual enhanced fields for debugging
-            _logger.LogInformation("Enhanced fields - TimestampSeconds: {TimestampSeconds}, DurationSeconds: {DurationSeconds}, PauseTimeSeconds: {PauseTimeSeconds}, MediaAttachments: {@MediaAttachments}",
-                request.TimestampSeconds, request.DurationSeconds, request.PauseTimeSeconds, request.MediaAttachments);
-
             // Handle anonymous users for debugging
             Guid userId;
             try
@@ -120,10 +116,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 ActivityId = request.ActivityId,
                 Order = request.Order,
                 Description = request.Description,
-                TimestampSeconds = request.TimestampSeconds ?? 0,
-                DurationSeconds = request.DurationSeconds ?? 0,
-                PauseTimeSeconds = request.PauseTimeSeconds ?? 0,
-                MediaAttachments = request.MediaAttachments ?? new List<string>(),
+                TimestampSeconds = request.TimestampSeconds,
                 UserId = userId
             };
 
@@ -170,6 +163,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 Id = id,
                 Order = request.Order,
                 Description = request.Description,
+                TimestampSeconds = request.TimestampSeconds,
                 UserId = CurrentUserId
             };
 

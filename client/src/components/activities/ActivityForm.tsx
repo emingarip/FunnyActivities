@@ -63,7 +63,7 @@ interface ActivityStep {
   id?: string;
   order: number;
   description: string;
-  pauseTimeSeconds?: number;
+  timestampSeconds: number;
 }
 
 interface ActivityMaterial {
@@ -152,10 +152,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
       activityId: step.activityId, // Use the activityId from Redux state
       order: step.order,
       description: step.description,
-      timestampSeconds: 0, // Default value since Redux doesn't store this
-      durationSeconds: 0,  // Default value since Redux doesn't store this
-      pauseTimeSeconds: step.pauseTimeSeconds || 0,
-      mediaAttachments: [], // Default value since Redux doesn't store this
+      timestampSeconds: step.timestampSeconds ?? 0,
     }));
   }, [reduxSteps]);
 
@@ -378,15 +375,15 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   // Handle steps change from EnhancedStepManager - simplified Redux integration
    const handleStepsChange = useCallback((updatedSteps: EnhancedStepDto[]) => {
      // Convert EnhancedStepDto[] to ActivityStep[] for Redux
-     const reduxSteps = updatedSteps
-       .filter(step => step.id) // Only include steps with IDs
-       .map(step => ({
-         id: step.id!,
-         activityId: step.activityId,
-         order: step.order,
-         description: step.description,
-         pauseTimeSeconds: step.pauseTimeSeconds || 0,
-       }));
+   const reduxSteps = updatedSteps
+     .filter(step => step.id) // Only include steps with IDs
+     .map(step => ({
+       id: step.id!,
+       activityId: step.activityId,
+       order: step.order,
+       description: step.description,
+        timestampSeconds: step.timestampSeconds ?? 0,
+     }));
 
      // Update Redux with the new steps
      if (activity?.id && reduxSteps.length > 0) {
@@ -554,8 +551,6 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                 order: step.order,
                 description: step.description,
                 timestampSeconds: step.timestampSeconds,
-                durationSeconds: step.durationSeconds,
-                pauseTimeSeconds: step.pauseTimeSeconds,
               });
             } else {
               // Create new step
@@ -564,8 +559,6 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                 order: step.order,
                 description: step.description,
                 timestampSeconds: step.timestampSeconds,
-                durationSeconds: step.durationSeconds,
-                pauseTimeSeconds: step.pauseTimeSeconds,
               });
             }
           } catch (stepError) {
@@ -851,9 +844,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                         stepData: {
                           order: step.order,
                           description: step.description,
-                          timestampSeconds: step.timestampSeconds,
-                          durationSeconds: step.durationSeconds,
-                          pauseTimeSeconds: step.pauseTimeSeconds,
+                          timestampSeconds: step.timestampSeconds ?? 0,
                         }
                       })).unwrap();
                       console.log('[ActivityForm] Step created successfully via Redux');
@@ -875,8 +866,6 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                         order: updates.order,
                         description: updates.description,
                         timestampSeconds: updates.timestampSeconds,
-                        durationSeconds: updates.durationSeconds,
-                        pauseTimeSeconds: updates.pauseTimeSeconds,
                       }
                     })).unwrap();
                   } catch (error) {

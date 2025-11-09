@@ -69,7 +69,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             _logger.LogInformation("Performing business rule validations for step update");
 
             // Update the step
-            step.UpdateDetails(request.Order, request.Description, request.TimestampSeconds, request.DurationSeconds, request.PauseTimeSeconds, request.MediaAttachments);
+            step.UpdateDetails(request.Order, request.Description, request.TimestampSeconds);
 
             // Save to repository
             await _stepRepository.UpdateAsync(step);
@@ -89,9 +89,6 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 Order = step.Order,
                 Description = step.Description,
                 TimestampSeconds = step.TimestampSeconds,
-                DurationSeconds = step.DurationSeconds,
-                PauseTimeSeconds = step.PauseTimeSeconds,
-                MediaAttachments = step.MediaAttachments,
                 CreatedAt = step.CreatedAt,
                 UpdatedAt = step.UpdatedAt
             };

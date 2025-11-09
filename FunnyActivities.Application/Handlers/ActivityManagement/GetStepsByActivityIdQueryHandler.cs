@@ -51,9 +51,6 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                     Order = step.Order,
                     Description = step.Description,
                     TimestampSeconds = step.TimestampSeconds,
-                    DurationSeconds = step.DurationSeconds,
-                    PauseTimeSeconds = step.PauseTimeSeconds,
-                    MediaAttachments = step.MediaAttachments ?? new List<string>(),
                     CreatedAt = step.CreatedAt,
                     UpdatedAt = step.UpdatedAt
                 })

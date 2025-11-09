@@ -24,16 +24,7 @@ namespace FunnyActivities.Application.Validators.ActivityManagement
                 .Length(1, 1000).WithMessage("Description must be between 1 and 1000 characters.");
 
             RuleFor(x => x.TimestampSeconds)
-                .GreaterThanOrEqualTo(0).WithMessage("Timestamp seconds must be non-negative.")
-                .When(x => x.TimestampSeconds.HasValue);
-
-            RuleFor(x => x.DurationSeconds)
-                .GreaterThanOrEqualTo(0).WithMessage("Duration seconds must be non-negative.")
-                .When(x => x.DurationSeconds.HasValue);
-
-            RuleFor(x => x.PauseTimeSeconds)
-                .GreaterThanOrEqualTo(0).WithMessage("Pause time seconds must be non-negative.")
-                .When(x => x.PauseTimeSeconds.HasValue);
+                .GreaterThanOrEqualTo(0).WithMessage("Timestamp seconds must be non-negative.");
 
             RuleFor(x => x.UserId)
                 .NotEmpty().WithMessage("User ID is required.");

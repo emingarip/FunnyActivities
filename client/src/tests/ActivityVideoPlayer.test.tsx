@@ -47,13 +47,13 @@ const mockSteps = [
     id: 'step-1',
     order: 1,
     description: 'First step',
-    pauseTimeSeconds: 30,
+    timestampSeconds: 30,
   },
   {
     id: 'step-2',
     order: 2,
     description: 'Second step',
-    pauseTimeSeconds: 60,
+    timestampSeconds: 60,
   },
 ];
 
@@ -68,6 +68,7 @@ const defaultProps = {
   onPause: jest.fn(),
   onContinue: jest.fn(),
   onTimeUpdate: jest.fn(),
+  onStepReached: jest.fn(),
   onEnded: jest.fn(),
 };
 
@@ -234,7 +235,7 @@ describe('ActivityVideoPlayer', () => {
     expect(defaultProps.onTimeUpdate).toHaveBeenCalledWith(15);
   });
 
-  it('pauses video when reaching step pause time', () => {
+  it('triggers onStepReached when hitting a step timestamp', () => {
     const mockVideo = {
       ...mockVideoElement,
       currentTime: 30,
@@ -255,12 +256,12 @@ describe('ActivityVideoPlayer', () => {
     fireEvent(video, new Event('timeupdate', { bubbles: true }));
 
     expect(mockVideo.pause).toHaveBeenCalledTimes(1);
-    expect(defaultProps.onPause).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onStepReached).toHaveBeenCalledWith(0);
 
     useRefSpy.mockRestore();
   });
 
-  it('does not pause video when not at step pause time', () => {
+  it('does not trigger step callbacks before timestamps are reached', () => {
     const mockVideo = {
       ...mockVideoElement,
       currentTime: 25,
@@ -280,7 +281,7 @@ describe('ActivityVideoPlayer', () => {
     fireEvent(video, new Event('timeupdate', { bubbles: true }));
 
     expect(mockVideo.pause).not.toHaveBeenCalled();
-    expect(defaultProps.onPause).not.toHaveBeenCalled();
+    expect(defaultProps.onStepReached).not.toHaveBeenCalled();
 
     useRefSpy.mockRestore();
   });
@@ -325,31 +326,6 @@ describe('ActivityVideoPlayer', () => {
     // Desktop styling should be applied (maxHeight: 500px)
   });
 
-  it('handles steps with no pause time', () => {
-    const stepsWithoutPause = [
-      {
-        id: 'step-1',
-        order: 1,
-        description: 'First step',
-        pauseTimeSeconds: undefined,
-      },
-    ];
-
-    renderWithTheme(
-      <ActivityVideoPlayer
-        {...defaultProps}
-        steps={stepsWithoutPause}
-      />
-    );
-
-    const video = screen.getByTestId('activity-video');
-    // Simulate timeupdate event
-    fireEvent(video, new Event('timeupdate', { bubbles: true }));
-
-    // Should not pause since no pause time is set
-    expect(defaultProps.onPause).not.toHaveBeenCalled();
-  });
-
   it('handles empty steps array', () => {
     renderWithTheme(
       <ActivityVideoPlayer
@@ -363,7 +339,7 @@ describe('ActivityVideoPlayer', () => {
     // Should not crash with empty steps
   });
 
-  it('renders timeline markers when video has duration and steps have pause times', async () => {
+  it('renders timeline markers when video has duration and steps have timestamps', async () => {
     // Create a proper mock video element
     const mockVideo = document.createElement('video');
     Object.defineProperty(mockVideo, 'duration', { value: 120, writable: true });
@@ -392,7 +368,7 @@ describe('ActivityVideoPlayer', () => {
     // Wait for state update
     await waitFor(() => {
       const markers = document.querySelectorAll('[aria-label*="Jump to step"]');
-      expect(markers).toHaveLength(2); // Two steps with pause times
+      expect(markers).toHaveLength(2); // Two steps with timestamps
     });
 
     useRefSpy.mockRestore();
@@ -426,31 +402,6 @@ describe('ActivityVideoPlayer', () => {
     expect(markers).toHaveLength(0);
 
     useRefSpy.mockRestore();
-  });
-
-  it('does not render timeline markers when steps have no pause times', () => {
-    const stepsWithoutPause = [
-      {
-        id: 'step-1',
-        order: 1,
-        description: 'First step',
-      },
-      {
-        id: 'step-2',
-        order: 2,
-        description: 'Second step',
-      },
-    ];
-
-    renderWithTheme(
-      <ActivityVideoPlayer
-        {...defaultProps}
-        steps={stepsWithoutPause}
-      />
-    );
-
-    const markers = document.querySelectorAll('[aria-label*="Jump to step"]');
-    expect(markers).toHaveLength(0);
   });
 
   it('clicking timeline marker triggers seek functionality', async () => {

@@ -12,7 +12,7 @@ interface ActivityStep {
   id: string;
   order: number;
   description: string;
-  pauseTimeSeconds?: number;
+  timestampSeconds: number;
 }
 
 interface ActivityLayoutProps {
@@ -33,14 +33,15 @@ const ActivityLayout: React.FC<ActivityLayoutProps> = ({
     return null;
   }
 
-  const currentStep = steps[currentStepIndex];
+  const safeIndex = Math.min(Math.max(currentStepIndex, 0), steps.length - 1);
+  const currentStep = steps[safeIndex];
 
   return (
     <Card data-cy="activity-layout" sx={{ mb: 3 }}>
       <CardContent sx={{ p: isMobile ? 2 : 3 }}>
         <ActivityStepsNavigator
           steps={steps}
-          currentStepIndex={currentStepIndex}
+          currentStepIndex={safeIndex}
           onStepClick={onStepClick}
         />
         <ActivityStepContent currentStep={currentStep} />

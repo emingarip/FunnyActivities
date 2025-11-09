@@ -41,17 +41,19 @@ namespace FunnyActivities.Domain.UnitTests
         public void UpdateDetails_ShouldUpdatePropertiesAndAddDomainEvent()
         {
             // Arrange
-            var step = Step.Create(Guid.NewGuid(), 1, "Original Description");
+            var step = Step.Create(Guid.NewGuid(), 1, "Original Description", 10);
             step.ClearDomainEvents();
             var newOrder = 2;
             var newDescription = "Updated Description";
+            var newTimestamp = 25;
 
             // Act
-            step.UpdateDetails(newOrder, newDescription);
+            step.UpdateDetails(newOrder, newDescription, newTimestamp);
 
             // Assert
             step.Order.Should().Be(newOrder);
             step.Description.Should().Be(newDescription);
+            step.TimestampSeconds.Should().Be(newTimestamp);
             step.DomainEvents.Should().ContainSingle(e => e is StepUpdatedEvent);
         }
 
@@ -67,6 +69,22 @@ namespace FunnyActivities.Domain.UnitTests
 
             // Assert
             step.DomainEvents.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void Create_ShouldThrowArgumentOutOfRange_WhenTimestampIsNegative()
+        {
+            var activityId = Guid.NewGuid();
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => Step.Create(activityId, 1, "Step", -5));
+        }
+
+        [Fact]
+        public void UpdateDetails_ShouldThrowArgumentOutOfRange_WhenTimestampIsNegative()
+        {
+            var step = Step.Create(Guid.NewGuid(), 1, "Step", 0);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => step.UpdateDetails(1, "Step", -1));
         }
     }
 }

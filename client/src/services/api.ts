@@ -838,53 +838,22 @@ export const stepsAPI = {
   // Delete step
   deleteStep: (id: string) => api.delete(`/steps/${id}`),
 
-  // Enhanced step methods with timestamps and media attachments
+  // Enhanced step methods with timestamps only
   createEnhancedStep: (data: {
     activityId: string;
     order: number;
     description: string;
-    timestampSeconds?: number;
-    durationSeconds?: number;
-    pauseTimeSeconds?: number;
-    mediaAttachments?: string[];
+    timestampSeconds: number;
   }) => {
-    const payload = {
-      ...data,
-      mediaAttachments: data.mediaAttachments || []
-    };
-
-    console.log('🔧 Frontend: Creating enhanced step with payload:', payload);
-    return api.post('/steps', payload);
+    console.log('dY"\u0015 Frontend: Creating enhanced step with payload:', data);
+    return api.post('/steps', data);
   },
 
   updateEnhancedStep: (id: string, data: {
     order?: number;
     description?: string;
     timestampSeconds?: number;
-    durationSeconds?: number;
-    pauseTimeSeconds?: number;
-    mediaAttachments?: any[];
-  }) => {
-    const payload = data;
-    return api.put(`/steps/${id}`, payload);
-  },
-
-  // Upload media attachments for steps
-  uploadStepMedia: (stepId: string, mediaFiles: File[]) => {
-    const formData = new FormData();
-    mediaFiles.forEach((file, index) => {
-      formData.append('mediaFiles', file);
-    });
-    return api.post(`/steps/${stepId}/media`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-  },
-
-  // Delete media attachment from step
-  deleteStepMedia: (stepId: string, mediaId: string) =>
-    api.delete(`/steps/${stepId}/media/${mediaId}`),
+  }) => api.put(`/steps/${id}`, data),
 };
 
 export const activityProductVariantsAPI = {
@@ -1047,3 +1016,11 @@ export const surveyAPI = {
 };
 
 export default api;
+
+
+
+
+
+
+
+

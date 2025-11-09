@@ -52,6 +52,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 ActivityName = step.Activity?.Name ?? "Unknown",
                 Order = step.Order,
                 Description = step.Description,
+                TimestampSeconds = step.TimestampSeconds,
                 CreatedAt = step.CreatedAt,
                 UpdatedAt = step.UpdatedAt
             };

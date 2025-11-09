@@ -147,12 +147,7 @@ const ActivityPage: React.FC = () => {
   const handleStepClick = useCallback((stepIndex: number) => {
     dispatch(setCurrentStepIndex(stepIndex));
     dispatch(setPausedAtStep(false));
-
-    const step = steps[stepIndex];
-    if (videoUrl && step.pauseTimeSeconds) {
-      // TODO: Seek video to step time
-    }
-  }, [dispatch, steps, videoUrl]);
+  }, [dispatch]);
 
   const updateLocalProgress = useCallback((activityId: string, completedSteps: number, totalSteps: number) => {
     const progressData = {
@@ -172,7 +167,8 @@ const ActivityPage: React.FC = () => {
 
   const handleContinue = useCallback(() => {
     dispatch(setPausedAtStep(false));
-    const nextStepIndex = Math.min(currentStepIndex + 1, steps.length - 1);
+    dispatch(setVideoPlaying(true));
+    const nextStepIndex = Math.min(currentStepIndex + 1, steps.length);
     dispatch(setCurrentStepIndex(nextStepIndex));
 
     // Update local progress when moving to next step
@@ -186,8 +182,6 @@ const ActivityPage: React.FC = () => {
       completedSteps: Array.from({ length: nextStepIndex }, (_, i) => i),
       lastWatchedAt: new Date().toISOString(),
     }));
-
-    // TODO: Play video
   }, [dispatch, currentStepIndex, steps, id, currentActivity, updateLocalProgress]);
 
   const handleVideoPlay = useCallback(() => {
@@ -201,6 +195,12 @@ const ActivityPage: React.FC = () => {
   const handleVideoTimeUpdate = useCallback((currentTime: number) => {
     // Handle time updates if needed
   }, []);
+
+  const handleStepReached = useCallback((stepIndex: number) => {
+    dispatch(setCurrentStepIndex(stepIndex));
+    dispatch(setPausedAtStep(true));
+    dispatch(setVideoPlaying(false));
+  }, [dispatch]);
 
   const handleVideoEnded = useCallback(() => {
     dispatch(setVideoPlaying(false));
@@ -288,6 +288,7 @@ const ActivityPage: React.FC = () => {
             onPause={handleVideoPause}
             onContinue={handleContinue}
             onTimeUpdate={handleVideoTimeUpdate}
+            onStepReached={handleStepReached}
             onEnded={handleVideoEnded}
           />
 

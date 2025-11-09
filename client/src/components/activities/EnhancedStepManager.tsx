@@ -26,12 +26,6 @@ import {
   Delete as DeleteIcon,
   Undo as UndoIcon,
   Redo as RedoIcon,
-  PlayArrow as PlayIcon,
-  AttachFile as AttachFileIcon,
-  Image as ImageIcon,
-  Videocam as VideoIcon,
-  Audiotrack as AudioIcon,
-  Description as DocumentIcon,
   AccessTime as TimeIcon,
 } from '@mui/icons-material';
 import VideoPlayerWithScrubber from './VideoPlayerWithScrubber';
@@ -40,7 +34,6 @@ import {
   TimelineMarker,
   StepHistoryState,
   StepHistoryAction,
-  StepMediaAttachment,
 } from '../../services/api.types';
 
 interface EnhancedStepManagerProps {
@@ -175,10 +168,7 @@ const EnhancedStepManager: React.FC<EnhancedStepManagerProps> = ({
       activityId,
       order: stepData.order || history.present.length + 1,
       description: stepData.description || '',
-      timestampSeconds: stepData.timestampSeconds,
-      durationSeconds: stepData.durationSeconds,
-      pauseTimeSeconds: stepData.pauseTimeSeconds,
-      mediaAttachments: stepData.mediaAttachments || [],
+      timestampSeconds: stepData.timestampSeconds ?? 0,
     };
 
     try {
@@ -301,34 +291,14 @@ const EnhancedStepManager: React.FC<EnhancedStepManagerProps> = ({
     onSave: (step: Partial<EnhancedStepDto>) => void;
     onCancel: () => void;
   }> = ({ step, currentTime, onSave, onCancel }) => {
-    const [formData, setFormData] = useState<Partial<EnhancedStepDto>>(step || {
-      description: '',
-      timestampSeconds: currentTime,
-      durationSeconds: 0,
-      pauseTimeSeconds: 0,
+    const [formData, setFormData] = useState<Pick<EnhancedStepDto, 'description' | 'timestampSeconds'>>({
+      description: step?.description ?? '',
+      timestampSeconds: step?.timestampSeconds ?? Math.floor(currentTime),
     });
 
-    const [mediaFiles, setMediaFiles] = useState<File[]>([]);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = Array.from(event.target.files || []);
-      setMediaFiles(prev => [...prev, ...files]);
-    };
-
     const handleSave = () => {
-      const mediaAttachments: StepMediaAttachment[] = mediaFiles.map(file => ({
-        type: file.type.startsWith('image/') ? 'image' :
-              file.type.startsWith('video/') ? 'video' :
-              file.type.startsWith('audio/') ? 'audio' : 'document',
-        filename: file.name,
-        file,
-        isNew: true,
-      }));
-
       onSave({
         ...formData,
-        mediaAttachments: [...(formData.mediaAttachments || []), ...mediaAttachments],
       });
     };
 
@@ -339,102 +309,33 @@ const EnhancedStepManager: React.FC<EnhancedStepManagerProps> = ({
           label="Description"
           multiline
           rows={3}
-          value={formData.description || ''}
+          value={formData.description}
           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           required
         />
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <TextField
-            fullWidth
-            label="Timestamp (seconds)"
-            type="number"
-            value={formData.timestampSeconds || 0}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              timestampSeconds: parseFloat(e.target.value) || 0
-            }))}
-            InputProps={{
-              endAdornment: (
-                <Button
-                  size="small"
-                  onClick={() => setFormData(prev => ({ ...prev, timestampSeconds: currentTime }))}
-                  sx={{ minHeight: 44 }}
-                >
-                  Current
-                </Button>
-              ),
-            }}
-          />
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField
-              fullWidth
-              label="Duration (seconds)"
-              type="number"
-              value={formData.durationSeconds || 0}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                durationSeconds: parseFloat(e.target.value) || 0
-              }))}
-            />
-            <TextField
-              fullWidth
-              label="Pause After (seconds)"
-              type="number"
-              value={formData.pauseTimeSeconds || 0}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                pauseTimeSeconds: parseFloat(e.target.value) || 0
-              }))}
-            />
-          </Box>
-        </Box>
-
-        {/* Media Attachments */}
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Media Attachments
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<AttachFileIcon />}
-              sx={{ minHeight: 44 }}
-            >
-              Add Files
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
-                hidden
-                onChange={handleFileSelect}
-              />
-            </Button>
-            <Typography variant="caption" color="text.secondary">
-              Supports images, videos, audio files, and documents
-            </Typography>
-          </Box>
-
-          {/* Existing and new media files */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {mediaFiles.map((file, index) => (
-              <Chip
-                key={index}
-                label={file.name}
-                onDelete={() => setMediaFiles(prev => prev.filter((_, i) => i !== index))}
-                icon={
-                  file.type.startsWith('image/') ? <ImageIcon /> :
-                  file.type.startsWith('video/') ? <VideoIcon /> :
-                  file.type.startsWith('audio/') ? <AudioIcon /> :
-                  <DocumentIcon />
-                }
-              />
-            ))}
-          </Box>
-        </Box>
+        <TextField
+          fullWidth
+          label="Timestamp (seconds)"
+          type="number"
+          inputProps={{ min: 0 }}
+          value={formData.timestampSeconds}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            timestampSeconds: Math.max(0, parseFloat(e.target.value) || 0)
+          }))}
+          InputProps={{
+            endAdornment: (
+              <Button
+                size="small"
+                onClick={() => setFormData(prev => ({ ...prev, timestampSeconds: Math.floor(currentTime) }))}
+                sx={{ minHeight: 44 }}
+              >
+                Current
+              </Button>
+            ),
+          }}
+        />
 
         <DialogActions>
           <Button onClick={onCancel} sx={{ minHeight: 44 }}>Cancel</Button>
@@ -644,47 +545,6 @@ const EnhancedStepManager: React.FC<EnhancedStepManagerProps> = ({
                           {step.description}
                         </Typography>
 
-                        {(step.durationSeconds || step.pauseTimeSeconds) && (
-                          <Box sx={{ display: 'flex', gap: 2, mb: 1, flexWrap: 'wrap' }}>
-                            {step.durationSeconds && (
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                aria-label={`Step duration: ${step.durationSeconds} seconds`}
-                              >
-                                Duration: {step.durationSeconds}s
-                              </Typography>
-                            )}
-                            {step.pauseTimeSeconds && (
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                aria-label={`Pause after step: ${step.pauseTimeSeconds} seconds`}
-                              >
-                                Pause: {step.pauseTimeSeconds}s
-                              </Typography>
-                            )}
-                          </Box>
-                        )}
-
-                        {step.mediaAttachments && step.mediaAttachments.length > 0 && (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {step.mediaAttachments.map((attachment, index) => (
-                              <Chip
-                                key={index}
-                                size="small"
-                                label={attachment.filename}
-                                aria-label={`${attachment.type} attachment: ${attachment.filename}`}
-                                icon={
-                                  attachment.type === 'image' ? <ImageIcon /> :
-                                  attachment.type === 'video' ? <VideoIcon /> :
-                                  attachment.type === 'audio' ? <AudioIcon /> :
-                                  <DocumentIcon />
-                                }
-                              />
-                            ))}
-                          </Box>
-                        )}
                       </Box>
 
                       {!readOnly && (

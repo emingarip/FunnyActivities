@@ -136,7 +136,7 @@ export interface ActivityStep {
   activityId: string;
   order: number;
   description: string;
-  pauseTimeSeconds?: number;
+  timestampSeconds: number;
 }
 
 export interface ActivityMaterial {
@@ -317,7 +317,7 @@ export const fetchActivityMaterials = createAsyncThunk(
 
 export const createStep = createAsyncThunk(
   'activity/createStep',
-  async ({ activityId, stepData }: { activityId: string; stepData: { order: number; description: string; timestampSeconds?: number; durationSeconds?: number; pauseTimeSeconds?: number } }, { rejectWithValue }) => {
+  async ({ activityId, stepData }: { activityId: string; stepData: { order: number; description: string; timestampSeconds: number } }, { rejectWithValue }) => {
     try {
       console.log('🔄 Redux: Creating step for activity:', activityId, 'with data:', stepData);
       const response = await stepsAPI.createEnhancedStep({
@@ -339,7 +339,7 @@ export const createStep = createAsyncThunk(
 
 export const updateStep = createAsyncThunk(
   'activity/updateStep',
-  async ({ stepId, updates }: { stepId: string; updates: { order?: number; description?: string; timestampSeconds?: number; durationSeconds?: number; pauseTimeSeconds?: number } }, { rejectWithValue, getState }) => {
+  async ({ stepId, updates }: { stepId: string; updates: { order?: number; description?: string; timestampSeconds?: number } }, { rejectWithValue, getState }) => {
     try {
       console.log('🔄 Redux: Updating step:', stepId, 'with updates:', updates);
 
