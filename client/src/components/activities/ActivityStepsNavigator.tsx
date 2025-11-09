@@ -11,7 +11,7 @@ interface ActivityStep {
   id: string;
   order: number;
   description: string;
-  pauseTimeSeconds?: number;
+  timestampSeconds: number;
 }
 
 interface ActivityStepsNavigatorProps {
@@ -31,6 +31,8 @@ const ActivityStepsNavigator: React.FC<ActivityStepsNavigatorProps> = ({
   if (steps.length === 0) {
     return null;
   }
+
+  const safeIndex = Math.min(Math.max(currentStepIndex, 0), steps.length - 1);
 
   return (
     <Box sx={{ mb: 2 }} data-cy="step-navigator">
@@ -53,7 +55,7 @@ const ActivityStepsNavigator: React.FC<ActivityStepsNavigatorProps> = ({
           <Button
             key={step.id}
             data-cy="step-button"
-            variant={index === currentStepIndex ? 'contained' : 'outlined'}
+            variant={index === safeIndex ? 'contained' : 'outlined'}
             size={isMobile ? 'small' : 'medium'}
             onClick={() => onStepClick(index)}
             sx={{

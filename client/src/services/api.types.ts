@@ -524,26 +524,12 @@ export interface BulkUpdateError {
   errorType: string;
 }
 
-// Enhanced Step Types with Timestamps and Media Attachments
-export interface StepMediaAttachment {
-  id?: string;
-  type: 'image' | 'video' | 'audio' | 'document';
-  url?: string; // Optional for new files that haven't been uploaded yet
-  filename: string;
-  uploadedAt?: string;
-  file?: File;
-  isNew?: boolean;
-}
-
 export interface EnhancedStepDto {
   id?: string;
   activityId: string;
   order: number;
   description: string;
-  timestampSeconds?: number; // Video timestamp in seconds
-  durationSeconds?: number; // How long this step takes
-  pauseTimeSeconds?: number; // Pause after this step
-  mediaAttachments?: StepMediaAttachment[];
+  timestampSeconds: number; // Video timestamp in seconds
   createdAt?: string;
   updatedAt?: string;
 }
@@ -553,19 +539,13 @@ export interface CreateEnhancedStepRequest {
   activityId: string;
   order: number;
   description: string;
-  timestampSeconds?: number;
-  durationSeconds?: number;
-  pauseTimeSeconds?: number;
-  mediaAttachments?: StepMediaAttachment[];
+  timestampSeconds: number;
 }
 
 export interface UpdateEnhancedStepRequest {
   order?: number;
   description?: string;
   timestampSeconds?: number;
-  durationSeconds?: number;
-  pauseTimeSeconds?: number;
-  mediaAttachments?: StepMediaAttachment[];
 }
 
 // Video Player and Timeline Types

@@ -17,7 +17,7 @@ interface ActivityStep {
   id: string;
   order: number;
   description: string;
-  pauseTimeSeconds?: number;
+  timestampSeconds: number;
 }
 
 interface ActivityVideoPlayerProps {
@@ -31,6 +31,7 @@ interface ActivityVideoPlayerProps {
   onPause: () => void;
   onContinue: () => void;
   onTimeUpdate: (currentTime: number) => void;
+  onStepReached: (stepIndex: number) => void;
   onEnded: () => void;
 }
 
@@ -45,6 +46,7 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
   onPause,
   onContinue,
   onTimeUpdate,
+  onStepReached,
   onEnded,
 }) => {
   const theme = useTheme();
@@ -54,11 +56,16 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
   const [videoDuration, setVideoDuration] = useState<number>(0);
   const [introCompleted, setIntroCompleted] = useState(!introVideoUrl);
   const [shouldAutoPlayMain, setShouldAutoPlayMain] = useState(false);
+  const nextPauseIndexRef = useRef(0);
 
   useEffect(() => {
     setIntroCompleted(!introVideoUrl);
     setShouldAutoPlayMain(false);
   }, [introVideoUrl]);
+
+useEffect(() => {
+  nextPauseIndexRef.current = 0;
+}, [steps]);
 
   const isIntroPhase = Boolean(introVideoUrl) && !introCompleted;
 
@@ -124,13 +131,20 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
       const currentTime = video.currentTime;
       onTimeUpdate(currentTime);
 
-      const currentStep = steps[currentStepIndex];
-      if (currentStep && currentStep.pauseTimeSeconds) {
-        const timeToPause = currentStep.pauseTimeSeconds - currentTime;
-        if (timeToPause >= 0 && timeToPause < 0.5 && !isPausedAtStep) {
-          video.pause();
-          onPause();
-        }
+      if (isPausedAtStep) {
+        return;
+      }
+
+      const targetIndex = nextPauseIndexRef.current;
+      if (targetIndex >= steps.length) {
+        return;
+      }
+
+      const targetStep = steps[targetIndex];
+      if (currentTime >= targetStep.timestampSeconds) {
+        nextPauseIndexRef.current = targetIndex + 1;
+        video.pause();
+        onStepReached(targetIndex);
       }
     };
 
@@ -249,7 +263,9 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
     );
   }
 
-  const currentStep = steps[currentStepIndex];
+  const hasSteps = steps.length > 0;
+  const safeStepIndex = hasSteps ? Math.min(Math.max(currentStepIndex, 0), steps.length - 1) : 0;
+  const currentStep = hasSteps ? steps[safeStepIndex] : null;
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -257,9 +273,11 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const handleMarkerClick = (pauseTimeSeconds: number) => {
+  const handleMarkerClick = (timestampSeconds: number) => {
     if (videoRef.current) {
-      videoRef.current.currentTime = pauseTimeSeconds;
+      videoRef.current.currentTime = timestampSeconds;
+      const markerIndex = steps.findIndex(step => step.timestampSeconds >= timestampSeconds - 0.1);
+      nextPauseIndexRef.current = markerIndex === -1 ? steps.length : markerIndex;
     }
   };
 
@@ -292,7 +310,7 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
             }}
           />
 
-          {!isPausedAtStep && videoDuration > 0 && steps.some(step => step.pauseTimeSeconds) && (
+          {!isPausedAtStep && videoDuration > 0 && steps.some(step => typeof step.timestampSeconds === 'number') && (
             <Box
               sx={{
                 position: 'absolute',
@@ -305,16 +323,16 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
               }}
             >
               {steps
-                .filter(step => step.pauseTimeSeconds && step.pauseTimeSeconds <= videoDuration)
+                .filter(step => step.timestampSeconds <= videoDuration)
                 .map((step) => {
-                  const positionPercent = (step.pauseTimeSeconds! / videoDuration) * 100;
+                  const positionPercent = (step.timestampSeconds / videoDuration) * 100;
                   return (
                     <Tooltip
                       key={step.id}
                       title={
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            Step {step.order}: {formatTime(step.pauseTimeSeconds!)}
+                            Step {step.order}: {formatTime(step.timestampSeconds)}
                           </Typography>
                           <Typography variant="body2" sx={{ mt: 0.5 }}>
                             {step.description}
@@ -348,9 +366,9 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleMarkerClick(step.pauseTimeSeconds!);
+                          handleMarkerClick(step.timestampSeconds);
                         }}
-                        aria-label={`Jump to step ${step.order} at ${formatTime(step.pauseTimeSeconds!)}`}
+                        aria-label={`Jump to step ${step.order} at ${formatTime(step.timestampSeconds)}`}
                       >
                         <MarkerIcon sx={{ fontSize: isMobile ? '12px' : '14px' }} />
                       </IconButton>
@@ -397,21 +415,32 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
               >
                 {currentStep.description}
               </Typography>
-              <Button
-                data-cy="continue-button"
-                variant="contained"
-                size={isMobile ? 'medium' : 'large'}
-                onClick={onContinue}
-                startIcon={<PlayIcon />}
-                sx={{
-                  minWidth: isMobile ? '120px' : '160px',
-                  minHeight: 44,
-                  fontSize: isMobile ? '1rem' : '1rem',
-                }}
-              >
-                Continue Activity
-              </Button>
-            </Box>
+          <Button
+            data-cy="continue-button"
+            variant="contained"
+            size={isMobile ? 'medium' : 'large'}
+            onClick={() => {
+              const nextIndex = Math.min(safeStepIndex + 1, steps.length);
+              nextPauseIndexRef.current = Math.max(nextPauseIndexRef.current, nextIndex);
+              const video = videoRef.current;
+              onContinue();
+              if (video) {
+                const epsilon = 0.05;
+                const targetTime = Math.min(video.currentTime + epsilon, videoDuration || video.currentTime + epsilon);
+                video.currentTime = targetTime;
+                video.play().catch(error => console.error('ActivityVideoPlayer: continue play failed', error));
+              }
+            }}
+            startIcon={<PlayIcon />}
+            sx={{
+              minWidth: isMobile ? '120px' : '160px',
+              minHeight: 44,
+              fontSize: isMobile ? '1rem' : '1rem',
+            }}
+          >
+            Continue Activity
+          </Button>
+        </Box>
           )}
         </Box>
       </CardContent>

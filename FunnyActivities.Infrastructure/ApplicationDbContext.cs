@@ -329,12 +329,6 @@ namespace FunnyActivities.Infrastructure
                       .HasForeignKey(s => s.ActivityId)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                // Configure MediaAttachments property with proper JSON conversion
-                var mediaAttachmentsConverter = new ValueConverter<List<string>, string>(
-                    v => JsonSerializer.Serialize(v ?? new List<string>(), new JsonSerializerOptions()),
-                    v => string.IsNullOrEmpty(v) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>());
-                entity.Property(s => s.MediaAttachments).HasConversion(mediaAttachmentsConverter);
-
                 // Add indexes for performance
                 entity.HasIndex(s => s.ActivityId);
                 entity.HasIndex(s => new { s.ActivityId, s.Order });

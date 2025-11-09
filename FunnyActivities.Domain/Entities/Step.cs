@@ -40,22 +40,7 @@ namespace FunnyActivities.Domain.Entities
         /// <summary>
         /// Gets the timestamp in seconds for the step.
         /// </summary>
-        public int? TimestampSeconds { get; private set; }
-
-        /// <summary>
-        /// Gets the duration in seconds for the step.
-        /// </summary>
-        public int? DurationSeconds { get; private set; }
-
-        /// <summary>
-        /// Gets the pause time in seconds for the step.
-        /// </summary>
-        public int? PauseTimeSeconds { get; private set; }
-
-        /// <summary>
-        /// Gets the media attachments for the step.
-        /// </summary>
-        public List<string> MediaAttachments { get; private set; } = new List<string>();
+        public int TimestampSeconds { get; private set; }
 
         /// <summary>
         /// Gets the date and time when the step was created.
@@ -80,19 +65,13 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="order">The order of the step.</param>
         /// <param name="description">The description of the step.</param>
         /// <param name="timestampSeconds">The timestamp in seconds.</param>
-        /// <param name="durationSeconds">The duration in seconds.</param>
-        /// <param name="pauseTimeSeconds">The pause time in seconds.</param>
-        /// <param name="mediaAttachments">The media attachments.</param>
-        public Step(Guid id, Guid activityId, int order, string description, int? timestampSeconds = null, int? durationSeconds = null, int? pauseTimeSeconds = null, List<string>? mediaAttachments = null)
+        public Step(Guid id, Guid activityId, int order, string description, int? timestampSeconds = null)
         {
             Id = id;
             ActivityId = activityId;
             Order = order;
             Description = description;
             TimestampSeconds = timestampSeconds ?? 0;
-            DurationSeconds = durationSeconds ?? 0;
-            PauseTimeSeconds = pauseTimeSeconds ?? 0;
-            MediaAttachments = mediaAttachments ?? new List<string>();
             DomainEvents = new List<IDomainEvent>();
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
@@ -110,13 +89,16 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="order">The order of the step.</param>
         /// <param name="description">The description of the step.</param>
         /// <param name="timestampSeconds">The timestamp in seconds.</param>
-        /// <param name="durationSeconds">The duration in seconds.</param>
-        /// <param name="pauseTimeSeconds">The pause time in seconds.</param>
-        /// <param name="mediaAttachments">The media attachments.</param>
         /// <returns>A new step instance.</returns>
-        public static Step Create(Guid activityId, int order, string description, int? timestampSeconds = null, int? durationSeconds = null, int? pauseTimeSeconds = null, List<string>? mediaAttachments = null)
+        public static Step Create(Guid activityId, int order, string description, int? timestampSeconds = null)
         {
-            var step = new Step(Guid.NewGuid(), activityId, order, description, timestampSeconds, durationSeconds, pauseTimeSeconds, mediaAttachments);
+            var normalizedTimestamp = timestampSeconds ?? 0;
+            if (normalizedTimestamp < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(timestampSeconds), "Timestamp must be non-negative.");
+            }
+
+            var step = new Step(Guid.NewGuid(), activityId, order, description, normalizedTimestamp);
             step.AddDomainEvent(new StepCreatedEvent(step.Id, description));
             return step;
         }
@@ -127,17 +109,16 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="order">The new order.</param>
         /// <param name="description">The new description.</param>
         /// <param name="timestampSeconds">The new timestamp in seconds.</param>
-        /// <param name="durationSeconds">The new duration in seconds.</param>
-        /// <param name="pauseTimeSeconds">The new pause time in seconds.</param>
-        /// <param name="mediaAttachments">The new media attachments.</param>
-        public void UpdateDetails(int order, string description, int? timestampSeconds = null, int? durationSeconds = null, int? pauseTimeSeconds = null, List<string>? mediaAttachments = null)
+        public void UpdateDetails(int order, string description, int? timestampSeconds = null)
         {
+            if (timestampSeconds.HasValue && timestampSeconds.Value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(timestampSeconds), "Timestamp must be non-negative.");
+            }
+
             Order = order;
             Description = description;
             TimestampSeconds = timestampSeconds ?? TimestampSeconds;
-            DurationSeconds = durationSeconds ?? DurationSeconds;
-            PauseTimeSeconds = pauseTimeSeconds ?? PauseTimeSeconds;
-            MediaAttachments = mediaAttachments ?? MediaAttachments;
             UpdatedAt = DateTime.UtcNow;
             AddDomainEvent(new StepUpdatedEvent(Id, description));
         }

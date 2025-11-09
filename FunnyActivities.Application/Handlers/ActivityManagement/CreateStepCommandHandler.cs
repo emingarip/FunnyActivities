@@ -68,10 +68,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 request.ActivityId,
                 request.Order,
                 request.Description,
-                request.TimestampSeconds ?? 0,
-                request.DurationSeconds ?? 0,
-                request.PauseTimeSeconds ?? 0,
-                request.MediaAttachments ?? new List<string>()
+                request.TimestampSeconds
             );
 
             // Save to repository
@@ -92,9 +89,6 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 Order = step.Order,
                 Description = step.Description,
                 TimestampSeconds = step.TimestampSeconds,
-                DurationSeconds = step.DurationSeconds,
-                PauseTimeSeconds = step.PauseTimeSeconds,
-                MediaAttachments = step.MediaAttachments,
                 CreatedAt = step.CreatedAt,
                 UpdatedAt = step.UpdatedAt
             };

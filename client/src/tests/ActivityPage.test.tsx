@@ -86,13 +86,13 @@ describe('ActivityPage', () => {
       id: 'step-1',
       order: 1,
       description: 'First step',
-      pauseTimeSeconds: 30,
+      timestampSeconds: 30,
     },
     {
       id: 'step-2',
       order: 2,
       description: 'Second step',
-      pauseTimeSeconds: 60,
+      timestampSeconds: 60,
     },
   ];
 
@@ -285,6 +285,7 @@ describe('ActivityPage', () => {
     fireEvent.click(continueButton);
 
     expect(mockDispatch).toHaveBeenCalledWith(setPausedAtStep(false));
+    expect(mockDispatch).toHaveBeenCalledWith(setVideoPlaying(true));
     expect(mockDispatch).toHaveBeenCalledWith(setCurrentStepIndex(1));
     expect(mockDispatch).toHaveBeenCalledWith(
       updateProgress({

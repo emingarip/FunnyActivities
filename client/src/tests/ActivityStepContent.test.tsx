@@ -17,7 +17,7 @@ const mockStep = {
   id: 'step-1',
   order: 1,
   description: 'This is the first step of the activity. Follow these instructions carefully.',
-  pauseTimeSeconds: 45,
+  timestampSeconds: 45,
 };
 
 describe('ActivityStepContent', () => {
@@ -30,26 +30,26 @@ describe('ActivityStepContent', () => {
     expect(screen.getByText('This is the first step of the activity. Follow these instructions carefully.')).toBeInTheDocument();
   });
 
-  it('renders pause time when available', () => {
+  it('renders stop time when available', () => {
     renderWithTheme(
       <ActivityStepContent currentStep={mockStep} />
     );
 
-    expect(screen.getByText('Pause at: 0:45')).toBeInTheDocument();
+    expect(screen.getByText('Stops at: 0:45')).toBeInTheDocument();
   });
 
-  it('formats pause time correctly for different durations', () => {
+  it('formats stop time correctly for different durations', () => {
     const testCases = [
-      { pauseTimeSeconds: 30, expected: 'Pause at: 0:30' },
-      { pauseTimeSeconds: 90, expected: 'Pause at: 1:30' },
-      { pauseTimeSeconds: 125, expected: 'Pause at: 2:05' },
-      { pauseTimeSeconds: 3600, expected: 'Pause at: 60:00' },
+      { timestampSeconds: 30, expected: 'Stops at: 0:30' },
+      { timestampSeconds: 90, expected: 'Stops at: 1:30' },
+      { timestampSeconds: 125, expected: 'Stops at: 2:05' },
+      { timestampSeconds: 3600, expected: 'Stops at: 60:00' },
     ];
 
-    testCases.forEach(({ pauseTimeSeconds, expected }) => {
+    testCases.forEach(({ timestampSeconds, expected }) => {
       const stepWithPauseTime = {
         ...mockStep,
-        pauseTimeSeconds,
+        timestampSeconds,
       };
 
       const { rerender } = renderWithTheme(
@@ -63,17 +63,17 @@ describe('ActivityStepContent', () => {
     });
   });
 
-  it('does not render pause time when not available', () => {
-    const stepWithoutPauseTime = {
+  it('does not render stop time when not available', () => {
+    const stepWithoutTimestamp = {
       ...mockStep,
-      pauseTimeSeconds: undefined,
-    };
+      timestampSeconds: undefined,
+    } as unknown as typeof mockStep;
 
     renderWithTheme(
-      <ActivityStepContent currentStep={stepWithoutPauseTime} />
+      <ActivityStepContent currentStep={stepWithoutTimestamp} />
     );
 
-    expect(screen.queryByText(/Pause at:/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Stops at:/)).not.toBeInTheDocument();
   });
 
   it('does not render when currentStep is null', () => {
@@ -82,7 +82,7 @@ describe('ActivityStepContent', () => {
     );
 
     expect(screen.queryByText(/Step/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Pause at:/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Stops at:/)).not.toBeInTheDocument();
   });
 
   it('applies correct styling for mobile screens', () => {
@@ -193,16 +193,16 @@ describe('ActivityStepContent', () => {
     expect(descriptionElement).toBeInTheDocument();
   });
 
-  it('handles pause time of 0 seconds', () => {
-    const stepWithZeroPauseTime = {
+  it('handles timestamp of 0 seconds', () => {
+    const stepWithZeroTimestamp = {
       ...mockStep,
-      pauseTimeSeconds: 0,
+      timestampSeconds: 0,
     };
 
     renderWithTheme(
-      <ActivityStepContent currentStep={stepWithZeroPauseTime} />
+      <ActivityStepContent currentStep={stepWithZeroTimestamp} />
     );
 
-    expect(screen.getByText('Pause at: 0:0')).toBeInTheDocument();
+    expect(screen.getByText('Stops at: 0:0')).toBeInTheDocument();
   });
 });

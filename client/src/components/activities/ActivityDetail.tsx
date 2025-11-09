@@ -53,7 +53,7 @@ interface ActivityStep {
   id: string;
   order: number;
   description: string;
-  pauseTimeSeconds?: number;
+  timestampSeconds: number;
 }
 
 interface ActivityMaterial {
@@ -179,7 +179,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activityId, onBack }) =
       const currentTime = video.currentTime;
       const currentStep = steps[currentStepIndex];
 
-      if (currentStep && currentStep.pauseTimeSeconds && Math.abs(currentTime - currentStep.pauseTimeSeconds) < 1) {
+      if (currentStep && Math.abs(currentTime - currentStep.timestampSeconds) < 1) {
         if (!isPausedAtStep) {
           video.pause();
           setIsPlaying(false);
@@ -258,8 +258,8 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activityId, onBack }) =
     setIsPausedAtStep(false);
 
     const step = steps[stepIndex];
-    if (videoRef.current && step.pauseTimeSeconds) {
-      videoRef.current.currentTime = step.pauseTimeSeconds;
+    if (videoRef.current) {
+      videoRef.current.currentTime = step.timestampSeconds;
       videoRef.current.play();
     }
   };
@@ -438,10 +438,10 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ activityId, onBack }) =
                 <Typography variant="body1">
                   {currentStep.description}
                 </Typography>
-                {currentStep.pauseTimeSeconds && (
+                {typeof currentStep.timestampSeconds === 'number' && (
                   <Typography variant="body2" color="text.secondary">
-                    Pause at: {Math.floor(currentStep.pauseTimeSeconds / 60)}:
-                    {(currentStep.pauseTimeSeconds % 60).toString().padStart(2, '0')}
+                    Stops at: {Math.floor(currentStep.timestampSeconds / 60)}:
+                    {(currentStep.timestampSeconds % 60).toString().padStart(2, '0')}
                   </Typography>
                 )}
               </Box>

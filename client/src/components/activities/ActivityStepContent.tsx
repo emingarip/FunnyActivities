@@ -10,7 +10,7 @@ interface ActivityStep {
   id: string;
   order: number;
   description: string;
-  pauseTimeSeconds?: number;
+  timestampSeconds: number;
 }
 
 interface ActivityStepContentProps {
@@ -50,7 +50,7 @@ const ActivityStepContent: React.FC<ActivityStepContentProps> = ({
       >
         {currentStep.description}
       </Typography>
-      {currentStep.pauseTimeSeconds && (
+      {typeof currentStep.timestampSeconds === 'number' && (
         <Typography
           variant="body2"
           color="text.secondary"
@@ -59,8 +59,8 @@ const ActivityStepContent: React.FC<ActivityStepContentProps> = ({
             fontSize: isMobile ? '0.875rem' : '0.875rem',
           }}
         >
-          Pause at: {Math.floor(currentStep.pauseTimeSeconds / 60)}:
-          {(currentStep.pauseTimeSeconds % 60).toString().padStart(2, '0')}
+          Stops at: {Math.floor(currentStep.timestampSeconds / 60)}:
+          {(currentStep.timestampSeconds % 60).toString().padStart(2, '0')}
         </Typography>
       )}
     </Box>
