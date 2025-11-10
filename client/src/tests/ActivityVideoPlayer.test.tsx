@@ -57,7 +57,19 @@ const mockSteps = [
   },
 ];
 
+const mockActivity = {
+  id: 'activity-1',
+  name: 'Test Activity',
+  description: 'This is a test activity',
+  activityCategoryId: 'category-1',
+  activityCategory: {
+    id: 'category-1',
+    name: 'Test Category',
+  },
+};
+
 const defaultProps = {
+  activity: mockActivity,
   videoUrl: 'https://example.com/video.mp4',
   introVideoUrl: undefined,
   steps: mockSteps,

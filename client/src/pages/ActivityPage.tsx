@@ -28,8 +28,6 @@ import {
 } from '../store/slices/activitySlice';
 import { activitiesAPI } from '../services/api';
 import VideoUtils from '../services/videoUtils';
-import ActivityHeader from '../components/activities/ActivityHeader';
-import ActivityProgressBar from '../components/activities/ActivityProgressBar';
 import ActivityVideoPlayer from '../components/activities/ActivityVideoPlayer';
 import ActivityLayout from '../components/activities/ActivityLayout';
 import ActivityMaterialsDialog from '../components/activities/ActivityMaterialsDialog';
@@ -184,6 +182,12 @@ const ActivityPage: React.FC = () => {
     }));
   }, [dispatch, currentStepIndex, steps, id, currentActivity, updateLocalProgress]);
 
+  const handleReplayStep = useCallback(() => {
+    dispatch(setPausedAtStep(false));
+    dispatch(setVideoPlaying(true));
+    // Keep current step index, just replay from previous step's end
+  }, [dispatch]);
+
   const handleVideoPlay = useCallback(() => {
     dispatch(setVideoPlaying(true));
   }, [dispatch]);
@@ -218,12 +222,6 @@ const ActivityPage: React.FC = () => {
     }));
   }, [dispatch, id, steps, currentActivity, updateLocalProgress]);
 
-  const getProgressPercentage = () => {
-    if (!currentActivity || steps.length === 0) return 0;
-    const activityProgress = progress.get(currentActivity.id);
-    if (!activityProgress) return 0;
-    return Math.round((activityProgress.completedSteps / activityProgress.totalSteps) * 100);
-  };
 
   if (!id) {
     return (
@@ -253,22 +251,18 @@ const ActivityPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', p: isMobile ? 2 : 3 }}>
-      <ActivityHeader
-        activity={currentActivity}
-        favorites={favorites}
-        onToggleFavorite={toggleFavorite}
-        onBack={() => navigate('/')}
-      />
-
-      <ActivityProgressBar progressPercentage={getProgressPercentage()} />
-
+    <Box sx={{
+      minHeight: '100vh',
+      p: isMobile ? 1 : 2,
+      maxWidth: '1400px',
+      mx: 'auto'
+    }}>
       {/* Main Layout */}
       <Box sx={{
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         gap: isMobile ? 2 : 3,
-        mt: 2
+        mt: isMobile ? 1 : 0
       }}>
         {/* Main Content Area */}
         <Box sx={{
@@ -278,6 +272,7 @@ const ActivityPage: React.FC = () => {
           gap: 2
         }}>
           <ActivityVideoPlayer
+            activity={currentActivity}
             videoUrl={videoUrl}
             introVideoUrl={introVideoUrl}
             steps={steps}
@@ -287,9 +282,13 @@ const ActivityPage: React.FC = () => {
             onPlay={handleVideoPlay}
             onPause={handleVideoPause}
             onContinue={handleContinue}
+            onReplayStep={handleReplayStep}
             onTimeUpdate={handleVideoTimeUpdate}
             onStepReached={handleStepReached}
             onEnded={handleVideoEnded}
+            showFavoriteButton={true}
+            isFavorite={favorites.has(currentActivity.id)}
+            onToggleFavorite={toggleFavorite}
           />
 
           <ActivityLayout

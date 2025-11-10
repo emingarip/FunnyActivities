@@ -10,7 +10,6 @@ import {
 import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
-  AccessTime as TimeIcon,
   Category as CategoryIcon,
 } from '@mui/icons-material';
 
@@ -18,9 +17,6 @@ interface Activity {
   id: string;
   name: string;
   description?: string;
-  durationHours?: number;
-  durationMinutes?: number;
-  durationSeconds?: number;
   activityCategoryId?: string;
   activityCategory?: {
     id: string;
@@ -33,6 +29,7 @@ interface ActivityHeaderProps {
   favorites: Set<string>;
   onToggleFavorite: () => void;
   onBack: () => void;
+  showFavoriteButton?: boolean;
 }
 
 const ActivityHeader: React.FC<ActivityHeaderProps> = ({
@@ -40,30 +37,24 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
   favorites,
   onToggleFavorite,
   onBack,
+  showFavoriteButton = true,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const formatDuration = (hours?: number, minutes?: number, seconds?: number) => {
-    const parts = [];
-    if (hours && hours > 0) parts.push(`${hours}h`);
-    if (minutes && minutes > 0) parts.push(`${minutes}m`);
-    if (seconds && seconds > 0) parts.push(`${seconds}s`);
-    return parts.join(' ') || 'N/A';
-  };
 
   return (
     <Box sx={{ mb: 3 }} data-cy="activity-header">
       {/* Header */}
       <Box sx={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         alignItems: 'flex-start',
         mb: 2,
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: isMobile ? 2 : 0,
+        flexDirection: 'column',
+        gap: 2,
       }}>
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ width: '100%' }}>
           <Typography
             variant={isMobile ? 'h5' : 'h4'}
             component="h1"
@@ -84,17 +75,6 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
             </Typography>
           )}
         </Box>
-        <IconButton
-          onClick={onToggleFavorite}
-          size="large"
-          sx={{ alignSelf: isMobile ? 'flex-end' : 'flex-start' }}
-        >
-          {favorites.has(activity.id) ? (
-            <FavoriteIcon color="error" fontSize="large" />
-          ) : (
-            <FavoriteBorderIcon fontSize="large" />
-          )}
-        </IconButton>
       </Box>
 
       {/* Activity Info */}
@@ -104,12 +84,6 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
         flexWrap: 'wrap',
         alignItems: 'center',
       }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TimeIcon fontSize="small" />
-          <Typography variant="body2">
-            Duration: {formatDuration(activity.durationHours, activity.durationMinutes, activity.durationSeconds)}
-          </Typography>
-        </Box>
         {activity.activityCategory && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <CategoryIcon fontSize="small" />
