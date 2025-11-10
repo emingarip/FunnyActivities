@@ -10,6 +10,7 @@ import {
   useMediaQuery,
   Tooltip,
   IconButton,
+  Chip,
 } from '@mui/material';
 import { PlayArrow as PlayIcon, RadioButtonChecked as MarkerIcon, VolumeUp as VolumeIcon, VolumeOff as VolumeOffIcon, Fullscreen as FullscreenIcon, Favorite as FavoriteIcon, FavoriteBorder as FavoriteBorderIcon } from '@mui/icons-material';
 
@@ -20,7 +21,19 @@ interface ActivityStep {
   timestampSeconds: number;
 }
 
+interface Activity {
+  id: string;
+  name: string;
+  description?: string;
+  activityCategoryId?: string;
+  activityCategory?: {
+    id: string;
+    name: string;
+  };
+}
+
 interface ActivityVideoPlayerProps {
+  activity: Activity;
   videoUrl: string | null;
   introVideoUrl?: string | null;
   steps: ActivityStep[];
@@ -40,6 +53,7 @@ interface ActivityVideoPlayerProps {
 }
 
 const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
+  activity,
   videoUrl,
   introVideoUrl,
   steps,
@@ -257,9 +271,10 @@ useEffect(() => {
           <Box sx={{
             position: 'relative',
             width: '100%',
-            height: isMobile ? '300px' : '500px',
+            height: isMobile ? '200px' : '320px',
             overflow: 'hidden',
             bgcolor: 'black',
+            borderRadius: 1,
           }}>
             <video
               data-testid="intro-video"
@@ -339,14 +354,49 @@ useEffect(() => {
   };
 
   return (
-    <Card sx={{ mb: 3 }}>
-      <CardContent sx={{ p: isMobile ? 1 : 2 }}>
+    <Card sx={{ mb: isMobile ? 3 : 1, mx: isMobile ? 1 : 2, backgroundColor: 'white', boxShadow: 1 }}>
+      <CardContent sx={{ p: 0 }}>
+        {/* Activity Header Information */}
+        <Box sx={{ mb: 0, pl: isMobile ? 1 : 2, pr: isMobile ? 1 : 2, pt: 0, pb: 0 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography
+                variant={isMobile ? 'h5' : 'h4'}
+                component="h1"
+                sx={{ wordBreak: 'break-word' }}
+                data-cy="activity-title"
+              >
+                {activity.name}
+              </Typography>
+              {activity.description && (
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ wordBreak: 'break-word' }}
+                  data-cy="activity-description"
+                >
+                  {activity.description}
+                </Typography>
+              )}
+            </Box>
+            {activity.activityCategory && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Category:
+                </Typography>
+                <Chip label={activity.activityCategory.name} size="small" />
+              </Box>
+            )}
+          </Box>
+        </Box>
+
         <Box sx={{
           position: 'relative',
           width: '100%',
-          height: isFullscreen ? '100vh' : (isMobile ? '300px' : '500px'),
+          height: isFullscreen ? '100vh' : (isMobile ? '200px' : '320px'),
           overflow: 'hidden',
           bgcolor: 'black',
+          borderRadius: isFullscreen ? 0 : 1,
         }}>
           {/* Favorite Button - Top Right */}
           {showFavoriteButton && onToggleFavorite && (
@@ -405,7 +455,7 @@ useEffect(() => {
             <Box
               sx={{
                 position: 'absolute',
-                bottom: 16,
+                bottom: isMobile ? 8 : 16,
                 left: 16,
                 right: 16,
                 display: 'flex',
@@ -493,7 +543,7 @@ useEffect(() => {
               </Box>
 
               {/* Custom Controls */}
-              <Box sx={{ display: 'flex', gap: 1 }}>
+              <Box sx={{ display: 'flex', gap: 1 }} className="video-player-controls">
                 <IconButton
                   onClick={() => {
                     if (videoRef.current) {
@@ -508,12 +558,13 @@ useEffect(() => {
                     '&:hover': {
                       bgcolor: 'rgba(0, 0, 0, 0.8)',
                     },
-                    width: 40,
-                    height: 40,
+                    width: isMobile ? 28 : 40,
+                    height: isMobile ? 28 : 40,
+                    padding: isMobile ? '4px' : '8px',
                   }}
-                  size="small"
+                  size={isMobile ? 'small' : 'small'}
                 >
-                  {isMuted ? <VolumeOffIcon fontSize="small" /> : <VolumeIcon fontSize="small" />}
+                  {isMuted ? <VolumeOffIcon fontSize={isMobile ? 'inherit' : 'small'} /> : <VolumeIcon fontSize={isMobile ? 'inherit' : 'small'} />}
                 </IconButton>
                 <IconButton
                   onClick={() => {
@@ -537,12 +588,13 @@ useEffect(() => {
                     '&:hover': {
                       bgcolor: 'rgba(0, 0, 0, 0.8)',
                     },
-                    width: 40,
-                    height: 40,
+                    width: isMobile ? 28 : 40,
+                    height: isMobile ? 28 : 40,
+                    padding: isMobile ? '4px' : '8px',
                   }}
-                  size="small"
+                  size={isMobile ? 'small' : 'small'}
                 >
-                  <FullscreenIcon fontSize="small" />
+                  <FullscreenIcon fontSize={isMobile ? 'inherit' : 'small'} />
                 </IconButton>
               </Box>
             </Box>
@@ -553,7 +605,7 @@ useEffect(() => {
             <Box
               sx={{
                 position: 'absolute',
-                bottom: 16,
+                bottom: isMobile ? 8 : 16,
                 left: 16,
                 right: 16,
                 zIndex: 5,

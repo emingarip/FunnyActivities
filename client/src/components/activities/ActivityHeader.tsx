@@ -10,7 +10,6 @@ import {
 import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
-  AccessTime as TimeIcon,
   Category as CategoryIcon,
 } from '@mui/icons-material';
 
@@ -18,9 +17,6 @@ interface Activity {
   id: string;
   name: string;
   description?: string;
-  durationHours?: number;
-  durationMinutes?: number;
-  durationSeconds?: number;
   activityCategoryId?: string;
   activityCategory?: {
     id: string;
@@ -46,13 +42,6 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const formatDuration = (hours?: number, minutes?: number, seconds?: number) => {
-    const parts = [];
-    if (hours && hours > 0) parts.push(`${hours}h`);
-    if (minutes && minutes > 0) parts.push(`${minutes}m`);
-    if (seconds && seconds > 0) parts.push(`${seconds}s`);
-    return parts.join(' ') || 'N/A';
-  };
 
   return (
     <Box sx={{ mb: 3 }} data-cy="activity-header">
@@ -95,12 +84,6 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
         flexWrap: 'wrap',
         alignItems: 'center',
       }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TimeIcon fontSize="small" />
-          <Typography variant="body2">
-            Duration: {formatDuration(activity.durationHours, activity.durationMinutes, activity.durationSeconds)}
-          </Typography>
-        </Box>
         {activity.activityCategory && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <CategoryIcon fontSize="small" />

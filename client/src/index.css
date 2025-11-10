@@ -33,6 +33,12 @@ button, a, input, select, textarea {
   min-width: 44px;
 }
 
+/* Override min-height for video player controls */
+.video-player-controls button {
+  min-height: 28px !important;
+  min-width: 28px !important;
+}
+
 /* Remove default margins and paddings for consistency */
 h1, h2, h3, h4, h5, h6, p, ul, ol {
   margin: 0;
