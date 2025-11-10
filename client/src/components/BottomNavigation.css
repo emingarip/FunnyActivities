@@ -271,6 +271,58 @@
   }
 }
 
+/* Mobile landscape mode - vertical navigation on left */
+@media (orientation: landscape) and (max-height: 500px) {
+  .modern-bottom-nav {
+    position: fixed;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    bottom: auto;
+    width: auto;
+    max-width: none;
+    z-index: 1000;
+  }
+
+  .nav-container {
+    flex-direction: column;
+    padding: 16px 10px;
+    gap: 8px;
+  }
+
+  .nav-item {
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+  }
+
+  .nav-item.center-item {
+    min-width: 40px;
+    height: 40px;
+    margin: 0;
+  }
+
+  .nav-item:not(.center-item) .nav-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .nav-item.center-item .nav-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Hide labels in vertical mode */
+  .nav-label {
+    display: none;
+  }
+
+  /* Push content to the right to avoid overlap */
+  body {
+    padding-left: 70px; /* Adjust based on nav width + margin */
+  }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .nav-item,
@@ -280,7 +332,7 @@
     transition: none;
     animation: none;
   }
-  
+
   .nav-item:hover,
   .nav-item.center-item:hover {
     transform: none;
