@@ -184,6 +184,12 @@ const ActivityPage: React.FC = () => {
     }));
   }, [dispatch, currentStepIndex, steps, id, currentActivity, updateLocalProgress]);
 
+  const handleReplayStep = useCallback(() => {
+    dispatch(setPausedAtStep(false));
+    dispatch(setVideoPlaying(true));
+    // Keep current step index, just replay from previous step's end
+  }, [dispatch]);
+
   const handleVideoPlay = useCallback(() => {
     dispatch(setVideoPlaying(true));
   }, [dispatch]);
@@ -253,12 +259,19 @@ const ActivityPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', p: isMobile ? 2 : 3 }}>
+    <Box sx={{
+      minHeight: '100vh',
+      bgcolor: 'background.default',
+      p: isMobile ? 2 : 3,
+      maxWidth: '1400px',
+      mx: 'auto'
+    }}>
       <ActivityHeader
         activity={currentActivity}
         favorites={favorites}
-        onToggleFavorite={toggleFavorite}
+        onToggleFavorite={() => {}} // Disabled since favorite button is now in video player
         onBack={() => navigate('/')}
+        showFavoriteButton={false}
       />
 
       <ActivityProgressBar progressPercentage={getProgressPercentage()} />
@@ -287,9 +300,13 @@ const ActivityPage: React.FC = () => {
             onPlay={handleVideoPlay}
             onPause={handleVideoPause}
             onContinue={handleContinue}
+            onReplayStep={handleReplayStep}
             onTimeUpdate={handleVideoTimeUpdate}
             onStepReached={handleStepReached}
             onEnded={handleVideoEnded}
+            showFavoriteButton={true}
+            isFavorite={favorites.has(currentActivity.id)}
+            onToggleFavorite={toggleFavorite}
           />
 
           <ActivityLayout

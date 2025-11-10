@@ -11,7 +11,7 @@ import {
   Tooltip,
   IconButton,
 } from '@mui/material';
-import { PlayArrow as PlayIcon, RadioButtonChecked as MarkerIcon, VolumeUp as VolumeIcon, VolumeOff as VolumeOffIcon, Fullscreen as FullscreenIcon } from '@mui/icons-material';
+import { PlayArrow as PlayIcon, RadioButtonChecked as MarkerIcon, VolumeUp as VolumeIcon, VolumeOff as VolumeOffIcon, Fullscreen as FullscreenIcon, Favorite as FavoriteIcon, FavoriteBorder as FavoriteBorderIcon } from '@mui/icons-material';
 
 interface ActivityStep {
   id: string;
@@ -30,9 +30,13 @@ interface ActivityVideoPlayerProps {
   onPlay: () => void;
   onPause: () => void;
   onContinue: () => void;
+  onReplayStep?: () => void;
   onTimeUpdate: (currentTime: number) => void;
   onStepReached: (stepIndex: number) => void;
   onEnded: () => void;
+  showFavoriteButton?: boolean;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
 const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
@@ -45,9 +49,13 @@ const ActivityVideoPlayer: React.FC<ActivityVideoPlayerProps> = ({
   onPlay,
   onPause,
   onContinue,
+  onReplayStep,
   onTimeUpdate,
   onStepReached,
   onEnded,
+  showFavoriteButton = false,
+  isFavorite = false,
+  onToggleFavorite,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -124,6 +132,28 @@ useEffect(() => {
     }
   }, [isPlaying, isPausedAtStep, isIntroPhase]);
 
+  // Auto-play main video when loaded (after intro or directly)
+  useEffect(() => {
+    if (isIntroPhase || !videoUrl || isPausedAtStep) {
+      return;
+    }
+
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    // Auto-play when video is loaded and ready
+    const handleCanPlay = () => {
+      if (!isPlaying && !isPausedAtStep) {
+        onPlay();
+      }
+    };
+
+    video.addEventListener('canplay', handleCanPlay);
+    return () => video.removeEventListener('canplay', handleCanPlay);
+  }, [isIntroPhase, videoUrl, isPausedAtStep, isPlaying, onPlay]);
+
   useEffect(() => {
     if (!isIntroPhase && shouldAutoPlayMain) {
       const timer = setTimeout(() => {
@@ -194,6 +224,11 @@ useEffect(() => {
     setIntroCompleted(true);
     setShouldAutoPlayMain(autoPlayMain);
     setShowUnmuteButton(true);
+
+    // Always start main video when intro completes (either by ending or skipping)
+    setTimeout(() => {
+      onPlay();
+    }, 100); // Small delay to ensure state updates
   };
 
   const handleIntroPlay = () => {
@@ -313,6 +348,33 @@ useEffect(() => {
           overflow: 'hidden',
           bgcolor: 'black',
         }}>
+          {/* Favorite Button - Top Right */}
+          {showFavoriteButton && onToggleFavorite && (
+            <IconButton
+              onClick={onToggleFavorite}
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                zIndex: 15,
+                bgcolor: 'rgba(0, 0, 0, 0.6)',
+                color: 'white',
+                '&:hover': {
+                  bgcolor: 'rgba(0, 0, 0, 0.8)',
+                },
+                width: 48,
+                height: 48,
+              }}
+              size="large"
+            >
+              {isFavorite ? (
+                <FavoriteIcon color="error" fontSize="large" />
+              ) : (
+                <FavoriteBorderIcon fontSize="large" />
+              )}
+            </IconButton>
+          )}
+
           <video
             data-testid="activity-video"
             ref={videoRef}
@@ -612,31 +674,59 @@ useEffect(() => {
               >
                 {currentStep.description}
               </Typography>
-          <Button
-            data-cy="continue-button"
-            variant="contained"
-            size={isMobile ? 'medium' : 'large'}
-            onClick={() => {
-              const nextIndex = Math.min(safeStepIndex + 1, steps.length);
-              nextPauseIndexRef.current = Math.max(nextPauseIndexRef.current, nextIndex);
-              const video = videoRef.current;
-              onContinue();
-              if (video) {
-                const epsilon = 0.05;
-                const targetTime = Math.min(video.currentTime + epsilon, videoDuration || video.currentTime + epsilon);
-                video.currentTime = targetTime;
-                video.play().catch(error => console.error('ActivityVideoPlayer: continue play failed', error));
-              }
-            }}
-            startIcon={<PlayIcon />}
-            sx={{
-              minWidth: isMobile ? '120px' : '160px',
-              minHeight: 44,
-              fontSize: isMobile ? '1rem' : '1rem',
-            }}
-          >
-            Continue Activity
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2, flexDirection: isMobile ? 'column' : 'row' }}>
+            <Button
+              data-cy="continue-button"
+              variant="contained"
+              size={isMobile ? 'medium' : 'large'}
+              onClick={() => {
+                const nextIndex = Math.min(safeStepIndex + 1, steps.length);
+                nextPauseIndexRef.current = Math.max(nextPauseIndexRef.current, nextIndex);
+                const video = videoRef.current;
+                onContinue();
+                if (video) {
+                  const epsilon = 0.05;
+                  const targetTime = Math.min(video.currentTime + epsilon, videoDuration || video.currentTime + epsilon);
+                  video.currentTime = targetTime;
+                  video.play().catch(error => console.error('ActivityVideoPlayer: continue play failed', error));
+                }
+              }}
+              startIcon={<PlayIcon />}
+              sx={{
+                minWidth: isMobile ? '120px' : '160px',
+                minHeight: 44,
+                fontSize: isMobile ? '1rem' : '1rem',
+              }}
+            >
+              Continue Activity
+            </Button>
+
+            {onReplayStep && (
+              <Button
+                variant="outlined"
+                size={isMobile ? 'medium' : 'large'}
+                onClick={() => {
+                  const video = videoRef.current;
+                  if (video) {
+                    // Always start from the beginning of current step (previous step's end or video start)
+                    const replayStartTime = safeStepIndex > 0 ? steps[safeStepIndex - 1].timestampSeconds : 0;
+                    video.currentTime = replayStartTime;
+                    nextPauseIndexRef.current = safeStepIndex; // Reset to current step
+                    onReplayStep();
+                    video.play().catch(error => console.error('ActivityVideoPlayer: replay step failed', error));
+                  }
+                }}
+                startIcon={<PlayIcon />}
+                sx={{
+                  minWidth: isMobile ? '120px' : '160px',
+                  minHeight: 44,
+                  fontSize: isMobile ? '1rem' : '1rem',
+                }}
+              >
+                Replay Step
+              </Button>
+            )}
+          </Box>
         </Box>
           )}
         </Box>

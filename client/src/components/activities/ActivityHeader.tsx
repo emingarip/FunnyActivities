@@ -33,6 +33,7 @@ interface ActivityHeaderProps {
   favorites: Set<string>;
   onToggleFavorite: () => void;
   onBack: () => void;
+  showFavoriteButton?: boolean;
 }
 
 const ActivityHeader: React.FC<ActivityHeaderProps> = ({
@@ -40,6 +41,7 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
   favorites,
   onToggleFavorite,
   onBack,
+  showFavoriteButton = true,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -57,13 +59,13 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
       {/* Header */}
       <Box sx={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         alignItems: 'flex-start',
         mb: 2,
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: isMobile ? 2 : 0,
+        flexDirection: 'column',
+        gap: 2,
       }}>
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ width: '100%' }}>
           <Typography
             variant={isMobile ? 'h5' : 'h4'}
             component="h1"
@@ -84,17 +86,6 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({
             </Typography>
           )}
         </Box>
-        <IconButton
-          onClick={onToggleFavorite}
-          size="large"
-          sx={{ alignSelf: isMobile ? 'flex-end' : 'flex-start' }}
-        >
-          {favorites.has(activity.id) ? (
-            <FavoriteIcon color="error" fontSize="large" />
-          ) : (
-            <FavoriteBorderIcon fontSize="large" />
-          )}
-        </IconButton>
       </Box>
 
       {/* Activity Info */}
