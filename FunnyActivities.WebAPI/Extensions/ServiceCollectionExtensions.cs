@@ -294,6 +294,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<FunnyActivities.Domain.Interfaces.ISurveyRepository, FunnyActivities.Infrastructure.SurveyRepository>();
         services.AddScoped<FunnyActivities.Domain.Interfaces.IVoteRepository, FunnyActivities.Infrastructure.VoteRepository>();
 
+        // Persona repositories
+        services.AddScoped<FunnyActivities.Domain.Interfaces.IPersonaRepository, FunnyActivities.Infrastructure.PersonaRepository>();
+        services.AddScoped<FunnyActivities.Domain.Interfaces.IPersonaActivityAssociationRepository, FunnyActivities.Infrastructure.PersonaActivityAssociationRepository>();
+
         return services;
     }
 
@@ -452,6 +456,17 @@ public static class ServiceCollectionExtensions
 
         // Input sanitization service
         services.AddScoped<FunnyActivities.Application.Interfaces.IInputSanitizer, FunnyActivities.Infrastructure.Services.InputSanitizer>();
+
+        // AI service
+        services.AddScoped<FunnyActivities.Application.Interfaces.IAIService, FunnyActivities.Application.Services.OllamaService>();
+        services.AddSingleton<FunnyActivities.Application.Services.OllamaSettings>(sp =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            return new FunnyActivities.Application.Services.OllamaSettings
+            {
+                BaseUrl = configuration["Ollama:BaseUrl"] ?? "http://localhost:11434"
+            };
+        });
 
         return services;
     }

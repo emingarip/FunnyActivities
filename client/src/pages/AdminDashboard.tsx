@@ -117,6 +117,15 @@ const AdminDashboard: React.FC = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
+              <Button component={Link} to="/admin/personas" variant="contained" color="primary">
+                Manage Personas
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card>
+            <CardContent>
               <Button component={Link} to="/admin/products" variant="contained" color="primary">
                 Manage Products
               </Button>

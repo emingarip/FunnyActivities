@@ -8,7 +8,9 @@ namespace FunnyActivities.Application.Interfaces
     public interface IMinioService
     {
         Task<string> UploadImageAsync(byte[] imageData, string fileName, string contentType, string imageType);
+        Task<string> UploadPersonaImageAsync(byte[] imageData, string fileName, string contentType, Guid personaId, string imageType);
         Task<string> GeneratePreSignedUrlAsync(string objectKey, int expiryInSeconds = 3600);
+        Task<string> GeneratePersonaPreSignedUrlAsync(string objectKey, int expiryInSeconds = 3600);
         Task<bool> DeleteImageAsync(string objectKey);
         Task<Image> SaveImageMetadataAsync(Image image);
 

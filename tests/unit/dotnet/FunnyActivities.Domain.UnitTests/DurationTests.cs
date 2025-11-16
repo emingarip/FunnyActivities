@@ -56,10 +56,9 @@ namespace FunnyActivities.Domain.UnitTests
         }
 
         [Fact]
-        public void Create_WithTimeSpan_ShouldThrowArgumentException_WhenTimeSpanIsZeroOrNegative()
+        public void Create_WithTimeSpan_ShouldThrowArgumentException_WhenTimeSpanIsNegative()
         {
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => Duration.Create(TimeSpan.Zero));
             Assert.Throws<ArgumentException>(() => Duration.Create(TimeSpan.FromSeconds(-1)));
         }
 

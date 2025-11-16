@@ -20,6 +20,7 @@ public class MinioService : IMinioService
         private readonly MinioConfiguration _minioConfig;
         private readonly ILogger<MinioService> _logger;
         private const string ProfileImagesBucketName = "profile-images";
+        private const string PersonaImagesBucketName = "persona-images";
         private const string ActivityVideosBucketName = "activity-videos";
         private const int MaxRetryAttempts = 3;
         private const int RequestTimeoutSeconds = 30;
@@ -50,6 +51,16 @@ public class MinioService : IMinioService
                 await _minioClient.MakeBucketAsync(makeProfileImagesBucketArgs);
             }
 
+            // Ensure persona images bucket exists
+            var personaImagesExistsArgs = new BucketExistsArgs().WithBucket(PersonaImagesBucketName);
+            bool personaImagesFound = await _minioClient.BucketExistsAsync(personaImagesExistsArgs);
+
+            if (!personaImagesFound)
+            {
+                var makePersonaImagesBucketArgs = new MakeBucketArgs().WithBucket(PersonaImagesBucketName);
+                await _minioClient.MakeBucketAsync(makePersonaImagesBucketArgs);
+            }
+
             // Ensure activity videos bucket exists
             var activityVideosExistsArgs = new BucketExistsArgs().WithBucket(ActivityVideosBucketName);
             bool activityVideosFound = await _minioClient.BucketExistsAsync(activityVideosExistsArgs);
@@ -71,6 +82,38 @@ public class MinioService : IMinioService
             using var stream = new MemoryStream(imageData);
             var putObjectArgs = new PutObjectArgs()
                 .WithBucket(ProfileImagesBucketName)
+                .WithObject(objectKey)
+                .WithStreamData(stream)
+                .WithObjectSize(stream.Length)
+                .WithContentType(contentType);
+
+            await _minioClient.PutObjectAsync(putObjectArgs);
+            return objectKey;
+        }
+
+        public async Task<string> GeneratePersonaPreSignedUrlAsync(string objectKey, int expiryInSeconds = 3600)
+        {
+            if (string.IsNullOrWhiteSpace(objectKey))
+            {
+                throw new ArgumentException("Object key cannot be null or empty", nameof(objectKey));
+            }
+
+            var presignedGetObjectArgs = new PresignedGetObjectArgs()
+                .WithBucket(PersonaImagesBucketName)
+                .WithObject(objectKey)
+                .WithExpiry(expiryInSeconds);
+
+            return await _minioClient.PresignedGetObjectAsync(presignedGetObjectArgs);
+        }
+
+        public async Task<string> UploadPersonaImageAsync(byte[] imageData, string fileName, string contentType, Guid personaId, string imageType)
+        {
+            var sanitizedFileName = SanitizeFileName(fileName);
+            var objectKey = $"personas/{personaId}/{imageType}/{Guid.NewGuid()}_{sanitizedFileName}";
+
+            using var stream = new MemoryStream(imageData);
+            var putObjectArgs = new PutObjectArgs()
+                .WithBucket(PersonaImagesBucketName)
                 .WithObject(objectKey)
                 .WithStreamData(stream)
                 .WithObjectSize(stream.Length)

@@ -17,6 +17,7 @@ import ActivityPage from './pages/ActivityPage';
 import UserDashboard from './pages/UserDashboard';
 import Wallet from './pages/Wallet';
 import MaterialsAdmin from './pages/MaterialsAdmin';
+import PersonaAdmin from './pages/PersonaAdmin';
 import { ProductsOverview, ProductWizardDemo } from './components/products';
 import {
   SurveyList,
@@ -60,6 +61,7 @@ function AppContent() {
           <Route path="/admin/activities" element={<AdminRoute><ActivityAdmin /></AdminRoute>} />
           <Route path="/admin/activities/:id/edit" element={<AdminRoute><ActivityEditPage /></AdminRoute>} />
           <Route path="/admin/materials" element={<AdminRoute><MaterialsAdmin /></AdminRoute>} />
+          <Route path="/admin/personas" element={<AdminRoute><PersonaAdmin /></AdminRoute>} />
           <Route path="/admin/products" element={<AdminRoute><ProductsOverview /></AdminRoute>} />
           <Route path="/admin/product-wizard-demo" element={<AdminRoute><ProductWizardDemo /></AdminRoute>} />
           <Route path="/admin/surveys" element={<AdminRoute><SurveyList /></AdminRoute>} />
