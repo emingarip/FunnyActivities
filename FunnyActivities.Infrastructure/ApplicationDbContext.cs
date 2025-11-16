@@ -34,6 +34,9 @@ namespace FunnyActivities.Infrastructure
         public DbSet<SurveyActivity> SurveyActivities { get; set; }
         public DbSet<SurveyParticipant> SurveyParticipants { get; set; }
         public DbSet<SurveyVote> SurveyVotes { get; set; }
+        public DbSet<Persona> Personas { get; set; }
+        public DbSet<PersonaCharacteristic> PersonaCharacteristics { get; set; }
+        public DbSet<PersonaActivityAssociation> PersonaActivityAssociations { get; set; }
         // public DbSet<UnitType> UnitTypes { get; set; } // Commented out - UnitType entity not found
         // public DbSet<Unit> Units { get; set; } // Commented out - Unit entity not found
 
@@ -85,10 +88,16 @@ namespace FunnyActivities.Infrastructure
                 entity.Property(i => i.ObjectKey).IsRequired().HasMaxLength(500);
                 entity.Property(i => i.PreSignedUrl).IsRequired().HasMaxLength(1000);
                 entity.Property(i => i.ImageType).IsRequired().HasMaxLength(50);
+                entity.HasIndex(i => i.PersonaId);
                 // Index on UserId for faster queries
                 entity.HasIndex(i => i.UserId);
                 // Index on ImageType for filtering
                 entity.HasIndex(i => i.ImageType);
+
+                entity.HasOne<Persona>()
+                      .WithMany(p => p.Images)
+                      .HasForeignKey(i => i.PersonaId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             // Configure Role entity
@@ -381,6 +390,75 @@ namespace FunnyActivities.Infrastructure
                 entity.HasIndex(f => f.ActivityId);
                 entity.HasIndex(f => new { f.UserId, f.ActivityId }).IsUnique();
                 entity.HasIndex(f => f.CreatedAt);
+            });
+
+            // Configure Persona entity
+            modelBuilder.Entity<Persona>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.Property(p => p.Name).IsRequired().HasMaxLength(100);
+                entity.Property(p => p.Description).HasMaxLength(500);
+                entity.Property(p => p.AvatarImageUrl).HasMaxLength(1000);
+                entity.Property(p => p.Age).IsRequired(false);
+                entity.Property(p => p.Gender).HasConversion<int?>(); // Store enum as int
+                entity.Property(p => p.Nationality).HasMaxLength(100);
+                entity.Property(p => p.Biography).HasMaxLength(2000);
+                // Foreign key to User
+                entity.HasOne(p => p.User)
+                       .WithMany()
+                       .HasForeignKey(p => p.UserId)
+                       .OnDelete(DeleteBehavior.Cascade);
+                // Foreign keys to related entities
+                entity.HasMany(p => p.Characteristics)
+                       .WithOne(pc => pc.Persona)
+                       .HasForeignKey(pc => pc.PersonaId)
+                       .OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(p => p.ActivityAssociations)
+                       .WithOne(paa => paa.Persona)
+                       .HasForeignKey(paa => paa.PersonaId)
+                       .OnDelete(DeleteBehavior.Cascade);
+                // Add indexes for performance
+                entity.HasIndex(p => p.UserId);
+                entity.HasIndex(p => p.Name);
+                entity.HasIndex(p => p.CreatedAt);
+            });
+
+            // Configure PersonaCharacteristic entity
+            modelBuilder.Entity<PersonaCharacteristic>(entity =>
+            {
+                entity.HasKey(pc => pc.Id);
+                entity.Property(pc => pc.Name).IsRequired().HasMaxLength(100);
+                entity.Property(pc => pc.Value).IsRequired().HasMaxLength(500);
+                entity.Property(pc => pc.Type).HasMaxLength(50);
+                // Foreign key to Persona
+                entity.HasOne(pc => pc.Persona)
+                      .WithMany(p => p.Characteristics)
+                      .HasForeignKey(pc => pc.PersonaId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                // Add indexes for performance
+                entity.HasIndex(pc => pc.PersonaId);
+                entity.HasIndex(pc => new { pc.PersonaId, pc.Order });
+            });
+
+            // Configure PersonaActivityAssociation entity
+            modelBuilder.Entity<PersonaActivityAssociation>(entity =>
+            {
+                entity.HasKey(paa => paa.Id);
+                // Foreign key to Persona
+                entity.HasOne(paa => paa.Persona)
+                      .WithMany(p => p.ActivityAssociations)
+                      .HasForeignKey(paa => paa.PersonaId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                // Foreign key to Activity
+                entity.HasOne(paa => paa.Activity)
+                      .WithMany()
+                      .HasForeignKey(paa => paa.ActivityId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                // Add indexes for performance
+                entity.HasIndex(paa => paa.PersonaId);
+                entity.HasIndex(paa => paa.ActivityId);
+                entity.HasIndex(paa => new { paa.PersonaId, paa.ActivityId }).IsUnique();
+                entity.HasIndex(paa => paa.CreatedAt);
             });
         }
     }

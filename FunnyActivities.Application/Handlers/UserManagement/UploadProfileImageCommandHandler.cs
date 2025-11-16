@@ -58,6 +58,7 @@ namespace FunnyActivities.Application.Handlers
             var originalImage = new Image(
                 Guid.NewGuid(),
                 request.UserId,
+                null,
                 request.FileName,
                 request.FileName,
                 request.ContentType,
@@ -71,6 +72,7 @@ namespace FunnyActivities.Application.Handlers
             var thumbnailImage = new Image(
                 Guid.NewGuid(),
                 request.UserId,
+                null,
                 $"thumb_{request.FileName}",
                 request.FileName,
                 request.ContentType,
@@ -84,6 +86,7 @@ namespace FunnyActivities.Application.Handlers
             var mediumImage = new Image(
                 Guid.NewGuid(),
                 request.UserId,
+                null,
                 $"medium_{request.FileName}",
                 request.FileName,
                 request.ContentType,

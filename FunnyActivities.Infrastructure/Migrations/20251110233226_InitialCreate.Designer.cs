@@ -3,6 +3,7 @@ using System;
 using FunnyActivities.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FunnyActivities.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251110233226_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,9 +333,6 @@ namespace FunnyActivities.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<Guid?>("PersonaId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("PreSignedUrl")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -347,8 +347,6 @@ namespace FunnyActivities.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ImageType");
-
-                    b.HasIndex("PersonaId");
 
                     b.HasIndex("UserId");
 
@@ -990,14 +988,6 @@ namespace FunnyActivities.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FunnyActivities.Domain.Entities.Image", b =>
-                {
-                    b.HasOne("FunnyActivities.Domain.Entities.Persona", null)
-                        .WithMany("Images")
-                        .HasForeignKey("PersonaId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("FunnyActivities.Domain.Entities.Persona", b =>
                 {
                     b.HasOne("FunnyActivities.Domain.Entities.User", "User")
@@ -1204,8 +1194,6 @@ namespace FunnyActivities.Infrastructure.Migrations
                     b.Navigation("ActivityAssociations");
 
                     b.Navigation("Characteristics");
-
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("FunnyActivities.Domain.Entities.Survey", b =>

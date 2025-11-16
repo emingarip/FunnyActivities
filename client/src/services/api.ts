@@ -931,6 +931,73 @@ export const favoritesAPI = {
     api.get(`/favorites/${activityId}/check`),
 };
 
+export const personasAPI = {
+  // Get paginated list of personas
+  getPersonas: (params?: {
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }) => api.get('/personas', { params }),
+
+  // Get single persona by ID
+  getPersona: (id: string) => api.get(`/personas/${id}`),
+
+  // Create new persona
+  createPersona: (data: {
+    name: string;
+    description?: string;
+    avatarImageUrl?: string;
+    age?: number;
+    gender?: string;
+    nationality?: string;
+    biography?: string;
+    characteristics?: any[];
+  }) => api.post('/personas', data),
+
+  // Update existing persona
+  updatePersona: (id: string, data: {
+    name?: string;
+    description?: string;
+    avatarImageUrl?: string;
+    age?: number;
+    gender?: string;
+    nationality?: string;
+    biography?: string;
+  }) => api.put(`/personas/${id}`, data),
+
+  // Upload persona images
+  uploadPersonaImages: (personaId: string, files: File[]) => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    return api.post(`/personas/${personaId}/images`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+
+  // Delete persona
+  deletePersona: (id: string) => api.delete(`/personas/${id}`),
+
+  // Get persona activity associations for an activity
+  getActivityPersonaAssociations: (activityId: string) =>
+    api.get(`/personas/activities/${activityId}/personas`),
+
+  // Create persona activity association
+  createActivityPersonaAssociation: (activityId: string, data: {
+    personaId: string;
+    preferenceLevel: number;
+  }) => api.post(`/personas/activities/${activityId}/personas`, data),
+
+  // Update persona activity association
+  updateActivityPersonaAssociation: (id: string, data: {
+    preferenceLevel: number;
+  }) => api.put(`/personas/activities/${id}/personas`, data),
+
+  // Delete persona activity association
+  deleteActivityPersonaAssociation: (id: string) =>
+    api.delete(`/personas/activities/${id}/personas`),
+};
+
 export const surveyAPI = {
   // Admin operations (require authentication)
 

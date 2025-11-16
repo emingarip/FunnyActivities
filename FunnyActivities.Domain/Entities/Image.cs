@@ -6,6 +6,7 @@ namespace FunnyActivities.Domain.Entities
     {
         public Guid Id { get; private set; }
         public Guid UserId { get; private set; }
+        public Guid? PersonaId { get; private set; }
         public string FileName { get; private set; }
         public string OriginalFileName { get; private set; }
         public string ContentType { get; private set; }
@@ -16,11 +17,12 @@ namespace FunnyActivities.Domain.Entities
         public DateTime UploadedAt { get; private set; }
         public string ImageType { get; private set; } // "thumbnail", "medium", "original"
 
-        public Image(Guid id, Guid userId, string fileName, string originalFileName, string contentType,
+        public Image(Guid id, Guid userId, Guid? personaId, string fileName, string originalFileName, string contentType,
                     long fileSize, string bucketName, string objectKey, string preSignedUrl, string imageType)
         {
             Id = id;
             UserId = userId;
+            PersonaId = personaId;
             FileName = fileName;
             OriginalFileName = originalFileName;
             ContentType = contentType;

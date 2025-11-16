@@ -38,8 +38,6 @@ namespace FunnyActivities.Domain.ValueObjects
                 throw new ArgumentException("Minutes and seconds must be less than 60.");
 
             var timeSpan = new TimeSpan(hours, minutes, seconds);
-            if (timeSpan.TotalSeconds <= 0)
-                throw new ArgumentException("Duration must be greater than zero.");
 
             return new Duration(timeSpan);
         }
@@ -52,9 +50,6 @@ namespace FunnyActivities.Domain.ValueObjects
         /// <exception cref="ArgumentException">Thrown when the TimeSpan is invalid.</exception>
         public static Duration Create(TimeSpan timeSpan)
         {
-            if (timeSpan.TotalSeconds <= 0)
-                throw new ArgumentException("Duration must be greater than zero.", nameof(timeSpan));
-
             return new Duration(timeSpan);
         }
 
