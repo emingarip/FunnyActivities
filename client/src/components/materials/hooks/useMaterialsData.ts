@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { materialsAPI } from '../../../services/api';
-import { MaterialListDto, PagedResult, GetMaterialsParams } from '../../../services/api.types';
+import { productsAPI } from '../../../services/api';
+import {
+  MaterialListDto,
+  PagedResult,
+  GetMaterialsParams,
+  ProductListDto,
+  GetProductsParams
+} from '../../../services/api.types';
 
 /**
  * Custom hook for managing materials data and filtering
@@ -28,22 +34,54 @@ export const useMaterialsData = (initialFilters: GetMaterialsParams = {}) => {
     ...initialFilters
   });
 
+  const mapProductToMaterial = useCallback((product: ProductListDto): MaterialListDto => {
+    const primaryVariant = product.variants?.[0];
+    const stockQuantity = product.variants?.reduce((sum, variant) => sum + (variant.stockQuantity || 0), 0) ?? 0;
+
+    return {
+      id: product.id,
+      name: product.name,
+      category: product.categoryName,
+      stockQuantity,
+      unit: primaryVariant?.unitSymbol || primaryVariant?.unitOfMeasureName || '',
+      photoCount: primaryVariant?.photos?.length ?? 0,
+      thumbnailUrl: primaryVariant?.photos?.[0]
+    };
+  }, []);
+
   const fetchMaterials = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await materialsAPI.getMaterials(filters);
-      const result: PagedResult<MaterialListDto> = response.data.data;
+      // Map materials filters to product filters
+      const productFilters: GetProductsParams = {
+        page: filters.page,
+        pageSize: filters.pageSize,
+        searchTerm: filters.search ?? filters.name,
+        sortBy: filters.sortBy === 'name' ? 'name' : 'updatedAt',
+        sortOrder: filters.sortOrder,
+        // Category and date filters can be added here when backend supports them
+      };
 
-      setMaterials(result.items);
+      const response = await productsAPI.getProducts(productFilters);
+      const responseData = response.data;
+
+      if (!responseData?.data) {
+        throw new Error('Products endpoint returned no data');
+      }
+
+      const productResult = responseData.data as PagedResult<ProductListDto>;
+      const mappedItems = (productResult.items || []).map(mapProductToMaterial);
+
+      setMaterials(mappedItems);
       setPagination({
-        page: result.page,
-        pageSize: result.pageSize,
-        totalCount: result.totalCount,
-        totalPages: result.totalPages,
-        hasPreviousPage: result.hasPreviousPage,
-        hasNextPage: result.hasNextPage
+        page: productResult.page,
+        pageSize: productResult.pageSize,
+        totalCount: productResult.totalCount,
+        totalPages: productResult.totalPages,
+        hasPreviousPage: productResult.hasPreviousPage,
+        hasNextPage: productResult.hasNextPage
       });
     } catch (err: any) {
       console.error('Error fetching materials:', err);
