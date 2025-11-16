@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { materialsAPI } from '../../services/api';
+import { productsAPI } from '../../services/api';
 import { MaterialListDto } from '../../services/api.types';
 import MaterialsTable from './MaterialsTable';
 import MaterialsPagination from './MaterialsPagination';
@@ -69,15 +69,16 @@ const MaterialsList: React.FC<MaterialsListProps> = React.memo(({
   // Memoized categories loading
   const loadCategories = useCallback(async () => {
     try {
-      const response = await materialsAPI.getMaterials({ pageSize: 1000 });
-      const materialsData = response.data.data.items;
+      const response = await productsAPI.getProducts({ pageSize: 1000 });
+      const productData = response.data.data?.items || [];
       const uniqueCategories: string[] = [];
       const categorySet = new Set<string>();
 
-      materialsData.forEach((item: MaterialListDto) => {
-        if (item.category && !categorySet.has(item.category)) {
-          categorySet.add(item.category);
-          uniqueCategories.push(item.category);
+      productData.forEach((item: any) => {
+        const categoryName = item.categoryName;
+        if (categoryName && !categorySet.has(categoryName)) {
+          categorySet.add(categoryName);
+          uniqueCategories.push(categoryName);
         }
       });
 
@@ -124,24 +125,17 @@ const MaterialsList: React.FC<MaterialsListProps> = React.memo(({
     setShowAdvancedPanel(false);
   }, [handleClearAllFilters]);
 
-  // Handle material deletion
+  // Handle material deletion (informational only; actual delete via products module)
   const handleDeleteMaterial = useCallback(async (material: MaterialListDto) => {
     if (!window.confirm(`Are you sure you want to delete "${material.name}"?`)) {
       return;
     }
 
     try {
-      await materialsAPI.deleteMaterial(material.id);
-      // Refresh the list - this will be handled by the hook
-      window.location.reload(); // Temporary solution until we implement proper refresh
+      alert('Silmeyi urunler uzerinden yapin. (Materials gorunumu sadece listeleme amacli)');
     } catch (err: any) {
       console.error('Error deleting material:', err);
-      let errorMessage = 'Unknown error';
-      if (err.response?.data && typeof err.response.data.success === 'boolean' && !err.response.data.success) {
-        errorMessage = err.response.data.message || 'Failed to delete material';
-      } else {
-        errorMessage = err.message || 'Failed to delete material';
-      }
+      const errorMessage = err?.message || 'Failed to delete material';
       alert('Failed to delete material: ' + errorMessage);
     }
   }, []);
@@ -226,3 +220,5 @@ const MaterialsList: React.FC<MaterialsListProps> = React.memo(({
 MaterialsList.displayName = 'MaterialsList';
 
 export default MaterialsList;
+
+
