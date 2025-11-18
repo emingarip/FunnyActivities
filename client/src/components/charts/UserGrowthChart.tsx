@@ -305,18 +305,11 @@ const UserGrowthChart: React.FC<UserGrowthChartProps> = ({
           mt: isSmallMobile ? 1.5 : 2,
           display: 'flex',
           flexDirection: isSmallMobile ? 'column' : 'row',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           alignItems: isSmallMobile ? 'flex-start' : 'center',
           gap: isSmallMobile ? 1 : 0
         }}
       >
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ fontSize: isSmallMobile ? '0.7rem' : '0.75rem' }}
-        >
-          Last updated: {new Date().toLocaleString()}
-        </Typography>
         <Typography
           variant="caption"
           color="text.secondary"

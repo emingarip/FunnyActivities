@@ -117,14 +117,14 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
 
     // Activity admin
     activity_admin_title: 'Activities Management',
+    'activity_admin_edit': 'Edit',
+    'activity_admin_delete': 'Delete',
     activity_admin_tab_activities: 'Activities',
     activity_admin_tab_categories: 'Categories',
     activity_admin_loading: 'Loading activities...',
     activity_admin_error: 'Failed to load activities and categories',
     activity_admin_retry: 'Retry',
     activity_admin_create: 'Create Activity',
-    activity_admin_edit: 'Edit',
-    activity_admin_delete: 'Delete',
     activity_admin_play_intro: 'Play Intro',
     activity_admin_play_main: 'Play Main',
     activity_admin_video_not_found: 'Video not found',
@@ -163,6 +163,10 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     activity_form_duration_hint: 'Specify duration in hours, minutes, and seconds.',
     activity_form_category_hint: 'Choose a category for this activity.',
     activity_form_video_hint: 'Optional intro/main video upload.',
+
+    // PublicActivities component
+    'publicActivities.noActivitiesAvailable': 'No activities available',
+    'publicActivities.checkBackLater': 'Check back later for new activities',
 
     // ActivityForm component
     'activityForm.basicInformation': 'Basic Information',
@@ -352,6 +356,10 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     activity_form_duration_hint: 'Süreyi saat, dakika ve saniye olarak belirtin.',
     activity_form_category_hint: 'Bu aktivite için bir kategori seçin.',
     activity_form_video_hint: 'Opsiyonel intro/ana video yükleyin.',
+
+    // PublicActivities component
+    'publicActivities.noActivitiesAvailable': 'Aktivite bulunamadı',
+    'publicActivities.checkBackLater': 'Yeni aktiviteler için daha sonra tekrar kontrol edin',
 
     // ActivityForm component
     'activityForm.basicInformation': 'Temel Bilgiler',

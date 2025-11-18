@@ -308,10 +308,10 @@ const ActivityAdmin: React.FC = () => {
                       <IconButton size="small" sx={{ mr: 1 }}>
                         <VideoIcon fontSize="small" /> {t('activity_admin_play_main')}
                       </IconButton>
-                      <IconButton size="small" onClick={() => handleEditActivity(activity)} sx={{ mr: 1 }}>
+                      <IconButton size="small" onClick={() => handleEditActivity(activity)} sx={{ mr: 1 }} title={t('activity_admin_edit')}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton size="small" color="error" onClick={() => handleDeleteActivity(activity)}>
+                      <IconButton size="small" color="error" onClick={() => handleDeleteActivity(activity)} title={t('activity_admin_delete')}>
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
@@ -352,10 +352,10 @@ const ActivityAdmin: React.FC = () => {
                     <TableCell>{category.name}</TableCell>
                     <TableCell>{category.description || '-'}</TableCell>
                     <TableCell align="right">
-                      <IconButton size="small">
+                      <IconButton size="small" title={t('activity_admin_edit')}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton size="small" color="error">
+                      <IconButton size="small" color="error" title={t('activity_admin_delete')}>
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
