@@ -6,6 +6,7 @@ using FunnyActivities.Application.Commands.UnitOfMeasureManagement;
 using FunnyActivities.Application.Queries.UnitOfMeasureManagement;
 using FunnyActivities.Application.DTOs.UnitOfMeasureManagement;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -24,17 +25,20 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<UnitOfMeasureController> _logger;
+        private readonly IStringLocalizer<UnitOfMeasureController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitOfMeasureController"/> class.
         /// </summary>
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
-        public UnitOfMeasureController(IMediator mediator, ILogger<UnitOfMeasureController> logger)
+        /// <param name="localizer">The string localizer.</param>
+        public UnitOfMeasureController(IMediator mediator, ILogger<UnitOfMeasureController> logger, IStringLocalizer<UnitOfMeasureController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -86,17 +90,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Unit of measure created successfully with ID: {Id}", result.Id);
-                return this.ApiSuccess(result, "Unit of measure created successfully", 201);
+                return this.ApiSuccess(result, _localizer["UnitCreated"], 201);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Unit of measure creation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["UnitCreateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating unit of measure");
-                return this.ApiError("An error occurred while creating the unit of measure", "InternalError", 500);
+                return this.ApiError(_localizer["UnitCreateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -139,10 +143,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (unit == null)
             {
                 _logger.LogWarning("Unit of measure with ID {UnitId} not found", id);
-                return this.ApiError("Unit of measure not found", "NotFound", 404);
+                return this.ApiError(_localizer["UnitNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(unit, "Unit of measure retrieved successfully");
+            return this.ApiSuccess(unit, _localizer["UnitRetrieved"]);
         }
 
         /// <summary>
@@ -199,22 +203,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Unit of measure updated successfully with ID: {UnitId}", result.Id);
-                return this.ApiSuccess(result, "Unit of measure updated successfully");
+                return this.ApiSuccess(result, _localizer["UnitUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Unit of measure update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["UnitUpdateNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Unit of measure update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["UnitUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating unit of measure");
-                return this.ApiError("An error occurred while updating the unit of measure", "InternalError", 500);
+                return this.ApiError(_localizer["UnitUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -253,17 +257,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Unit of measure deleted successfully with ID: {UnitId}", id);
-                return this.ApiSuccess<object>("Unit of measure deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["UnitDeleted"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Unit of measure deletion failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["UnitDeleteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting unit of measure");
-                return this.ApiError("An error occurred while deleting the unit of measure", "InternalError", 500);
+                return this.ApiError(_localizer["UnitDeleteUnexpected"], "InternalError", 500);
             }
         }
 
@@ -301,7 +305,7 @@ namespace FunnyActivities.WebAPI.Controllers
 
             var query = new GetUnitOfMeasuresQuery();
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Units of measure retrieved successfully");
+            return this.ApiSuccess(result, _localizer["UnitsRetrieved"]);
         }
     }
 }

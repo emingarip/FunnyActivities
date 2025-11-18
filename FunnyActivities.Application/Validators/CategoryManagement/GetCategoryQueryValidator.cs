@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Queries.CategoryManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.CategoryManagement
 {
@@ -14,7 +15,7 @@ namespace FunnyActivities.Application.Validators.CategoryManagement
         public GetCategoryQueryValidator()
         {
             RuleFor(x => x.Id)
-                .NotEmpty().WithMessage("Category ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("CategoryIdRequired"));
         }
     }
 }

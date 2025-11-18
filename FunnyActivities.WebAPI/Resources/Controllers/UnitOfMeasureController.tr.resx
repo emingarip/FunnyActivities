@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="UnitCreated" xml:space="preserve"><value>Olcum birimi basariyla olusturuldu</value></data>
+  <data name="UnitCreateValidationError" xml:space="preserve"><value>Olcum birimi olusturulamadi: {0}. Lutfen girdilerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="UnitCreateUnexpected" xml:space="preserve"><value>Olcum birimi olusturulurken bir sorun olustu. Lutfen daha sonra tekrar deneyin.</value></data>
+  <data name="UnitNotFound" xml:space="preserve"><value>Istenen olcum birimi bulunamadi. Lutfen ID'yi dogrulayin ve tekrar deneyin.</value></data>
+  <data name="UnitRetrieved" xml:space="preserve"><value>Olcum birimi basariyla getirildi</value></data>
+  <data name="UnitUpdated" xml:space="preserve"><value>Olcum birimi basariyla guncellendi</value></data>
+  <data name="UnitUpdateNotFound" xml:space="preserve"><value>Guncellenmek istenen olcum birimi bulunamadi.</value></data>
+  <data name="UnitUpdateValidationError" xml:space="preserve"><value>Olcum birimi guncellenemedi: {0}. Lutfen degisikliklerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="UnitUpdateUnexpected" xml:space="preserve"><value>Olcum birimi guncellenirken bir sorun olustu. Lutfen daha sonra tekrar deneyin.</value></data>
+  <data name="UnitDeleted" xml:space="preserve"><value>Olcum birimi basariyla silindi</value></data>
+  <data name="UnitDeleteNotFound" xml:space="preserve"><value>Silmek istediginiz olcum birimi bulunamadi.</value></data>
+  <data name="UnitDeleteUnexpected" xml:space="preserve"><value>Olcum birimi silinirken bir sorun olustu. Lutfen daha sonra tekrar deneyin.</value></data>
+  <data name="UnitsRetrieved" xml:space="preserve"><value>Olcum birimleri basariyla getirildi</value></data>
+</root>

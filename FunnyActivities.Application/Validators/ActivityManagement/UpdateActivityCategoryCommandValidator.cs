@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Commands.ActivityManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.ActivityManagement
 {
@@ -14,18 +15,18 @@ namespace FunnyActivities.Application.Validators.ActivityManagement
         public UpdateActivityCategoryCommandValidator()
         {
             RuleFor(x => x.Id)
-                .NotEmpty().WithMessage("Category ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("CategoryIdRequired"));
 
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Category name is required.")
-                .Length(1, 100).WithMessage("Category name must be between 1 and 100 characters.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("NameRequired"))
+                .Length(1, 100).WithMessage(ValidationMessageProvider.Get("NameLength1To100"));
 
             RuleFor(x => x.Description)
-                .MaximumLength(500).WithMessage("Category description cannot exceed 500 characters.")
+                .MaximumLength(500).WithMessage(ValidationMessageProvider.Get("DescriptionMax500"))
                 .When(x => !string.IsNullOrEmpty(x.Description));
 
             RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("UserIdRequired"));
         }
     }
 }

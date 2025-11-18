@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -20,8 +20,6 @@ import {
   TableRow,
   IconButton,
   Chip,
-  Alert,
-  CircularProgress,
   TextField,
   useTheme,
   useMediaQuery,
@@ -35,6 +33,7 @@ import {
 } from '@mui/icons-material';
 import { activitiesAPI, activityCategoriesAPI } from '../services/api';
 import ActivityForm from '../components/activities/ActivityForm';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface Activity {
   id: string;
@@ -67,7 +66,6 @@ interface TabPanelProps {
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
-
   return (
     <div
       role="tabpanel"
@@ -82,8 +80,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const ActivityAdmin: React.FC = () => {
-  console.log('[ActivityAdmin] Component rendered');
-
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -102,121 +99,69 @@ const ActivityAdmin: React.FC = () => {
   const [categoryFormErrors, setCategoryFormErrors] = useState<{ name?: string }>({});
 
   useEffect(() => {
-    console.log('[ActivityAdmin] useEffect triggered, calling loadData');
     loadData();
   }, []);
 
   const loadData = async () => {
-    console.log('[ActivityAdmin] loadData called');
     try {
       setLoading(true);
       setError(null);
-      console.log('[ActivityAdmin] Making API calls...');
 
       const [activitiesResponse, categoriesResponse] = await Promise.all([
         activitiesAPI.getActivities(),
         activityCategoriesAPI.getActivityCategories(),
       ]);
 
-      console.log('[ActivityAdmin] Activities response:', activitiesResponse);
-      console.log('[ActivityAdmin] Categories response:', categoriesResponse);
-
       if (activitiesResponse.data.success) {
-        const activities = activitiesResponse.data.data?.items || [];
-        console.log('[ActivityAdmin] Activities loaded:', activities.length);
-        console.log('[ActivityAdmin] Full activities response:', activitiesResponse.data);
-        console.log('[ActivityAdmin] First activity from API:', activities[0]);
-        console.log('[ActivityAdmin] Activities response data structure:', activitiesResponse.data.data);
-
-        // Check if the data structure is nested differently
-        if (activities.length > 0) {
-          console.log('[ActivityAdmin] Checking activity properties:');
-          const firstActivity = activities[0];
-          Object.keys(firstActivity).forEach(key => {
-            console.log(`[ActivityAdmin] ${key}:`, firstActivity[key]);
-          });
-
-          // Check for nested properties that might contain the data
-          console.log('[ActivityAdmin] Checking for nested activityCategory:');
-          if (firstActivity.activityCategory) {
-            console.log('[ActivityAdmin] activityCategory object:', firstActivity.activityCategory);
-          }
-
-          // Check if duration might be in a different field
-          console.log('[ActivityAdmin] Checking for duration in other fields:');
-          ['duration', 'totalDuration', 'time', 'length', 'durationInSeconds', 'totalTime', 'activityDuration'].forEach(field => {
-            if (firstActivity[field]) {
-              console.log(`[ActivityAdmin] Found ${field}:`, firstActivity[field]);
-            }
-          });
-
-          // Check for any numeric fields that might represent duration
-          console.log('[ActivityAdmin] Checking for numeric fields that might be duration:');
-          Object.keys(firstActivity).forEach(key => {
-            const value = firstActivity[key];
-            if (typeof value === 'number' && value > 0 && value < 86400) { // Less than 24 hours in seconds
-              console.log(`[ActivityAdmin] Potential duration field ${key}:`, value, 'seconds');
-            }
-          });
-        }
-
-        // Enhance activities with category names if only IDs are available
-        const enhancedActivities = activities.map((activity: any) => {
+        const list = activitiesResponse.data.data?.items || [];
+        const enhancedActivities = list.map((activity: any) => {
           if (activity.activityCategoryId && !activity.activityCategory) {
-            console.log('[ActivityAdmin] Activity has categoryId but no category object:', activity.activityCategoryId);
+            return {
+              ...activity,
+              activityCategory: categories.find((c) => c.id === activity.activityCategoryId),
+            };
           }
           return activity;
         });
-
         setActivities(enhancedActivities);
       }
 
       if (categoriesResponse.data.success) {
         setCategories(categoriesResponse.data.data?.items || []);
-        console.log('[ActivityAdmin] Categories loaded:', categoriesResponse.data.data?.items?.length || 0);
       }
     } catch (err: any) {
-      console.error('[ActivityAdmin] Error loading data:', err);
-      setError('Failed to load activities and categories');
+      setError(t('activity_admin_error'));
     } finally {
       setLoading(false);
-      console.log('[ActivityAdmin] loadData completed');
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
-  const handleCreateActivity = () => {
-    setFormOpen(true);
-  };
+  const handleCreateActivity = () => setFormOpen(true);
 
   const handleEditActivity = (activity: Activity) => {
     navigate(`/admin/activities/${activity.id}/edit`);
   };
 
   const handleDeleteActivity = async (activity: Activity) => {
-    if (!window.confirm(`Are you sure you want to delete "${activity.name}"?`)) {
-      return;
-    }
-
+    const confirmText = t('activity_admin_confirm_delete').replace('{0}', activity.name);
+    if (!window.confirm(confirmText)) return;
     try {
       await activitiesAPI.deleteActivity(activity.id);
-      await loadData(); // Refresh the list
-    } catch (err: any) {
-      console.error('Error deleting activity:', err);
-      setError('Failed to delete activity');
+      await loadData();
+    } catch {
+      setError(t('activity_admin_error'));
     }
   };
 
-  const handleFormClose = () => {
-    setFormOpen(false);
-  };
+  const handleFormClose = () => setFormOpen(false);
 
   const handleFormSuccess = async () => {
     setFormOpen(false);
-    await loadData(); // Refresh the list
+    await loadData();
   };
 
   const handleCreateCategory = () => {
@@ -232,12 +177,10 @@ const ActivityAdmin: React.FC = () => {
   };
 
   const handleCategoryFormSubmit = async () => {
-    // Validation
     const errors: { name?: string } = {};
     if (!categoryFormData.name.trim()) {
-      errors.name = 'Category name is required';
+      errors.name = t('activity_admin_category_validation');
     }
-
     if (Object.keys(errors).length > 0) {
       setCategoryFormErrors(errors);
       return;
@@ -250,130 +193,46 @@ const ActivityAdmin: React.FC = () => {
       });
       setCategoryFormOpen(false);
       setCategoryFormData({ name: '', description: '' });
-      await loadData(); // Refresh the list
-    } catch (err: any) {
-      console.error('Error creating category:', err);
-      setError('Failed to create category');
+      await loadData();
+    } catch {
+      setError(t('activity_admin_error'));
     }
-  };
-
-  const extractDuration = (activity: any) => {
-    console.log('[ActivityAdmin] extractDuration called for activity:', activity.name);
-    console.log('[ActivityAdmin] Full activity object:', activity);
-
-    // Try multiple possible structures for duration
-    let hours = 0, minutes = 0, seconds = 0;
-
-    // Structure 1: Separate fields (current expected structure)
-    if (activity.durationHours !== undefined && activity.durationHours !== null) {
-      hours = activity.durationHours;
-      console.log('[ActivityAdmin] Found durationHours:', hours);
-    }
-    if (activity.durationMinutes !== undefined && activity.durationMinutes !== null) {
-      minutes = activity.durationMinutes;
-      console.log('[ActivityAdmin] Found durationMinutes:', minutes);
-    }
-    if (activity.durationSeconds !== undefined && activity.durationSeconds !== null) {
-      seconds = activity.durationSeconds;
-      console.log('[ActivityAdmin] Found durationSeconds:', seconds);
-    }
-
-    // Structure 2: Nested duration object
-    if ((activity as any).duration) {
-      const duration = (activity as any).duration;
-      console.log('[ActivityAdmin] Found duration object:', duration);
-
-      // Handle string format like "00:07:00"
-      if (typeof duration === 'string') {
-        console.log('[ActivityAdmin] Duration is a string, parsing:', duration);
-        const parts = duration.split(':');
-        if (parts.length === 3) {
-          hours = parseInt(parts[0]) || 0;
-          minutes = parseInt(parts[1]) || 0;
-          seconds = parseInt(parts[2]) || 0;
-          console.log('[ActivityAdmin] Parsed duration string:', { hours, minutes, seconds });
-        } else if (parts.length === 2) {
-          // Handle "MM:SS" format
-          hours = 0;
-          minutes = parseInt(parts[0]) || 0;
-          seconds = parseInt(parts[1]) || 0;
-          console.log('[ActivityAdmin] Parsed duration string (MM:SS):', { hours, minutes, seconds });
-        }
-      } else {
-        // Handle object format
-        if (duration.hours !== undefined) hours = duration.hours;
-        if (duration.minutes !== undefined) minutes = duration.minutes;
-        if (duration.seconds !== undefined) seconds = duration.seconds;
-      }
-    }
-
-    // Structure 3: Single duration field in seconds
-    if (activity.duration && typeof activity.duration === 'number') {
-      const totalSeconds = activity.duration;
-      console.log('[ActivityAdmin] Found single duration field:', totalSeconds, 'seconds');
-      hours = Math.floor(totalSeconds / 3600);
-      minutes = Math.floor((totalSeconds % 3600) / 60);
-      seconds = totalSeconds % 60;
-    }
-
-    // Structure 4: Check for other possible duration field names
-    const possibleDurationFields = ['totalDuration', 'time', 'length', 'durationInSeconds', 'totalTime', 'activityDuration'];
-    for (const field of possibleDurationFields) {
-      if (activity[field] && typeof activity[field] === 'number') {
-        const totalSeconds = activity[field];
-        console.log(`[ActivityAdmin] Found duration in ${field}:`, totalSeconds, 'seconds');
-        hours = Math.floor(totalSeconds / 3600);
-        minutes = Math.floor((totalSeconds % 3600) / 60);
-        seconds = totalSeconds % 60;
-        break;
-      }
-    }
-
-    console.log('[ActivityAdmin] Final extracted duration:', { hours, minutes, seconds });
-    return { hours, minutes, seconds };
-  };
-
-  const getCategoryName = (activityCategoryId: string | undefined): string => {
-    if (!activityCategoryId) return 'No category';
-
-    const category = categories.find(cat => cat.id === activityCategoryId);
-    if (category) {
-      console.log('[ActivityAdmin] Found category name for ID', activityCategoryId, ':', category.name);
-      return category.name;
-    }
-
-    console.log('[ActivityAdmin] Category not found for ID:', activityCategoryId);
-    return `Category ID: ${activityCategoryId}`;
   };
 
   const formatDuration = (activity: Activity) => {
-    const { hours, minutes, seconds } = extractDuration(activity);
+    const h = activity.durationHours || 0;
+    const m = activity.durationMinutes || 0;
+    const s = activity.durationSeconds || 0;
+    if (h === 0 && m === 0 && s === 0) return '-';
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s
+      .toString()
+      .padStart(2, '0')}`;
+  };
 
-    console.log('[ActivityAdmin] formatDuration called for activity:', activity.name, {
-      originalActivity: {
-        durationHours: activity.durationHours,
-        durationMinutes: activity.durationMinutes,
-        durationSeconds: activity.durationSeconds,
-        duration: (activity as any).duration
-      },
-      extracted: { hours, minutes, seconds }
-    });
-
-    if (hours === 0 && minutes === 0 && seconds === 0) {
-      console.log('[ActivityAdmin] formatDuration returning "Not set"');
-      return 'Not set';
-    }
-
-    const result = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    console.log('[ActivityAdmin] formatDuration returning:', result);
-    return result;
+  const getCategoryName = (activity: Activity) => {
+    if (activity.activityCategory?.name) return activity.activityCategory.name;
+    const found = categories.find((c) => c.id === activity.activityCategoryId);
+    return found?.name || '-';
   };
 
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-          <CircularProgress />
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <Typography>{t('activity_admin_loading')}</Typography>
+        </Box>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+          <Typography color="error">{error}</Typography>
+          <Button variant="outlined" onClick={loadData}>
+            {t('activity_admin_retry')}
+          </Button>
         </Box>
       </Container>
     );
@@ -381,33 +240,27 @@ const ActivityAdmin: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Activity Management
+      <Typography variant="h4" gutterBottom>
+        {t('activity_admin_title')}
       </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
 
       <Paper sx={{ width: '100%', mb: 2 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={activeTab} onChange={handleTabChange} aria-label="activity admin tabs">
-            <Tab label="Activities" id="activity-admin-tab-0" aria-controls="activity-admin-tabpanel-0" />
-            <Tab label="Categories" id="activity-admin-tab-1" aria-controls="activity-admin-tabpanel-1" />
+            <Tab label={t('activity_admin_tab_activities')} id="activity-admin-tab-0" aria-controls="activity-admin-tabpanel-0" />
+            <Tab label={t('activity_admin_tab_categories')} id="activity-admin-tab-1" aria-controls="activity-admin-tabpanel-1" />
           </Tabs>
         </Box>
 
         <TabPanel value={activeTab} index={0}>
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleCreateActivity}
               sx={{ mb: 2 }}
             >
-              Create Activity
+              {t('activity_admin_create')}
             </Button>
           </Box>
 
@@ -415,100 +268,59 @@ const ActivityAdmin: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Duration</TableCell>
-                  <TableCell>Video</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{t('activity_admin_tab_activities')}</TableCell>
+                  <TableCell>{t('activity_admin_category_label')}</TableCell>
+                  <TableCell>{t('activity_admin_duration_label')}</TableCell>
+                  <TableCell>{t('activity_admin_created_at')}</TableCell>
+                  <TableCell align="right">{t('activity_admin_actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {activities.map((activity) => {
-                  console.log('[ActivityAdmin] Rendering activity:', {
-                    id: activity.id,
-                    name: activity.name,
-                    activityCategory: activity.activityCategory,
-                    durationHours: activity.durationHours,
-                    durationMinutes: activity.durationMinutes,
-                    durationSeconds: activity.durationSeconds,
-                  });
-
-                  return (
-                    <TableRow key={activity.id} hover>
-                      <TableCell>
-                        <Box>
-                          <Typography variant="body1" fontWeight="medium">
-                            {activity.name}
-                          </Typography>
-                          {activity.description && (
-                            <Typography variant="body2" color="text.secondary">
-                              {activity.description.length > 50
-                                ? `${activity.description.substring(0, 50)}...`
-                                : activity.description}
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        {activity.activityCategory ? (
-                          <Chip
-                            label={activity.activityCategory.name}
-                            size="small"
-                            variant="outlined"
-                          />
-                        ) : (
-                          <Typography variant="body2" color="text.secondary">
-                            {getCategoryName(activity.activityCategoryId)}
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2">
-                          {formatDuration(activity)}
+                {activities.map((activity) => (
+                  <TableRow key={activity.id} hover>
+                    <TableCell>
+                      <Typography variant="body1" fontWeight="medium">
+                        {activity.name}
+                      </Typography>
+                      {activity.description && (
+                        <Typography variant="body2" color="text.secondary">
+                          {activity.description.length > 50
+                            ? `${activity.description.substring(0, 50)}...`
+                            : activity.description}
                         </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {activity.videoUrl ? (
-                          <IconButton size="small" color="primary">
-                            <VideoIcon />
-                          </IconButton>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary">
-                            No video
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2">
-                          {new Date(activity.createdAt).toLocaleDateString()}
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {activity.activityCategory ? (
+                        <Chip label={activity.activityCategory.name} size="small" variant="outlined" />
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          {getCategoryName(activity)}
                         </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEditActivity(activity)}
-                          color="primary"
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDeleteActivity(activity)}
-                          color="error"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                      )}
+                    </TableCell>
+                    <TableCell>{formatDuration(activity)}</TableCell>
+                    <TableCell>{new Date(activity.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell align="right">
+                      <IconButton size="small" sx={{ mr: 1 }}>
+                        <PlayIcon fontSize="small" /> {t('activity_admin_play_intro')}
+                      </IconButton>
+                      <IconButton size="small" sx={{ mr: 1 }}>
+                        <VideoIcon fontSize="small" /> {t('activity_admin_play_main')}
+                      </IconButton>
+                      <IconButton size="small" onClick={() => handleEditActivity(activity)} sx={{ mr: 1 }}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton size="small" color="error" onClick={() => handleDeleteActivity(activity)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
                 {activities.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                      <Typography variant="body1" color="text.secondary">
-                        No activities found. Create your first activity to get started.
-                      </Typography>
+                    <TableCell colSpan={5} align="center">
+                      {t('activity_admin_no_activities')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -518,13 +330,10 @@ const ActivityAdmin: React.FC = () => {
         </TabPanel>
 
         <TabPanel value={activeTab} index={1}>
-          <Box sx={{ mb: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreateCategory}
-            >
-              Create Category
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6">{t('activity_admin_manage_categories')}</Typography>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreateCategory}>
+              {t('activity_admin_category_create')}
             </Button>
           </Box>
 
@@ -532,32 +341,18 @@ const ActivityAdmin: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Activities Count</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{t('activity_admin_category_name')}</TableCell>
+                  <TableCell>{t('activity_admin_category_description')}</TableCell>
+                  <TableCell>{t('activity_admin_actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {categories.map((category) => (
                   <TableRow key={category.id} hover>
-                    <TableCell>
-                      <Typography variant="body1" fontWeight="medium">
-                        {category.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {category.description || 'No description'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {activities.filter(a => a.activityCategoryId === category.id).length}
-                      </Typography>
-                    </TableCell>
+                    <TableCell>{category.name}</TableCell>
+                    <TableCell>{category.description || '-'}</TableCell>
                     <TableCell align="right">
-                      <IconButton size="small" color="primary">
+                      <IconButton size="small">
                         <EditIcon />
                       </IconButton>
                       <IconButton size="small" color="error">
@@ -568,9 +363,9 @@ const ActivityAdmin: React.FC = () => {
                 ))}
                 {categories.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                    <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
                       <Typography variant="body1" color="text.secondary">
-                        No categories found. Create your first category to get started.
+                        {t('activity_admin_no_activities')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -581,17 +376,8 @@ const ActivityAdmin: React.FC = () => {
         </TabPanel>
       </Paper>
 
-      {/* Activity Form Dialog */}
-      <Dialog
-        open={formOpen}
-        onClose={handleFormClose}
-        maxWidth="md"
-        fullWidth
-        fullScreen={isMobile}
-      >
-        <DialogTitle>
-          Create New Activity
-        </DialogTitle>
+      <Dialog open={formOpen} onClose={handleFormClose} maxWidth="md" fullWidth fullScreen={isMobile}>
+        <DialogTitle>{t('activity_form_create_title')}</DialogTitle>
         <DialogContent>
           <ActivityForm
             activity={null}
@@ -602,32 +388,25 @@ const ActivityAdmin: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Category Form Dialog */}
-      <Dialog
-        open={categoryFormOpen}
-        onClose={handleCategoryFormClose}
-        maxWidth="sm"
-        fullWidth
-        fullScreen={isMobile}
-      >
-        <DialogTitle>Create New Category</DialogTitle>
+      <Dialog open={categoryFormOpen} onClose={handleCategoryFormClose} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle>{t('activity_admin_category_create')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 2 }}>
             <TextField
               fullWidth
-              label="Category Name"
+              label={t('activity_admin_category_name')}
               value={categoryFormData.name}
-              onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e) => setCategoryFormData((prev) => ({ ...prev, name: e.target.value }))}
               error={!!categoryFormErrors.name}
-              helperText={categoryFormErrors.name}
+              helperText={categoryFormErrors.name || t('activity_admin_category_validation')}
               required
               sx={{ mb: 2 }}
             />
             <TextField
               fullWidth
-              label="Description"
+              label={t('activity_admin_category_description')}
               value={categoryFormData.description}
-              onChange={(e) => setCategoryFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => setCategoryFormData((prev) => ({ ...prev, description: e.target.value }))}
               multiline
               rows={3}
               sx={{ mb: 2 }}
@@ -635,13 +414,9 @@ const ActivityAdmin: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCategoryFormClose}>Cancel</Button>
-          <Button
-            onClick={handleCategoryFormSubmit}
-            variant="contained"
-            disabled={!categoryFormData.name.trim()}
-          >
-            Create
+          <Button onClick={handleCategoryFormClose}>{t('activity_admin_category_cancel')}</Button>
+          <Button onClick={handleCategoryFormSubmit} variant="contained" disabled={!categoryFormData.name.trim()}>
+            {t('activity_admin_category_save')}
           </Button>
         </DialogActions>
       </Dialog>

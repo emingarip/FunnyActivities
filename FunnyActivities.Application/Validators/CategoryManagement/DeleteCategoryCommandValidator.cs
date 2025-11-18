@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Commands.CategoryManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.CategoryManagement
 {
@@ -14,10 +15,10 @@ namespace FunnyActivities.Application.Validators.CategoryManagement
         public DeleteCategoryCommandValidator()
         {
             RuleFor(x => x.Id)
-                .NotEmpty().WithMessage("Category ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("CategoryIdRequired"));
 
             RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("UserIdRequired"));
         }
     }
 }

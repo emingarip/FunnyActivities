@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -15,11 +16,13 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<AuthController> _logger;
+        private readonly IStringLocalizer<AuthController> _localizer;
 
-        public AuthController(IMediator mediator, ILogger<AuthController> logger)
+        public AuthController(IMediator mediator, ILogger<AuthController> logger, IStringLocalizer<AuthController> localizer)
         {
             _mediator = mediator;
             _logger = logger;
+            _localizer = localizer;
         }
 
         [HttpPost("register")]
@@ -74,7 +77,7 @@ namespace FunnyActivities.WebAPI.Controllers
                     refreshToken = loginResult.RefreshToken
                 };
 
-                return this.ApiSuccess(data, "Registration successful");
+                return this.ApiSuccess(data, _localizer["RegistrationSuccessful"]);
             }
             catch (Exception ex)
             {
@@ -85,7 +88,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 if (ex.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase) ||
                     ex.Message.Contains("duplicate", StringComparison.OrdinalIgnoreCase))
                 {
-                    return this.ApiError("User already exists", "ConflictError", 409);
+                    return this.ApiError(_localizer["UserAlreadyExists"], "ConflictError", 409);
                 }
 
                 return this.ApiError(ex.Message, "ValidationError", 400);
@@ -144,7 +147,7 @@ namespace FunnyActivities.WebAPI.Controllers
 
                 _logger.LogDebug("[AUTH-LOGIN] About to return ApiSuccess", new { UserId = result.User.Id, Email = MaskEmail(request.Email), IP = MaskIP(ip), Method = method, Path = path, CorrelationId = correlationId });
 
-                return this.ApiSuccess(data, "Login successful");
+                return this.ApiSuccess(data, _localizer["LoginSuccessful"]);
             }
             catch (Exception ex)
             {
@@ -153,7 +156,7 @@ namespace FunnyActivities.WebAPI.Controllers
 
                 _logger.LogDebug("[AUTH-LOGIN] About to return ApiError", new { Email = MaskEmail(request.Email), Error = ex.Message, IP = MaskIP(ip), Method = method, Path = path, CorrelationId = correlationId });
 
-                return this.ApiError("Invalid credentials", "AuthenticationError", 401);
+                return this.ApiError(_localizer["InvalidCredentials"], "AuthenticationError", 401);
             }
         }
 
@@ -235,15 +238,29 @@ namespace FunnyActivities.WebAPI.Controllers
             }
         }
 
-        // Helper methods for PII-safe logging
-        private string MaskEmail(string email)
+    // Helper methods for PII-safe logging
+    private string MaskEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
         {
-            if (string.IsNullOrEmpty(email)) return "***";
-            var atIndex = email.IndexOf('@');
-            if (atIndex > 3)
-                return email.Substring(0, 3) + "***" + email.Substring(atIndex);
-            return "***" + email.Substring(atIndex);
+            return "***";
         }
+
+        var atIndex = email.IndexOf('@');
+
+        // if no '@' or it's the first char, just mask the whole thing
+        if (atIndex <= 0)
+        {
+            return "***";
+        }
+
+        if (atIndex > 3)
+        {
+            return email.Substring(0, 3) + "***" + email.Substring(atIndex);
+        }
+
+        return "***" + email.Substring(atIndex);
+    }
 
         private string MaskIP(string ip)
         {

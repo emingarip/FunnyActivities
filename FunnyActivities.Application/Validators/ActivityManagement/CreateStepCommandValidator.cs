@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Commands.ActivityManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.ActivityManagement
 {
@@ -14,20 +15,20 @@ namespace FunnyActivities.Application.Validators.ActivityManagement
         public CreateStepCommandValidator()
         {
             RuleFor(x => x.ActivityId)
-                .NotEmpty().WithMessage("Activity ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("ActivityIdRequired"));
 
             RuleFor(x => x.Order)
-                .GreaterThan(0).WithMessage("Order must be greater than 0.");
+                .GreaterThan(0).WithMessage(ValidationMessageProvider.Get("StepOrderGreaterThan0"));
 
             RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("Description is required.")
-                .Length(1, 1000).WithMessage("Description must be between 1 and 1000 characters.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("StepDescriptionRequired"))
+                .Length(1, 1000).WithMessage(ValidationMessageProvider.Get("StepDescriptionLength1To1000"));
 
             RuleFor(x => x.TimestampSeconds)
-                .GreaterThanOrEqualTo(0).WithMessage("Timestamp seconds must be non-negative.");
+                .GreaterThanOrEqualTo(0).WithMessage(ValidationMessageProvider.Get("TimestampSecondsNonNegative"));
 
             RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("UserIdRequired"));
         }
     }
 }

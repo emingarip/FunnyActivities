@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="StepNotFound" xml:space="preserve"><value>Step not found</value></data>
+  <data name="StepRetrieved" xml:space="preserve"><value>Step retrieved successfully</value></data>
+  <data name="StepsRetrieved" xml:space="preserve"><value>Steps retrieved successfully</value></data>
+  <data name="StepCreated" xml:space="preserve"><value>Step created successfully</value></data>
+  <data name="StepCreateValidationError" xml:space="preserve"><value>Unable to create step: {0}. Please check your input and try again.</value></data>
+  <data name="StepCreateUnexpected" xml:space="preserve"><value>An error occurred while creating the step</value></data>
+  <data name="StepUpdated" xml:space="preserve"><value>Step updated successfully</value></data>
+  <data name="StepUpdateNotFound" xml:space="preserve"><value>The step you're trying to update could not be found. Please verify the ID and try again.</value></data>
+  <data name="StepUpdateValidationError" xml:space="preserve"><value>Unable to update step: {0}. Please review your changes and try again.</value></data>
+  <data name="StepUpdateUnexpected" xml:space="preserve"><value>An error occurred while updating the step</value></data>
+  <data name="StepDeleted" xml:space="preserve"><value>Step deleted successfully</value></data>
+  <data name="StepDeleteNotFound" xml:space="preserve"><value>The step you're trying to delete could not be found. Please verify the ID and try again.</value></data>
+  <data name="StepDeleteUnexpected" xml:space="preserve"><value>An error occurred while deleting the step</value></data>
+</root>

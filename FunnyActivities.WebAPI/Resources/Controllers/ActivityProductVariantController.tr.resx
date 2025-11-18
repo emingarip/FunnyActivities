@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ActivityProductVariantNotFound" xml:space="preserve"><value>İstenen aktivite ürün varyantı bulunamadı. Lütfen varyant ID'sini kontrol edip tekrar deneyin.</value></data>
+  <data name="ActivityProductVariantRetrieved" xml:space="preserve"><value>Aktivite ürün varyantı başarıyla getirildi</value></data>
+  <data name="ActivityProductVariantsRetrieved" xml:space="preserve"><value>Aktivite ürün varyantları başarıyla getirildi</value></data>
+  <data name="ActivityProductVariantCreated" xml:space="preserve"><value>Aktivite ürün varyantı başarıyla oluşturuldu</value></data>
+  <data name="ActivityProductVariantCreateValidationError" xml:space="preserve"><value>Aktivite ürün varyantı oluşturulamadı: {0}. Lütfen girdilerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="ActivityProductVariantCreateUnexpected" xml:space="preserve"><value>Aktivite ürün varyantı oluşturulurken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
+  <data name="ActivityProductVariantUpdated" xml:space="preserve"><value>Aktivite ürün varyantı başarıyla güncellendi</value></data>
+  <data name="ActivityProductVariantUpdateNotFound" xml:space="preserve"><value>Güncellemeye çalıştığınız aktivite ürün varyantı bulunamadı. Lütfen varyant ID'sini doğrulayın ve tekrar deneyin.</value></data>
+  <data name="ActivityProductVariantUpdateValidationError" xml:space="preserve"><value>Aktivite ürün varyantı güncellenemedi: {0}. Lütfen değişikliklerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="ActivityProductVariantUpdateUnexpected" xml:space="preserve"><value>Aktivite ürün varyantı güncellenirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
+  <data name="ActivityProductVariantDeleted" xml:space="preserve"><value>Aktivite ürün varyantı başarıyla silindi</value></data>
+  <data name="ActivityProductVariantDeleteNotFound" xml:space="preserve"><value>Silmek istediğiniz aktivite ürün varyantı bulunamadı. Lütfen varyant ID'sini doğrulayın ve tekrar deneyin.</value></data>
+  <data name="ActivityProductVariantDeleteUnexpected" xml:space="preserve"><value>Aktivite ürün varyantı silinirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
+</root>

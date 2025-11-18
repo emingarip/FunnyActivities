@@ -9,6 +9,7 @@ using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.DTOs.Shared;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -29,6 +30,7 @@ namespace FunnyActivities.WebAPI.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger<ActivityCategoryController> _logger;
         private readonly IInputSanitizer _inputSanitizer;
+        private readonly IStringLocalizer<ActivityCategoryController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivityCategoryController"/> class.
@@ -36,12 +38,17 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="inputSanitizer">The input sanitizer for security.</param>
-        public ActivityCategoryController(IMediator mediator, ILogger<ActivityCategoryController> logger, IInputSanitizer inputSanitizer)
+        public ActivityCategoryController(
+            IMediator mediator,
+            ILogger<ActivityCategoryController> logger,
+            IInputSanitizer inputSanitizer,
+            IStringLocalizer<ActivityCategoryController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
             _inputSanitizer = inputSanitizer;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -86,7 +93,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Activity categories retrieved successfully");
+            return this.ApiSuccess(result, _localizer["ActivityCategoriesRetrieved"]);
         }
 
         /// <summary>
@@ -109,10 +116,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (category == null)
             {
                 _logger.LogWarning("Activity category with ID {CategoryId} not found", id);
-                return this.ApiError("The requested activity category could not be found. Please check the category ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityCategoryNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(category, "Activity category retrieved successfully");
+            return this.ApiSuccess(category, _localizer["ActivityCategoryRetrieved"]);
         }
 
         /// <summary>
@@ -143,17 +150,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Activity category created successfully with ID: {Id}", result.Id);
-                return this.ApiCreated(nameof(GetActivityCategory), new { id = result.Id }, result, "Activity category created successfully");
+                return this.ApiCreated(nameof(GetActivityCategory), new { id = result.Id }, result, _localizer["ActivityCategoryCreated"]);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity category creation failed: {Message}", ex.Message);
-                return this.ApiError($"Unable to create activity category: {ex.Message}. Please check your input and try again.", "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["ActivityCategoryCreateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while creating activity category");
-                return this.ApiError("We encountered an issue while creating your activity category. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityCategoryCreateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -188,22 +195,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Activity category updated successfully with ID: {CategoryId}", result.Id);
-                return this.ApiSuccess(result, "Activity category updated successfully");
+                return this.ApiSuccess(result, _localizer["ActivityCategoryUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity category update failed: {Message}", ex.Message);
-                return this.ApiError("The activity category you're trying to update could not be found. Please verify the category ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityCategoryUpdateNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity category update failed: {Message}", ex.Message);
-                return this.ApiError($"Unable to update activity category: {ex.Message}. Please review your changes and try again.", "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["ActivityCategoryUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while updating activity category");
-                return this.ApiError("We encountered an issue while updating your activity category. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityCategoryUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -230,17 +237,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Activity category deleted successfully with ID: {CategoryId}", id);
-                return this.ApiSuccess<object>("Activity category deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["ActivityCategoryDeleted"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity category deletion failed: {Message}", ex.Message);
-                return this.ApiError("The activity category you're trying to delete could not be found. Please verify the category ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityCategoryDeleteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while deleting activity category");
-                return this.ApiError("We encountered an issue while deleting your activity category. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityCategoryDeleteUnexpected"], "InternalError", 500);
             }
         }
     }

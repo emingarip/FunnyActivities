@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using FunnyActivities.Application.Commands.PersonaManagement;
@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -22,11 +23,13 @@ namespace FunnyActivities.WebAPI.Controllers
     public class PersonaController : BaseController
     {
         private readonly IMediator _mediator;
+        private readonly IStringLocalizer<PersonaController> _localizer;
 
-        public PersonaController(IMediator mediator, ILogger<PersonaController> logger)
+        public PersonaController(IMediator mediator, ILogger<PersonaController> logger, IStringLocalizer<PersonaController> localizer)
             : base(logger)
         {
             _mediator = mediator;
+            _localizer = localizer;
         }
 
         [HttpPost]
@@ -42,7 +45,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var persona = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetPersona), new { id = persona.Id }, persona);
+            return this.ApiCreated(nameof(GetPersona), new { id = persona.Id }, persona, _localizer["PersonaCreated"]);
         }
 
         [HttpGet("{id}")]
@@ -51,7 +54,12 @@ namespace FunnyActivities.WebAPI.Controllers
             var query = new GetPersonaQuery { Id = id, UserId = CurrentUserId };
             var persona = await _mediator.Send(query);
 
-            return Ok(persona);
+            if (persona == null)
+            {
+                return this.ApiError(_localizer["PersonaNotFound"], "NotFound", 404);
+            }
+
+            return this.ApiSuccess(persona, _localizer["PersonaRetrieved"]);
         }
 
         [HttpGet]
@@ -67,7 +75,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return Ok(result);
+            return this.ApiSuccess(result, _localizer["PersonaListRetrieved"]);
         }
 
         [HttpPut("{id}")]
@@ -86,7 +94,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 else
                 {
                     _logger.LogWarning("[PERSONA-CONTROLLER] Invalid gender string received: {Gender}", request.Gender);
-                    return BadRequest($"Invalid gender value: {request.Gender}");
+                    return this.ApiError(string.Format(_localizer["PersonaInvalidGender"], request.Gender), "ValidationError", 400);
                 }
             }
 
@@ -104,7 +112,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var persona = await _mediator.Send(command);
-            return Ok(persona);
+            return this.ApiSuccess(persona, _localizer["PersonaUpdated"]);
         }
 
         [HttpPost("{personaId}/images")]
@@ -112,7 +120,7 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             if (files == null || files.Count == 0)
             {
-                return BadRequest("Yüklenecek dosya bulunamadı.");
+                return this.ApiError(_localizer["PersonaImageFileRequired"], "ValidationError", 400);
             }
 
             var uploadFiles = new List<UploadPersonaImageFile>();
@@ -137,7 +145,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(command);
-            return Ok(result);
+            return this.ApiSuccess(result, _localizer["PersonaImagesUploaded"]);
         }
 
         [HttpDelete("{id}")]
@@ -150,7 +158,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             await _mediator.Send(command);
-            return NoContent();
+            return this.ApiSuccess<object>(_localizer["PersonaDeleted"], 204);
         }
 
         // Persona Activity Association endpoints
@@ -164,7 +172,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var association = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetPersonaActivityAssociations), new { personaId = personaId }, association);
+            return this.ApiCreated(nameof(GetPersonaActivityAssociations), new { personaId = personaId }, association, _localizer["PersonaActivityAssociationCreated"]);
         }
 
         [HttpGet("{personaId}/activities")]
@@ -172,7 +180,7 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             var query = new GetPersonaActivityAssociationsQuery { PersonaId = personaId };
             var associations = await _mediator.Send(query);
-            return Ok(associations);
+            return this.ApiSuccess(associations, _localizer["PersonaActivityAssociationsRetrieved"]);
         }
 
         [HttpPut("activities/{id}")]
@@ -180,7 +188,7 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             // Since there's no preference level to update, this endpoint might not be needed
             // But keeping it for potential future use or to maintain API compatibility
-            return Ok();
+            return this.ApiSuccess<object>(_localizer["PersonaActivityAssociationUpdated"]);
         }
 
         [HttpDelete("activities/{id}")]
@@ -188,7 +196,7 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             var command = new DeletePersonaActivityAssociationCommand { Id = id };
             await _mediator.Send(command);
-            return NoContent();
+            return this.ApiSuccess<object>(_localizer["PersonaActivityAssociationDeleted"], 204);
         }
 
         // Activity-side persona association endpoints
@@ -202,7 +210,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var association = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetActivityPersonaAssociations), new { activityId = activityId }, association);
+            return this.ApiCreated(nameof(GetActivityPersonaAssociations), new { activityId = activityId }, association, _localizer["ActivityPersonaAssociationCreated"]);
         }
 
         [HttpGet("activities/{activityId}/personas")]
@@ -210,7 +218,7 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             var query = new GetActivityPersonaAssociationsQuery { ActivityId = activityId };
             var associations = await _mediator.Send(query);
-            return Ok(associations);
+            return this.ApiSuccess(associations, _localizer["ActivityPersonaAssociationsRetrieved"]);
         }
 
         [HttpPut("activities/{id}/personas")]
@@ -218,7 +226,7 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             // Since there's no preference level to update, this endpoint might not be needed
             // But keeping it for potential future use or to maintain API compatibility
-            return Ok();
+            return this.ApiSuccess<object>(_localizer["ActivityPersonaAssociationUpdated"]);
         }
 
         [HttpDelete("activities/{id}/personas")]
@@ -226,7 +234,7 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             var command = new DeleteActivityPersonaAssociationCommand { Id = id };
             await _mediator.Send(command);
-            return NoContent();
+            return this.ApiSuccess<object>(_localizer["ActivityPersonaAssociationDeleted"], 204);
         }
     }
 

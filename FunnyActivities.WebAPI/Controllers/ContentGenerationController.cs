@@ -5,6 +5,7 @@ using FunnyActivities.Application.Commands.ContentGeneration;
 using Microsoft.AspNetCore.Authorization;
 using FunnyActivities.WebAPI.Controllers.Base;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -14,11 +15,13 @@ namespace FunnyActivities.WebAPI.Controllers
     public class ContentGenerationController : BaseController
     {
         private readonly IMediator _mediator;
+        private readonly IStringLocalizer<ContentGenerationController> _localizer;
 
-        public ContentGenerationController(IMediator mediator, ILogger<ContentGenerationController> logger)
+        public ContentGenerationController(IMediator mediator, ILogger<ContentGenerationController> logger, IStringLocalizer<ContentGenerationController> localizer)
             : base(logger)
         {
             _mediator = mediator;
+            _localizer = localizer;
         }
 
         [HttpPost("generate")]
@@ -33,8 +36,16 @@ namespace FunnyActivities.WebAPI.Controllers
                 Model = request.Model ?? "llama2"
             };
 
-            var content = await _mediator.Send(command);
-            return Ok(new { content });
+            try
+            {
+                var content = await _mediator.Send(command);
+                return this.ApiSuccess(new { content }, _localizer["ContentGenerated"]);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Content generation failed for user {UserId}", CurrentUserId);
+                return this.ApiError(_localizer["ContentGenerationUnexpected"], "InternalError", 500);
+            }
         }
     }
 

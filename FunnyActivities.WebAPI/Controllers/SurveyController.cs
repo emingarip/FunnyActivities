@@ -10,6 +10,7 @@ using FunnyActivities.Application.DTOs.SurveyManagement;
 using FunnyActivities.Application.DTOs.Shared;
 using FunnyActivities.WebAPI.Controllers.Base;
 using FunnyActivities.Application.Services;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -30,6 +31,7 @@ namespace FunnyActivities.WebAPI.Controllers
         private readonly ISurveyService _surveyService;
         private readonly ILogger<SurveyController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IStringLocalizer<SurveyController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SurveyController"/> class.
@@ -38,13 +40,20 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <param name="surveyService">The survey service.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="configuration">The configuration.</param>
-        public SurveyController(IMediator mediator, ISurveyService surveyService, ILogger<SurveyController> logger, IConfiguration configuration)
+        /// <param name="localizer">The string localizer.</param>
+        public SurveyController(
+            IMediator mediator,
+            ISurveyService surveyService,
+            ILogger<SurveyController> logger,
+            IConfiguration configuration,
+            IStringLocalizer<SurveyController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _surveyService = surveyService;
             _logger = logger;
             _configuration = configuration;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -93,7 +102,7 @@ namespace FunnyActivities.WebAPI.Controllers
             var result = await _mediator.Send(query);
             _logger.LogInformation("Surveys query returned {Count} items, total {TotalCount}", result.Surveys.Count, result.TotalCount);
 
-            return this.ApiSuccess(result, "Surveys retrieved successfully");
+            return this.ApiSuccess(result, _localizer["SurveysRetrieved"]);
         }
 
         /// <summary>
@@ -115,10 +124,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (survey == null)
             {
                 _logger.LogWarning("Survey with ID {SurveyId} not found", id);
-                return this.ApiError("Survey not found", "NotFound", 404);
+                return this.ApiError(_localizer["SurveyNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(survey, "Survey retrieved successfully");
+            return this.ApiSuccess(survey, _localizer["SurveyRetrieved"]);
         }
 
         /// <summary>
@@ -148,17 +157,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Survey created successfully with ID: {Id}", result.Id);
-                return this.ApiCreated(nameof(GetSurvey), new { id = result.Id }, result, "Survey created successfully");
+                return this.ApiCreated(nameof(GetSurvey), new { id = result.Id }, result, _localizer["SurveyCreated"]);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Survey creation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["SurveyCreateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating survey");
-                return this.ApiError("An error occurred while creating the survey", "InternalError", 500);
+                return this.ApiError(_localizer["SurveyCreateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -192,22 +201,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Survey updated successfully with ID: {SurveyId}", result.Id);
-                return this.ApiSuccess(result, "Survey updated successfully");
+                return this.ApiSuccess(result, _localizer["SurveyUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Survey update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["SurveyUpdateNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Survey update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["SurveyUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating survey");
-                return this.ApiError("An error occurred while updating the survey", "InternalError", 500);
+                return this.ApiError(_localizer["SurveyUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -234,17 +243,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Survey deleted successfully with ID: {SurveyId}", id);
-                return this.ApiSuccess<object>("Survey deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["SurveyDeleted"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Survey deletion failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["SurveyDeleteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting survey");
-                return this.ApiError("An error occurred while deleting the survey", "InternalError", 500);
+                return this.ApiError(_localizer["SurveyDeleteUnexpected"], "InternalError", 500);
             }
         }
 
@@ -267,10 +276,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (results == null)
             {
                 _logger.LogWarning("Survey results not found for ID {SurveyId}", id);
-                return this.ApiError("Survey not found", "NotFound", 404);
+                return this.ApiError(_localizer["SurveyResultsNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(results, "Survey results retrieved successfully");
+            return this.ApiSuccess(results, _localizer["SurveyResultsRetrieved"]);
         }
 
         /// <summary>
@@ -292,10 +301,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (statistics == null)
             {
                 _logger.LogWarning("Survey statistics not found for ID {SurveyId}", id);
-                return this.ApiError("Survey not found", "NotFound", 404);
+                return this.ApiError(_localizer["SurveyStatisticsNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(statistics, "Survey statistics retrieved successfully");
+            return this.ApiSuccess(statistics, _localizer["SurveyStatisticsRetrieved"]);
         }
 
         /// <summary>
@@ -314,7 +323,7 @@ namespace FunnyActivities.WebAPI.Controllers
             var query = new GetSurveyParticipantsQuery { SurveyId = id };
             var participants = await _mediator.Send(query);
 
-            return this.ApiSuccess(participants, "Survey participants retrieved successfully");
+            return this.ApiSuccess(participants, _localizer["SurveyParticipantsRetrieved"]);
         }
 
         /// <summary>
@@ -356,17 +365,17 @@ namespace FunnyActivities.WebAPI.Controllers
                     };
                 }
 
-                return this.ApiSuccess(result, "Share URL generated successfully");
+                return this.ApiSuccess(result, _localizer["ShareUrlGenerated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Share URL generation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["ShareUrlNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while generating share URL for survey {SurveyId}", id);
-                return this.ApiError("An error occurred while generating the share URL", "InternalError", 500);
+                return this.ApiError(_localizer["ShareUrlUnexpected"], "InternalError", 500);
             }
         }
     }

@@ -81,6 +81,7 @@ public static class SwaggerConfiguration
             // Configure Swagger to handle file uploads
             c.OperationFilter<FileUploadOperationFilter>();
             c.OperationFilter<AuthorizeOperationFilter>();
+            c.OperationFilter<AcceptLanguageHeaderOperationFilter>();
             c.MapType<IFormFile>(() => new OpenApiSchema { Type = "string", Format = "binary" });
 
             // Group endpoints by controller
@@ -195,6 +196,24 @@ public static class SwaggerConfiguration
                     operation.Summary += " (Requires Authentication)";
                 }
             }
+        }
+    }
+
+    public class AcceptLanguageHeaderOperationFilter : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            operation.Parameters ??= new List<OpenApiParameter>();
+
+            // Add Accept-Language header to demonstrate language negotiation
+            operation.Parameters.Add(new OpenApiParameter
+            {
+                Name = "Accept-Language",
+                In = ParameterLocation.Header,
+                Required = false,
+                Description = "Preferred response language (e.g., tr-TR, en-US)",
+                Schema = new OpenApiSchema { Type = "string" }
+            });
         }
     }
 

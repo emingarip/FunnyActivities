@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ActivityCategoriesRetrieved" xml:space="preserve"><value>Activity categories retrieved successfully</value></data>
+  <data name="ActivityCategoryNotFound" xml:space="preserve"><value>The requested activity category could not be found. Please check the category ID and try again.</value></data>
+  <data name="ActivityCategoryRetrieved" xml:space="preserve"><value>Activity category retrieved successfully</value></data>
+  <data name="ActivityCategoryCreated" xml:space="preserve"><value>Activity category created successfully</value></data>
+  <data name="ActivityCategoryCreateValidationError" xml:space="preserve"><value>Unable to create activity category: {0}. Please check your input and try again.</value></data>
+  <data name="ActivityCategoryCreateUnexpected" xml:space="preserve"><value>We encountered an issue while creating your activity category. Please try again later or contact support if the problem persists.</value></data>
+  <data name="ActivityCategoryUpdated" xml:space="preserve"><value>Activity category updated successfully</value></data>
+  <data name="ActivityCategoryUpdateNotFound" xml:space="preserve"><value>The activity category you're trying to update could not be found. Please verify the category ID and try again.</value></data>
+  <data name="ActivityCategoryUpdateValidationError" xml:space="preserve"><value>Unable to update activity category: {0}. Please review your changes and try again.</value></data>
+  <data name="ActivityCategoryUpdateUnexpected" xml:space="preserve"><value>We encountered an issue while updating your activity category. Please try again later or contact support if the problem persists.</value></data>
+  <data name="ActivityCategoryDeleted" xml:space="preserve"><value>Activity category deleted successfully</value></data>
+  <data name="ActivityCategoryDeleteNotFound" xml:space="preserve"><value>The activity category you're trying to delete could not be found. Please verify the category ID and try again.</value></data>
+  <data name="ActivityCategoryDeleteUnexpected" xml:space="preserve"><value>We encountered an issue while deleting your activity category. Please try again later or contact support if the problem persists.</value></data>
+</root>

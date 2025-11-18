@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Queries.ProductVariantManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.ProductVariantManagement
 {
@@ -16,7 +17,7 @@ namespace FunnyActivities.Application.Validators.ProductVariantManagement
             // Id validation
             RuleFor(x => x.Id)
                 .NotEmpty()
-                .WithMessage("Product variant ID is required.");
+                .WithMessage(ValidationMessageProvider.Get("ProductVariantIdRequired"));
         }
     }
 }

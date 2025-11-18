@@ -8,6 +8,7 @@ using FunnyActivities.Application.Queries.CategoryManagement;
 using FunnyActivities.Application.DTOs.CategoryManagement;
 using FunnyActivities.Application.DTOs.Shared;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -27,17 +28,19 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<CategoryController> _logger;
+        private readonly IStringLocalizer<CategoryController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CategoryController"/> class.
         /// </summary>
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
-        public CategoryController(IMediator mediator, ILogger<CategoryController> logger)
+        public CategoryController(IMediator mediator, ILogger<CategoryController> logger, IStringLocalizer<CategoryController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -81,7 +84,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Categories retrieved successfully");
+            return this.ApiSuccess(result, _localizer["CategoriesRetrieved"]);
         }
 
         /// <summary>
@@ -103,10 +106,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (category == null)
             {
                 _logger.LogWarning("Category with ID {CategoryId} not found", id);
-                return this.ApiError("Category not found", "NotFound", 404);
+                return this.ApiError(_localizer["CategoryNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(category, "Category retrieved successfully");
+            return this.ApiSuccess(category, _localizer["CategoryRetrieved"]);
         }
 
         /// <summary>
@@ -128,10 +131,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (category == null)
             {
                 _logger.LogWarning("Category with ID {CategoryId} not found", id);
-                return this.ApiError("Category not found", "NotFound", 404);
+                return this.ApiError(_localizer["CategoryNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(category, "Category with products retrieved successfully");
+            return this.ApiSuccess(category, _localizer["CategoryWithProductsRetrieved"]);
         }
 
         /// <summary>
@@ -153,7 +156,7 @@ namespace FunnyActivities.WebAPI.Controllers
 
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                return this.ApiError("Search term is required", "ValidationError", 400);
+                return this.ApiError(_localizer["SearchTermRequired"], "ValidationError", 400);
             }
 
             // Validate pageSize
@@ -170,7 +173,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Categories search completed successfully");
+            return this.ApiSuccess(result, _localizer["CategoriesSearchCompleted"]);
         }
 
         /// <summary>
@@ -197,17 +200,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Category created successfully with ID: {Id}", result.Id);
-                return this.ApiSuccess(result, "Category created successfully", 201);
+                return this.ApiSuccess(result, _localizer["CategoryCreated"], 201);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Category creation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["CategoryCreateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating category");
-                return this.ApiError("An error occurred while creating the category", "InternalError", 500);
+                return this.ApiError(_localizer["CategoryCreateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -238,22 +241,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Category updated successfully with ID: {CategoryId}", result.Id);
-                return this.ApiSuccess(result, "Category updated successfully");
+                return this.ApiSuccess(result, _localizer["CategoryUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Category update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["CategoryUpdateNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Category update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["CategoryUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating category");
-                return this.ApiError("An error occurred while updating the category", "InternalError", 500);
+                return this.ApiError(_localizer["CategoryUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -280,17 +283,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Category deleted successfully with ID: {CategoryId}", id);
-                return this.ApiSuccess<object>("Category deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["CategoryDeleted"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Category deletion failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["CategoryDeleteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting category");
-                return this.ApiError("An error occurred while deleting the category", "InternalError", 500);
+                return this.ApiError(_localizer["CategoryDeleteUnexpected"], "InternalError", 500);
             }
         }
     }

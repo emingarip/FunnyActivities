@@ -7,6 +7,7 @@ using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.Queries.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -26,17 +27,19 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<StepController> _logger;
+        private readonly IStringLocalizer<StepController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StepController"/> class.
         /// </summary>
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
-        public StepController(IMediator mediator, ILogger<StepController> logger)
+        public StepController(IMediator mediator, ILogger<StepController> logger, IStringLocalizer<StepController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -59,10 +62,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (step == null)
             {
                 _logger.LogWarning("Step with ID {StepId} not found", id);
-                return this.ApiError("Step not found", "NotFound", 404);
+                return this.ApiError(_localizer["StepNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(step, "Step retrieved successfully");
+            return this.ApiSuccess(step, _localizer["StepRetrieved"]);
         }
 
         /// <summary>
@@ -81,7 +84,7 @@ namespace FunnyActivities.WebAPI.Controllers
             var query = new GetStepsByActivityIdQuery { ActivityId = activityId };
             var steps = await _mediator.Send(query);
 
-            return this.ApiSuccess(steps, "Steps retrieved successfully");
+            return this.ApiSuccess(steps, _localizer["StepsRetrieved"]);
         }
 
         /// <summary>
@@ -128,17 +131,17 @@ namespace FunnyActivities.WebAPI.Controllers
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Step created successfully with ID: {Id}", result.Id);
                 _logger.LogInformation("Created step data: {@Result}", result);
-                return this.ApiCreated(nameof(GetStep), new { id = result.Id }, result, "Step created successfully");
+                return this.ApiCreated(nameof(GetStep), new { id = result.Id }, result, _localizer["StepCreated"]);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Step creation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["StepCreateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating step");
-                return this.ApiError("An error occurred while creating the step", "InternalError", 500);
+                return this.ApiError(_localizer["StepCreateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -171,22 +174,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Step updated successfully with ID: {StepId}", result.Id);
-                return this.ApiSuccess(result, "Step updated successfully");
+                return this.ApiSuccess(result, _localizer["StepUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Step update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["StepUpdateNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Step update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["StepUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating step");
-                return this.ApiError("An error occurred while updating the step", "InternalError", 500);
+                return this.ApiError(_localizer["StepUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -213,17 +216,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Step deleted successfully with ID: {StepId}", id);
-                return this.ApiSuccess<object>("Step deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["StepDeleted"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Step deletion failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["StepDeleteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting step");
-                return this.ApiError("An error occurred while deleting the step", "InternalError", 500);
+                return this.ApiError(_localizer["StepDeleteUnexpected"], "InternalError", 500);
             }
         }
 

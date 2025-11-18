@@ -24,6 +24,10 @@ RUN dotnet publish FunnyActivities.WebAPI.csproj -c Release -o /app/publish /p:U
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runtime
 
+# Enable full globalization (needed for cultures like tr-TR)
+RUN apk add --no-cache icu-libs
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
 # Install Trivy for security scanning (optional, for CI/CD)
 # RUN apk add --no-cache curl && \
 #     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin

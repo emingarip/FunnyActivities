@@ -8,6 +8,7 @@ using FunnyActivities.Domain.Entities;
 using FunnyActivities.WebAPI.Controllers.Base;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -17,11 +18,13 @@ namespace FunnyActivities.WebAPI.Controllers
     public class RoleManagementController : BaseController
     {
         private readonly IMediator _mediator;
+        private readonly IStringLocalizer<RoleManagementController> _localizer;
 
-        public RoleManagementController(IMediator mediator, ILogger<RoleManagementController> logger)
+        public RoleManagementController(IMediator mediator, ILogger<RoleManagementController> logger, IStringLocalizer<RoleManagementController> localizer)
             : base(logger)
         {
             _mediator = mediator;
+            _localizer = localizer;
         }
 
         [HttpPost("assign")]
@@ -41,10 +44,10 @@ namespace FunnyActivities.WebAPI.Controllers
 
             if (!result)
             {
-                return BadRequest(new { message = "Failed to assign role. User not found or insufficient permissions." });
+                return this.ApiError(_localizer["RoleAssignFailed"], "ValidationError", 400);
             }
 
-            return Ok(new { message = "Role assigned successfully." });
+            return this.ApiSuccess(new { request.UserId, role = request.Role.ToString() }, _localizer["RoleAssigned"]);
         }
 
         [HttpGet("user/{userId}")]
@@ -56,10 +59,10 @@ namespace FunnyActivities.WebAPI.Controllers
 
             if (role == null)
             {
-                return NotFound(new { message = "User not found." });
+                return this.ApiError(_localizer["RoleUserNotFound"], "NotFound", 404);
             }
 
-            return Ok(new { userId, role = role.ToString() });
+            return this.ApiSuccess(new { userId, role = role.ToString() }, _localizer["UserRoleRetrieved"]);
         }
     }
 

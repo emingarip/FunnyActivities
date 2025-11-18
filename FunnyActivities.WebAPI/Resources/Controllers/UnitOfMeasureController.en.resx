@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="UnitCreated" xml:space="preserve"><value>Unit of measure created successfully</value></data>
+  <data name="UnitCreateValidationError" xml:space="preserve"><value>Unable to create unit of measure: {0}. Please check your input and try again.</value></data>
+  <data name="UnitCreateUnexpected" xml:space="preserve"><value>We encountered an issue while creating the unit of measure. Please try again later.</value></data>
+  <data name="UnitNotFound" xml:space="preserve"><value>The requested unit of measure could not be found. Please verify the ID and try again.</value></data>
+  <data name="UnitRetrieved" xml:space="preserve"><value>Unit of measure retrieved successfully</value></data>
+  <data name="UnitUpdated" xml:space="preserve"><value>Unit of measure updated successfully</value></data>
+  <data name="UnitUpdateNotFound" xml:space="preserve"><value>The unit of measure you are trying to update could not be found.</value></data>
+  <data name="UnitUpdateValidationError" xml:space="preserve"><value>Unable to update unit of measure: {0}. Please review your changes and try again.</value></data>
+  <data name="UnitUpdateUnexpected" xml:space="preserve"><value>We encountered an issue while updating the unit of measure. Please try again later.</value></data>
+  <data name="UnitDeleted" xml:space="preserve"><value>Unit of measure deleted successfully</value></data>
+  <data name="UnitDeleteNotFound" xml:space="preserve"><value>The unit of measure you are trying to delete could not be found.</value></data>
+  <data name="UnitDeleteUnexpected" xml:space="preserve"><value>We encountered an issue while deleting the unit of measure. Please try again later.</value></data>
+  <data name="UnitsRetrieved" xml:space="preserve"><value>Units of measure retrieved successfully</value></data>
+</root>

@@ -11,6 +11,7 @@ using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Enums;
 using FunnyActivities.Domain.ValueObjects;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -32,6 +33,7 @@ namespace FunnyActivities.WebAPI.Controllers
         private readonly ILogger<ActivityController> _logger;
         private readonly IMinioService _minioService;
         private readonly IInputSanitizer _inputSanitizer;
+        private readonly IStringLocalizer<ActivityController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivityController"/> class.
@@ -40,13 +42,19 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <param name="logger">The logger.</param>
         /// <param name="minioService">The Minio service for file operations.</param>
         /// <param name="inputSanitizer">The input sanitizer for security.</param>
-        public ActivityController(IMediator mediator, ILogger<ActivityController> logger, IMinioService minioService, IInputSanitizer inputSanitizer)
+        public ActivityController(
+            IMediator mediator,
+            ILogger<ActivityController> logger,
+            IMinioService minioService,
+            IInputSanitizer inputSanitizer,
+            IStringLocalizer<ActivityController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
             _minioService = minioService;
             _inputSanitizer = inputSanitizer;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -93,7 +101,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Activities retrieved successfully");
+            return this.ApiSuccess(result, _localizer["ActivitiesRetrieved"]);
         }
 
         /// <summary>
@@ -106,7 +114,7 @@ namespace FunnyActivities.WebAPI.Controllers
         public IActionResult TestAnonymous()
         {
             _logger.LogInformation("=== TEST ENDPOINT REACHED ===");
-            return this.ApiSuccess(new { message = "Anonymous access works!" }, "Test successful");
+            return this.ApiSuccess(new { message = _localizer["AnonymousAccessWorks"] }, _localizer["TestSuccessful"]);
         }
 
         /// <summary>
@@ -119,7 +127,7 @@ namespace FunnyActivities.WebAPI.Controllers
         public IActionResult TestSimpleAnonymous()
         {
             _logger.LogInformation("=== SIMPLE TEST ENDPOINT REACHED ===");
-            return Ok(new { message = "Simple anonymous access works!" });
+            return Ok(new { message = _localizer["SimpleAnonymousAccessWorks"] });
         }
 
         /// <summary>
@@ -169,7 +177,7 @@ namespace FunnyActivities.WebAPI.Controllers
 
             var result = await _mediator.Send(query);
             _logger.LogInformation("=== PUBLIC ENDPOINT COMPLETED ===");
-            return this.ApiSuccess(result, "Public activities retrieved successfully");
+            return this.ApiSuccess(result, _localizer["PublicActivitiesRetrieved"]);
         }
 
         /// <summary>
@@ -191,10 +199,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", id);
-                return this.ApiError("The requested activity could not be found. Please check the activity ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(activity, "Activity retrieved successfully");
+            return this.ApiSuccess(activity, _localizer["ActivityRetrieved"]);
         }
 
         /// <summary>
@@ -217,11 +225,11 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found or not public", id);
-                return this.ApiError("The requested activity could not be found or is not publicly available. Please check the activity ID or contact the activity creator.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityNotFoundPublic"], "NotFound", 404);
             }
 
             _logger.LogInformation("=== PUBLIC ACTIVITY RETRIEVED SUCCESSFULLY ===");
-            return this.ApiSuccess(activity, "Public activity retrieved successfully");
+            return this.ApiSuccess(activity, _localizer["PublicActivityRetrieved"]);
         }
 
         /// <summary>
@@ -244,10 +252,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", id);
-                return this.ApiError("The requested activity could not be found. Please check the activity ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(activity, "Activity with details retrieved successfully");
+            return this.ApiSuccess(activity, _localizer["ActivityWithDetailsRetrieved"]);
         }
 
         /// <summary>
@@ -284,17 +292,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Activity created successfully with ID: {Id}", result.Id);
-                return this.ApiCreated(nameof(GetActivity), new { id = result.Id }, result, "Activity created successfully");
+                return this.ApiCreated(nameof(GetActivity), new { id = result.Id }, result, _localizer["ActivityCreated"]);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity creation failed: {Message}", ex.Message);
-                return this.ApiError($"Unable to create activity: {ex.Message}. Please check your input and try again.", "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["ActivityCreateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while creating activity");
-                return this.ApiError("We encountered an issue while creating your activity. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityCreateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -335,22 +343,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Activity updated successfully with ID: {ActivityId}", result.Id);
-                return this.ApiSuccess(result, "Activity updated successfully");
+                return this.ApiSuccess(result, _localizer["ActivityUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity update failed: {Message}", ex.Message);
-                return this.ApiError($"The activity you're trying to update could not be found. Please verify the activity ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityUpdateNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity update failed: {Message}", ex.Message);
-                return this.ApiError($"Unable to update activity: {ex.Message}. Please review your changes and try again.", "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["ActivityUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while updating activity");
-                return this.ApiError("We encountered an issue while updating your activity. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -377,17 +385,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Activity deleted successfully with ID: {ActivityId}", id);
-                return this.ApiSuccess<object>("Activity deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["ActivityDeleted"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity deletion failed: {Message}", ex.Message);
-                return this.ApiError("The activity you're trying to delete could not be found. Please verify the activity ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityDeleteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while deleting activity");
-                return this.ApiError("We encountered an issue while deleting your activity. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityDeleteUnexpected"], "InternalError", 500);
             }
         }
 
@@ -410,7 +418,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (!Enum.TryParse<ActivityVideoType>(videoType, true, out var parsedVideoType))
             {
                 _logger.LogWarning("Invalid video type '{VideoType}' provided for activity {ActivityId}", videoType, activityId);
-                return this.ApiError("Invalid video type. Allowed values are 'main' or 'intro'.", "ValidationError", 400);
+                return this.ApiError(_localizer["InvalidVideoType"], "ValidationError", 400);
             }
 
             // Validate that the activity exists
@@ -420,7 +428,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", activityId);
-                return this.ApiError("The requested activity could not be found. Please check the activity ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityNotFound"], "NotFound", 404);
             }
 
             try
@@ -428,7 +436,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 // Validate video file
                 if (videoFile == null || videoFile.Length == 0)
                 {
-                    return this.ApiError("No video file provided", "ValidationError", 400);
+                    return this.ApiError(_localizer["NoVideoFileProvided"], "ValidationError", 400);
                 }
 
                 // Convert IFormFile to byte array
@@ -470,12 +478,12 @@ namespace FunnyActivities.WebAPI.Controllers
                 };
 
                 _logger.LogInformation("Video uploaded and activity updated successfully for activity ID: {ActivityId}, Object Key: {ObjectKey}, Type: {VideoType}", activityId, objectKey, parsedVideoType);
-                return this.ApiSuccess(response, "Video uploaded successfully");
+                return this.ApiSuccess(response, _localizer["VideoUploaded"]);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while uploading video for activity {ActivityId}", activityId);
-                return this.ApiError("An error occurred while uploading the video", "InternalError", 500);
+                return this.ApiError(_localizer["VideoUploadError"], "InternalError", 500);
             }
         }
 
@@ -501,7 +509,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", activityId);
-                return this.ApiError("Activity not found", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityNotFound"], "NotFound", 404);
             }
 
             try
@@ -517,12 +525,12 @@ namespace FunnyActivities.WebAPI.Controllers
                     GeneratedAt = DateTime.UtcNow
                 };
 
-                return this.ApiSuccess(response, "Video URL generated successfully");
+                return this.ApiSuccess(response, _localizer["VideoUrlGenerated"]);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while generating video URL for activity {ActivityId}", activityId);
-                return this.ApiError("An error occurred while generating the video URL", "InternalError", 500);
+                return this.ApiError(_localizer["VideoUrlGenerateError"], "InternalError", 500);
             }
         }
 
@@ -551,7 +559,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (string.IsNullOrWhiteSpace(videoObjectKey))
             {
                 _logger.LogWarning("Video object key is null or empty for activity ID: {ActivityId}", activityId);
-                return this.ApiError("Video object key is required", "ValidationError", 400);
+                return this.ApiError(_localizer["VideoObjectKeyRequired"], "ValidationError", 400);
             }
 
             // Validate expiry seconds
@@ -568,7 +576,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found for public video URL request", activityId);
-                return this.ApiError("Activity not found", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityNotFound"], "NotFound", 404);
             }
 
             // TODO: Add IsPublic property to Activity entity and validate here
@@ -592,22 +600,22 @@ namespace FunnyActivities.WebAPI.Controllers
                 };
 
                 _logger.LogInformation("Successfully generated public video URL for activity ID: {ActivityId}, Object Key: {ObjectKey}", activityId, videoObjectKey);
-                return this.ApiSuccess(response, "Public video URL generated successfully");
+                return this.ApiSuccess(response, _localizer["VideoUrlGenerated"]);
             }
             catch (FileNotFoundException ex)
             {
                 _logger.LogWarning("Video object not found: {ObjectKey} for activity ID: {ActivityId}. Error: {ErrorMessage}", videoObjectKey, activityId, ex.Message);
-                return this.ApiError("Video not found", "VideoNotFound", 404);
+                return this.ApiError(_localizer["VideoNotFound"], "VideoNotFound", 404);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogError(ex, "MinIO service error while generating public video URL for activity ID: {ActivityId}, Object Key: {ObjectKey}", activityId, videoObjectKey);
-                return this.ApiError("Unable to generate video URL. Storage service unavailable.", "StorageServiceError", 503);
+                return this.ApiError(_localizer["VideoUrlStorageUnavailable"], "StorageServiceError", 503);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error while generating public video URL for activity ID: {ActivityId}, Object Key: {ObjectKey}", activityId, videoObjectKey);
-                return this.ApiError("An error occurred while generating the video URL", "InternalError", 500);
+                return this.ApiError(_localizer["VideoUrlGenerateError"], "InternalError", 500);
             }
         }
 
@@ -634,7 +642,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (string.IsNullOrWhiteSpace(videoObjectKey))
             {
                 _logger.LogWarning("Video object key is null or empty");
-                return this.ApiError("Video object key is required", "ValidationError", 400);
+                return this.ApiError(_localizer["VideoObjectKeyRequired"], "ValidationError", 400);
             }
 
             try
@@ -642,22 +650,22 @@ namespace FunnyActivities.WebAPI.Controllers
                 var metadata = await _minioService.GetVideoMetadataAsync(videoObjectKey);
 
                 _logger.LogInformation("Successfully retrieved metadata for video object: {ObjectKey}", videoObjectKey);
-                return this.ApiSuccess(metadata, "Video metadata retrieved successfully");
+                return this.ApiSuccess(metadata, _localizer["VideoMetadataRetrieved"]);
             }
             catch (FileNotFoundException ex)
             {
                 _logger.LogWarning("Video object not found: {ObjectKey}. Error: {ErrorMessage}", videoObjectKey, ex.Message);
-                return this.ApiError("Video not found", "VideoNotFound", 404);
+                return this.ApiError(_localizer["VideoNotFound"], "VideoNotFound", 404);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogError(ex, "MinIO service error while retrieving video metadata for object: {ObjectKey}", videoObjectKey);
-                return this.ApiError("Unable to retrieve video metadata. Storage service unavailable.", "StorageServiceError", 503);
+                return this.ApiError(_localizer["VideoMetadataStorageUnavailable"], "StorageServiceError", 503);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error while retrieving video metadata for object: {ObjectKey}", videoObjectKey);
-                return this.ApiError("An error occurred while retrieving video metadata", "InternalError", 500);
+                return this.ApiError(_localizer["VideoMetadataError"], "InternalError", 500);
             }
         }
 
@@ -684,7 +692,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (string.IsNullOrWhiteSpace(objectKey))
             {
                 _logger.LogWarning("Object key is null or empty");
-                return this.ApiError("Object key is required", "ValidationError", 400);
+                return this.ApiError(_localizer["ObjectKeyRequired"], "ValidationError", 400);
             }
 
             try
@@ -692,22 +700,22 @@ namespace FunnyActivities.WebAPI.Controllers
                 var metadata = await _minioService.GetObjectMetadataAsync(objectKey);
 
                 _logger.LogInformation("Successfully retrieved metadata for object: {ObjectKey}", objectKey);
-                return this.ApiSuccess(metadata, "Object metadata retrieved successfully");
+                return this.ApiSuccess(metadata, _localizer["ObjectMetadataRetrieved"]);
             }
             catch (FileNotFoundException ex)
             {
                 _logger.LogWarning("Object not found: {ObjectKey}. Error: {ErrorMessage}", objectKey, ex.Message);
-                return this.ApiError("Object not found", "ObjectNotFound", 404);
+                return this.ApiError(_localizer["ObjectNotFound"], "ObjectNotFound", 404);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogError(ex, "MinIO service error while retrieving object metadata for object: {ObjectKey}", objectKey);
-                return this.ApiError("Unable to retrieve object metadata. Storage service unavailable.", "StorageServiceError", 503);
+                return this.ApiError(_localizer["ObjectMetadataStorageUnavailable"], "StorageServiceError", 503);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error while retrieving object metadata for object: {ObjectKey}", objectKey);
-                return this.ApiError("An error occurred while retrieving object metadata", "InternalError", 500);
+                return this.ApiError(_localizer["ObjectMetadataError"], "InternalError", 500);
             }
         }
 
@@ -728,7 +736,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (!Enum.TryParse<ActivityVideoType>(videoType, true, out var parsedVideoType))
             {
                 _logger.LogWarning("Invalid video type '{VideoType}' provided for delete on activity {ActivityId}", videoType, activityId);
-                return this.ApiError("Invalid video type. Allowed values are 'main' or 'intro'.", "ValidationError", 400);
+                return this.ApiError(_localizer["InvalidVideoType"], "ValidationError", 400);
             }
 
             // Validate that the activity exists
@@ -738,7 +746,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activity == null)
             {
                 _logger.LogWarning("Activity with ID {ActivityId} not found", activityId);
-                return this.ApiError("Activity not found", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityNotFound"], "NotFound", 404);
             }
 
             try
@@ -748,7 +756,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 if (!deleted)
                 {
                     _logger.LogWarning("Failed to delete video for activity {ActivityId}, Object Key: {ObjectKey}", activityId, videoObjectKey);
-                    return this.ApiError("Failed to delete the video", "DeletionFailed", 500);
+                    return this.ApiError(_localizer["VideoDeletionFailed"], "DeletionFailed", 500);
                 }
 
                 var updateCommand = new UpdateActivityCommand
@@ -764,12 +772,12 @@ namespace FunnyActivities.WebAPI.Controllers
                 await _mediator.Send(updateCommand);
 
                 _logger.LogInformation("Video deleted successfully for activity ID: {ActivityId} ({VideoType})", activityId, parsedVideoType);
-                return this.ApiSuccess<object>("Video deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["VideoDeleted"], 204);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting video for activity {ActivityId}", activityId);
-                return this.ApiError("An error occurred while deleting the video", "InternalError", 500);
+                return this.ApiError(_localizer["VideoDeleteError"], "InternalError", 500);
             }
         }
     }

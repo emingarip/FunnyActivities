@@ -37,7 +37,9 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddControllers(this IServiceCollection services)
     {
-        Microsoft.Extensions.DependencyInjection.MvcServiceCollectionExtensions.AddControllers(services);
+        Microsoft.Extensions.DependencyInjection.MvcServiceCollectionExtensions.AddControllers(services)
+            .AddDataAnnotationsLocalization()
+            .AddViewLocalization();
         return services;
     }
 

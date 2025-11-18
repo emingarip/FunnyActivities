@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="SurveysRetrieved" xml:space="preserve"><value>Surveys retrieved successfully</value></data>
+  <data name="SurveyNotFound" xml:space="preserve"><value>The requested survey could not be found. Please check the survey ID and try again.</value></data>
+  <data name="SurveyRetrieved" xml:space="preserve"><value>Survey retrieved successfully</value></data>
+  <data name="SurveyCreated" xml:space="preserve"><value>Survey created successfully</value></data>
+  <data name="SurveyCreateValidationError" xml:space="preserve"><value>Unable to create survey: {0}. Please check your input and try again.</value></data>
+  <data name="SurveyCreateUnexpected" xml:space="preserve"><value>We encountered an issue while creating the survey. Please try again later or contact support if the problem persists.</value></data>
+  <data name="SurveyUpdated" xml:space="preserve"><value>Survey updated successfully</value></data>
+  <data name="SurveyUpdateNotFound" xml:space="preserve"><value>The survey you're trying to update could not be found. Please verify the survey ID and try again.</value></data>
+  <data name="SurveyUpdateValidationError" xml:space="preserve"><value>Unable to update survey: {0}. Please review your changes and try again.</value></data>
+  <data name="SurveyUpdateUnexpected" xml:space="preserve"><value>We encountered an issue while updating the survey. Please try again later or contact support if the problem persists.</value></data>
+  <data name="SurveyDeleted" xml:space="preserve"><value>Survey deleted successfully</value></data>
+  <data name="SurveyDeleteNotFound" xml:space="preserve"><value>The survey you're trying to delete could not be found. Please verify the survey ID and try again.</value></data>
+  <data name="SurveyDeleteUnexpected" xml:space="preserve"><value>We encountered an issue while deleting the survey. Please try again later or contact support if the problem persists.</value></data>
+  <data name="SurveyResultsRetrieved" xml:space="preserve"><value>Survey results retrieved successfully</value></data>
+  <data name="SurveyResultsNotFound" xml:space="preserve"><value>Survey results could not be found for the requested survey.</value></data>
+  <data name="SurveyStatisticsRetrieved" xml:space="preserve"><value>Survey statistics retrieved successfully</value></data>
+  <data name="SurveyStatisticsNotFound" xml:space="preserve"><value>Survey statistics could not be found for the requested survey.</value></data>
+  <data name="SurveyParticipantsRetrieved" xml:space="preserve"><value>Survey participants retrieved successfully</value></data>
+  <data name="ShareUrlGenerated" xml:space="preserve"><value>Share URL generated successfully</value></data>
+  <data name="ShareUrlNotFound" xml:space="preserve"><value>The survey you're trying to share could not be found. Please verify the survey ID and try again.</value></data>
+  <data name="ShareUrlUnexpected" xml:space="preserve"><value>We encountered an issue while generating the share URL. Please try again later or contact support if the problem persists.</value></data>
+</root>

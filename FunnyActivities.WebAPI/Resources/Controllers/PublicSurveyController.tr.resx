@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="PublicSurveyNotFoundOrAccessible" xml:space="preserve"><value>Anket bulunamadi veya erisime kapali</value></data>
+  <data name="PublicSurveyRetrieved" xml:space="preserve"><value>Genel anket basariyla getirildi</value></data>
+  <data name="SurveyNotFound" xml:space="preserve"><value>Anket bulunamadi</value></data>
+  <data name="SurveyNotAvailable" xml:space="preserve"><value>Anket kullanilabilir degil</value></data>
+  <data name="PublicSurveyRetrieveUnexpected" xml:space="preserve"><value>Anket getirilirken bir hata olustu</value></data>
+  <data name="ParticipantRegistered" xml:space="preserve"><value>Katilimci basariyla kaydedildi</value></data>
+  <data name="ParticipantRegistrationValidationError" xml:space="preserve"><value>Katilimci kaydedilemedi: {0}. Lutfen girdilerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="ParticipantRegistrationNotFound" xml:space="preserve"><value>Paylasim tokeni icin anket bulunamadi. Lutfen tokeni kontrol edip tekrar deneyin.</value></data>
+  <data name="ParticipantRegistrationUnexpected" xml:space="preserve"><value>Katilimci kaydedilirken bir hata olustu</value></data>
+  <data name="VoteSubmitted" xml:space="preserve"><value>Oy basariyla gonderildi</value></data>
+  <data name="VoteValidationError" xml:space="preserve"><value>Oy gonderilemedi: {0}. Lutfen girdilerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="VoteNotFound" xml:space="preserve"><value>Oy islemi icin hedef bulunamadi. Lutfen aktivite ve katilimci bilgilerini dogrulayin.</value></data>
+  <data name="VoteUnexpected" xml:space="preserve"><value>Oy gonderilirken bir hata olustu</value></data>
+  <data name="SurveyActivitiesNotFound" xml:space="preserve"><value>Bu anket icin aktivite bulunamadi</value></data>
+  <data name="SurveyActivitiesRetrieved" xml:space="preserve"><value>Anket aktiviteleri basariyla getirildi</value></data>
+  <data name="ParticipantVotesRetrieved" xml:space="preserve"><value>Katilimciya ait oylar basariyla getirildi</value></data>
+  <data name="ParticipantVotesUnexpected" xml:space="preserve"><value>Katilimci oylarini getirirken bir hata olustu</value></data>
+  <data name="SurveyStatusRetrieved" xml:space="preserve"><value>Anket durumu basariyla getirildi</value></data>
+</root>

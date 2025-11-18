@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Login.css';
+import { useTranslation } from '../hooks/useTranslation';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +18,7 @@ const Login: React.FC = () => {
 
   const { login, register, isLoading, error, isAuthenticated, clearError } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -74,15 +76,15 @@ const Login: React.FC = () => {
   };
 
   if (isAuthenticated) {
-    return <div>Redirecting...</div>;
+    return <div>{t('login_redirecting')}</div>;
   }
 
   return (
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-          <p>{isLogin ? 'Sign in to your account' : 'Join our community'}</p>
+          <h2>{isLogin ? t('login_title_login') : t('login_title_register')}</h2>
+          <p>{isLogin ? t('login_subtitle_login') : t('login_subtitle_register')}</p>
         </div>
 
         <div className="auth-tabs">
@@ -90,13 +92,13 @@ const Login: React.FC = () => {
             className={`tab-button ${isLogin ? 'active' : ''}`}
             onClick={() => setIsLogin(true)}
           >
-            Login
+            {t('login_tab_login')}
           </button>
           <button
             className={`tab-button ${!isLogin ? 'active' : ''}`}
             onClick={() => setIsLogin(false)}
           >
-            Register
+            {t('login_tab_register')}
           </button>
         </div>
 
@@ -109,7 +111,7 @@ const Login: React.FC = () => {
         {isLogin ? (
           <form onSubmit={handleLogin} className="login-form">
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">{t('login_label_email')}</label>
               <input
                 type="email"
                 id="email"
@@ -122,7 +124,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t('login_label_password')}</label>
               <input
                 type="password"
                 id="password"
@@ -139,14 +141,14 @@ const Login: React.FC = () => {
               className="login-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t('login_signing_in') : t('login_sign_in')}
             </button>
           </form>
         ) : (
           <form onSubmit={handleRegister} className="register-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="firstName">First Name</label>
+                <label htmlFor="firstName">{t('login_label_first_name')}</label>
                 <input
                   type="text"
                   id="firstName"
@@ -159,7 +161,7 @@ const Login: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="lastName">Last Name</label>
+                <label htmlFor="lastName">{t('login_label_last_name')}</label>
                 <input
                   type="text"
                   id="lastName"
@@ -173,7 +175,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="registerEmail">Email</label>
+              <label htmlFor="registerEmail">{t('login_label_email')}</label>
               <input
                 type="email"
                 id="registerEmail"
@@ -186,7 +188,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="registerPassword">Password</label>
+              <label htmlFor="registerPassword">{t('login_label_password')}</label>
               <input
                 type="password"
                 id="registerPassword"
@@ -200,7 +202,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="confirmPassword">{t('login_label_confirm_password')}</label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -212,7 +214,7 @@ const Login: React.FC = () => {
                 minLength={6}
               />
               {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                <span className="password-mismatch">Passwords do not match</span>
+                <span className="password-mismatch">{t('login_passwords_not_match')}</span>
               )}
             </div>
 
@@ -221,7 +223,7 @@ const Login: React.FC = () => {
               className="register-button"
               disabled={isLoading || formData.password !== formData.confirmPassword}
             >
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? t('login_creating_account') : t('login_create_account')}
             </button>
           </form>
         )}
@@ -229,24 +231,24 @@ const Login: React.FC = () => {
         <div className="auth-links">
           {isLogin ? (
             <p>
-              Don't have an account?{' '}
+              {t('login_no_account')}{' '}
               <button
                 type="button"
                 className="link-button"
                 onClick={() => setIsLogin(false)}
               >
-                Sign up
+                {t('login_sign_up')}
               </button>
             </p>
           ) : (
             <p>
-              Already have an account?{' '}
+              {t('login_have_account')}{' '}
               <button
                 type="button"
                 className="link-button"
                 onClick={() => setIsLogin(true)}
               >
-                Sign in
+                {t('login_sign_in_cta')}
               </button>
             </p>
           )}

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="CategoriesRetrieved" xml:space="preserve"><value>Kategoriler başarıyla getirildi</value></data>
+  <data name="CategoryNotFound" xml:space="preserve"><value>Kategori bulunamadı</value></data>
+  <data name="CategoryRetrieved" xml:space="preserve"><value>Kategori başarıyla getirildi</value></data>
+  <data name="CategoryWithProductsRetrieved" xml:space="preserve"><value>Kategori ürünleriyle birlikte başarıyla getirildi</value></data>
+  <data name="SearchTermRequired" xml:space="preserve"><value>Arama terimi zorunludur</value></data>
+  <data name="CategoriesSearchCompleted" xml:space="preserve"><value>Kategori araması başarıyla tamamlandı</value></data>
+  <data name="CategoryCreated" xml:space="preserve"><value>Kategori başarıyla oluşturuldu</value></data>
+  <data name="CategoryCreateValidationError" xml:space="preserve"><value>Kategori oluşturulamadı: {0}. Lütfen girdilerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="CategoryCreateUnexpected" xml:space="preserve"><value>Kategori oluşturulurken bir hata oluştu</value></data>
+  <data name="CategoryUpdated" xml:space="preserve"><value>Kategori başarıyla güncellendi</value></data>
+  <data name="CategoryUpdateNotFound" xml:space="preserve"><value>Güncellemeye çalıştığınız kategori bulunamadı. Lütfen ID'yi doğrulayıp tekrar deneyin.</value></data>
+  <data name="CategoryUpdateValidationError" xml:space="preserve"><value>Kategori güncellenemedi: {0}. Lütfen değişikliklerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="CategoryUpdateUnexpected" xml:space="preserve"><value>Kategori güncellenirken bir hata oluştu</value></data>
+  <data name="CategoryDeleted" xml:space="preserve"><value>Kategori başarıyla silindi</value></data>
+  <data name="CategoryDeleteNotFound" xml:space="preserve"><value>Silmek istediğiniz kategori bulunamadı. Lütfen ID'yi doğrulayıp tekrar deneyin.</value></data>
+  <data name="CategoryDeleteUnexpected" xml:space="preserve"><value>Kategori silinirken bir hata oluştu</value></data>
+</root>

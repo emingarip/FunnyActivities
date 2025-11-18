@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 using FunnyActivities.Domain.Exceptions;
+using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
 
 namespace FunnyActivities.CrossCuttingConcerns.ErrorHandling;
 
@@ -11,20 +13,22 @@ namespace FunnyActivities.CrossCuttingConcerns.ErrorHandling;
 /// Global exception handling middleware that catches and handles various types of exceptions,
 /// returning appropriate HTTP responses with ProblemDetails format.
 /// </summary>
-public class ExceptionMiddleware
-{
-    private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionMiddleware> _logger;
+    public class ExceptionMiddleware
+    {
+        private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly IStringLocalizer<ExceptionMiddleware> _localizer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExceptionMiddleware"/> class.
     /// </summary>
     /// <param name="next">The next middleware in the pipeline.</param>
     /// <param name="logger">The logger instance for logging exceptions.</param>
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IStringLocalizer<ExceptionMiddleware> localizer)
     {
         _next = next;
         _logger = logger;
+        _localizer = localizer;
     }
 
     /// <summary>
@@ -64,40 +68,40 @@ public class ExceptionMiddleware
         string path = context.Request.Path;
 
         switch (exception)
-        {
-            case ValidationException validationEx:
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                problemDetails.Title = "Validation Error";
-                problemDetails.Detail = "One or more validation errors occurred.";
-                problemDetails.Status = 400;
-                problemDetails.Extensions["errors"] = validationEx.Errors;
-                problemDetails.Extensions["errorCode"] = "VALIDATION_FAILED";
+            {
+                case ValidationException validationEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    problemDetails.Title = _localizer["ValidationErrorTitle"];
+                    problemDetails.Detail = _localizer["ValidationErrorDetail"];
+                    problemDetails.Status = 400;
+                    problemDetails.Extensions["errors"] = validationEx.Errors;
+                    problemDetails.Extensions["errorCode"] = "VALIDATION_FAILED";
 
                 _logger.LogWarning(exception,
                     "Validation exception occurred. Method: {Method}, Path: {Path}, User: {User}, Errors: {Errors}",
                     method, path, user, string.Join("; ", validationEx.Errors));
                 break;
 
-            case MaterialNameAlreadyExistsException materialEx:
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                problemDetails.Title = "Business Rule Violation";
-                problemDetails.Detail = exception.Message;
-                problemDetails.Status = 400;
-                problemDetails.Extensions["materialName"] = materialEx.MaterialName;
-                problemDetails.Extensions["errorCode"] = "MATERIAL_NAME_EXISTS";
+                case MaterialNameAlreadyExistsException materialEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    problemDetails.Title = _localizer["BusinessRuleViolationTitle"];
+                    problemDetails.Detail = exception.Message;
+                    problemDetails.Status = 400;
+                    problemDetails.Extensions["materialName"] = materialEx.MaterialName;
+                    problemDetails.Extensions["errorCode"] = "MATERIAL_NAME_EXISTS";
 
                 _logger.LogWarning(exception,
                     "Business exception occurred. Method: {Method}, Path: {Path}, User: {User}, MaterialName: {MaterialName}",
                     method, path, user, materialEx.MaterialName);
                 break;
 
-            case InvalidStockQuantityException stockEx:
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                problemDetails.Title = "Business Rule Violation";
-                problemDetails.Detail = exception.Message;
-                problemDetails.Status = 400;
-                problemDetails.Extensions["stockQuantity"] = stockEx.StockQuantity;
-                problemDetails.Extensions["errorCode"] = "INVALID_STOCK_QUANTITY";
+                case InvalidStockQuantityException stockEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    problemDetails.Title = _localizer["BusinessRuleViolationTitle"];
+                    problemDetails.Detail = exception.Message;
+                    problemDetails.Status = 400;
+                    problemDetails.Extensions["stockQuantity"] = stockEx.StockQuantity;
+                    problemDetails.Extensions["errorCode"] = "INVALID_STOCK_QUANTITY";
 
                 _logger.LogWarning(exception,
                     "Business exception occurred. Method: {Method}, Path: {Path}, User: {User}, StockQuantity: {StockQuantity}",
@@ -106,7 +110,7 @@ public class ExceptionMiddleware
 
             case MaterialNotFoundException notFoundEx:
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                problemDetails.Title = "Business Rule Violation";
+                problemDetails.Title = _localizer["BusinessRuleViolationTitle"];
                 problemDetails.Detail = exception.Message;
                 problemDetails.Status = 400;
                 problemDetails.Extensions["materialId"] = notFoundEx.MaterialId;
@@ -117,26 +121,26 @@ public class ExceptionMiddleware
                     method, path, user, notFoundEx.MaterialId);
                 break;
 
-            case MaterialCannotBeDeletedException deleteEx:
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                problemDetails.Title = "Business Rule Violation";
-                problemDetails.Detail = exception.Message;
-                problemDetails.Status = 400;
-                problemDetails.Extensions["materialId"] = deleteEx.MaterialId;
-                problemDetails.Extensions["errorCode"] = "MATERIAL_CANNOT_BE_DELETED";
+                case MaterialCannotBeDeletedException deleteEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    problemDetails.Title = _localizer["BusinessRuleViolationTitle"];
+                    problemDetails.Detail = exception.Message;
+                    problemDetails.Status = 400;
+                    problemDetails.Extensions["materialId"] = deleteEx.MaterialId;
+                    problemDetails.Extensions["errorCode"] = "MATERIAL_CANNOT_BE_DELETED";
 
                 _logger.LogWarning(exception,
                     "Business exception occurred. Method: {Method}, Path: {Path}, User: {User}, MaterialId: {MaterialId}",
                     method, path, user, deleteEx.MaterialId);
                 break;
 
-            case MaterialPhotoNotFoundException photoEx:
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                problemDetails.Title = "Business Rule Violation";
-                problemDetails.Detail = exception.Message;
-                problemDetails.Status = 400;
-                problemDetails.Extensions["materialId"] = photoEx.MaterialId;
-                problemDetails.Extensions["photoUrl"] = photoEx.PhotoUrl;
+                case MaterialPhotoNotFoundException photoEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    problemDetails.Title = _localizer["BusinessRuleViolationTitle"];
+                    problemDetails.Detail = exception.Message;
+                    problemDetails.Status = 400;
+                    problemDetails.Extensions["materialId"] = photoEx.MaterialId;
+                    problemDetails.Extensions["photoUrl"] = photoEx.PhotoUrl;
                 problemDetails.Extensions["errorCode"] = "MATERIAL_PHOTO_NOT_FOUND";
 
                 _logger.LogWarning(exception,
@@ -144,36 +148,36 @@ public class ExceptionMiddleware
                     method, path, user, photoEx.MaterialId, photoEx.PhotoUrl);
                 break;
 
-            case BaseProductHasVariantsException baseProductEx:
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                problemDetails.Title = "Business Rule Violation";
-                problemDetails.Detail = exception.Message;
-                problemDetails.Status = 400;
-                problemDetails.Extensions["errorCode"] = "BASE_PRODUCT_HAS_VARIANTS";
+                case BaseProductHasVariantsException baseProductEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    problemDetails.Title = _localizer["BusinessRuleViolationTitle"];
+                    problemDetails.Detail = exception.Message;
+                    problemDetails.Status = 400;
+                    problemDetails.Extensions["errorCode"] = "BASE_PRODUCT_HAS_VARIANTS";
 
                 _logger.LogWarning(exception,
                     "Middleware caught BaseProductHasVariantsException. Method: {Method}, Path: {Path}, User: {User}",
                     method, path, user);
                 break;
 
-            case UnauthorizedAccessException authEx:
-                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                problemDetails.Title = "Access Denied";
-                problemDetails.Detail = "You do not have permission to perform this action.";
-                problemDetails.Status = 403;
-                problemDetails.Extensions["errorCode"] = "ACCESS_DENIED";
+                case UnauthorizedAccessException authEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    problemDetails.Title = _localizer["AccessDeniedTitle"];
+                    problemDetails.Detail = _localizer["AccessDeniedDetail"];
+                    problemDetails.Status = 403;
+                    problemDetails.Extensions["errorCode"] = "ACCESS_DENIED";
 
                 _logger.LogWarning(exception,
                     "Authorization exception occurred. Method: {Method}, Path: {Path}, User: {User}",
                     method, path, user);
                 break;
 
-            default:
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                problemDetails.Title = "Internal Server Error";
-                problemDetails.Detail = "An unexpected error occurred while processing your request.";
-                problemDetails.Status = 500;
-                problemDetails.Extensions["errorCode"] = "INTERNAL_SERVER_ERROR";
+                default:
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    problemDetails.Title = _localizer["InternalServerErrorTitle"];
+                    problemDetails.Detail = _localizer["InternalServerErrorDetail"];
+                    problemDetails.Status = 500;
+                    problemDetails.Extensions["errorCode"] = "INTERNAL_SERVER_ERROR";
 
                 _logger.LogError(exception,
                     "Unhandled exception occurred. Method: {Method}, Path: {Path}, User: {User}",

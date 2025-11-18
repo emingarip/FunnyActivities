@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.DTOs.UserManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.UserManagement;
 
@@ -8,14 +9,14 @@ public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequ
     public ResetPasswordRequestValidator()
     {
         RuleFor(x => x.Token)
-            .NotEmpty().WithMessage("Token is required.");
+            .NotEmpty().WithMessage(ValidationMessageProvider.Get("TokenRequired"));
 
         RuleFor(x => x.NewPassword)
-            .NotEmpty().WithMessage("New password is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")
-            .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
-            .Matches(@"[a-z]").WithMessage("Password must contain at least one lowercase letter.")
-            .Matches(@"[0-9]").WithMessage("Password must contain at least one number.")
-            .Matches(@"[\W]").WithMessage("Password must contain at least one special character.");
+            .NotEmpty().WithMessage(ValidationMessageProvider.Get("NewPasswordRequired"))
+            .MinimumLength(8).WithMessage(ValidationMessageProvider.Get("PasswordMinLength"))
+            .Matches(@"[A-Z]").WithMessage(ValidationMessageProvider.Get("PasswordUppercase"))
+            .Matches(@"[a-z]").WithMessage(ValidationMessageProvider.Get("PasswordLowercase"))
+            .Matches(@"[0-9]").WithMessage(ValidationMessageProvider.Get("PasswordNumber"))
+            .Matches(@"[\W]").WithMessage(ValidationMessageProvider.Get("PasswordSpecial"));
     }
 }

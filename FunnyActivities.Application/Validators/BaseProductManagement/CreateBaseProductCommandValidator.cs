@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Commands.BaseProductManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.BaseProductManagement
 {
@@ -15,27 +16,23 @@ namespace FunnyActivities.Application.Validators.BaseProductManagement
         {
             // Name validation
             RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage("Name is required.")
-                .MaximumLength(100)
-                .WithMessage("Name cannot exceed 100 characters.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("NameRequired"))
+                .MaximumLength(100).WithMessage(ValidationMessageProvider.Get("NameMax100"));
 
             // Description validation
             RuleFor(x => x.Description)
-                .MaximumLength(500)
-                .WithMessage("Description cannot exceed 500 characters.")
+                .MaximumLength(500).WithMessage(ValidationMessageProvider.Get("DescriptionMax500"))
                 .When(x => !string.IsNullOrEmpty(x.Description));
 
             // CategoryId validation
             RuleFor(x => x.CategoryId)
                 .Must(x => x == null || x != Guid.Empty)
-                .WithMessage("CategoryId must be a valid GUID if provided.")
+                .WithMessage(ValidationMessageProvider.Get("CategoryIdInvalid"))
                 .When(x => x.CategoryId.HasValue);
 
             // UserId validation
             RuleFor(x => x.UserId)
-                .NotEmpty()
-                .WithMessage("User ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("UserIdRequired"));
         }
     }
 }

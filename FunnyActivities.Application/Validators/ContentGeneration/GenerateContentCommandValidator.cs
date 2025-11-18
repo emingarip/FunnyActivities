@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Commands.ContentGeneration;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.ContentGeneration
 {
@@ -8,21 +9,21 @@ namespace FunnyActivities.Application.Validators.ContentGeneration
         public GenerateContentCommandValidator()
         {
             RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("UserIdRequired"));
 
             RuleFor(x => x.PersonaId)
-                .NotEmpty().WithMessage("Persona ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("PersonaIdRequired"));
 
             RuleFor(x => x.ActivityId)
-                .NotEmpty().WithMessage("Activity ID is required.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("ActivityIdRequired"));
 
             RuleFor(x => x.CustomPrompt)
-                .MaximumLength(1000).WithMessage("Custom prompt must not exceed 1000 characters.")
+                .MaximumLength(1000).WithMessage(ValidationMessageProvider.Get("CustomPromptMax1000"))
                 .When(x => !string.IsNullOrEmpty(x.CustomPrompt));
 
             RuleFor(x => x.Model)
-                .NotEmpty().WithMessage("Model is required.")
-                .Must(BeValidModel).WithMessage("Invalid model specified.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("ModelRequired"))
+                .Must(BeValidModel).WithMessage(ValidationMessageProvider.Get("ModelInvalid"));
         }
 
         private bool BeValidModel(string model)
