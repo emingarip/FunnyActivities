@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, Button, Grid } from '@mui/material';
 import { useUserCount } from '../hooks/useUserCount';
 import { useOnlineUsers } from '../hooks/useOnlineUsers';
 import UserGrowthChart from '../components/charts/UserGrowthChart';
 import './AdminDashboard.css';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface DashboardStats {
   totalUsers: number;
@@ -14,48 +15,52 @@ interface DashboardStats {
   regularUsers: number;
 }
 
+const formatWithPlaceholder = (template: string, value: string | number) =>
+  template.replace('{0}', String(value));
 
 const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const { t } = useTranslation();
 
-  // Use hooks for data fetching
   const {
     data: userCountData,
     isLoading: countLoading,
     error: countError,
-    refetch: refetchCount
+    refetch: refetchCount,
   } = useUserCount();
 
   const {
     data: onlineUsersData,
     isLoading: onlineUsersLoading,
     error: onlineUsersError,
-    refetch: refetchOnlineUsers
+    refetch: refetchOnlineUsers,
   } = useOnlineUsers();
 
   const loading = countLoading || onlineUsersLoading;
   const error = countError || (onlineUsersError as Error | null);
 
-  // Update stats when user count data is available
   React.useEffect(() => {
     if (userCountData) {
-      setStats(prev => prev ? { ...prev, totalUsers: userCountData.totalUsers } : {
-        totalUsers: userCountData.totalUsers,
-        activeUsers: 142,
-        inactiveUsers: 8,
-        adminUsers: 3,
-        regularUsers: 147
-      });
+      setStats((prev) =>
+        prev
+          ? { ...prev, totalUsers: userCountData.totalUsers }
+          : {
+              totalUsers: userCountData.totalUsers,
+              activeUsers: 142,
+              inactiveUsers: 8,
+              adminUsers: 3,
+              regularUsers: 147,
+            }
+      );
     }
   }, [userCountData]);
-
 
   if (loading) {
     return (
       <div className="page-container">
         <div className="loading">
           <div className="spinner"></div>
-          Loading dashboard...
+          {t('admin_loading')}
         </div>
       </div>
     );
@@ -65,10 +70,16 @@ const AdminDashboard: React.FC = () => {
     return (
       <div className="page-container">
         <div className="error">
-          {error.message || 'Error loading data'}
+          {error.message || t('admin_error')}
           <div className="retry-buttons">
-            <button onClick={() => { refetchCount(); if (refetchOnlineUsers) refetchOnlineUsers(); }} className="retry-btn">
-              Retry
+            <button
+              onClick={() => {
+                refetchCount();
+                if (refetchOnlineUsers) refetchOnlineUsers();
+              }}
+              className="retry-btn"
+            >
+              {t('admin_retry')}
             </button>
           </div>
         </div>
@@ -78,22 +89,22 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="page-container">
-      <h1 aria-label={`Admin Dashboard - Total users: ${stats?.totalUsers || 0}`}>
-        Admin Dashboard - Total Users: {stats?.totalUsers || 0}
+      <h1 aria-label={formatWithPlaceholder(t('admin_title'), stats?.totalUsers || 0)}>
+        {formatWithPlaceholder(t('admin_title'), stats?.totalUsers || 0)}
       </h1>
-  
+
       {/* Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card">
-          <h3>Total Users</h3>
+          <h3>{t('admin_stats_total')}</h3>
           <p className="stat-number">{stats?.totalUsers || 0}</p>
         </div>
         <div className="stat-card">
-          <h3>Online Users</h3>
+          <h3>{t('admin_stats_online')}</h3>
           <p className="stat-number">{onlineUsersData || 0}</p>
           <div className="online-indicator">
             <span className="online-dot"></span>
-            Live Data
+            {t('admin_stats_live')}
           </div>
         </div>
       </div>
@@ -109,7 +120,7 @@ const AdminDashboard: React.FC = () => {
           <Card>
             <CardContent>
               <Button component={Link} to="/admin/activities" variant="contained" color="primary">
-                Manage Activities
+                {t('admin_manage_activities')}
               </Button>
             </CardContent>
           </Card>
@@ -118,7 +129,7 @@ const AdminDashboard: React.FC = () => {
           <Card>
             <CardContent>
               <Button component={Link} to="/admin/personas" variant="contained" color="primary">
-                Manage Personas
+                {t('admin_manage_personas')}
               </Button>
             </CardContent>
           </Card>
@@ -127,7 +138,7 @@ const AdminDashboard: React.FC = () => {
           <Card>
             <CardContent>
               <Button component={Link} to="/admin/products" variant="contained" color="primary">
-                Manage Products
+                {t('admin_manage_products')}
               </Button>
             </CardContent>
           </Card>
@@ -136,7 +147,7 @@ const AdminDashboard: React.FC = () => {
           <Card>
             <CardContent>
               <Button component={Link} to="/admin/materials" variant="contained" color="primary">
-                Manage Materials
+                {t('admin_manage_materials')}
               </Button>
             </CardContent>
           </Card>
@@ -145,7 +156,7 @@ const AdminDashboard: React.FC = () => {
           <Card>
             <CardContent>
               <Button component={Link} to="/admin/surveys" variant="contained" color="primary">
-                Manage Surveys
+                {t('admin_manage_surveys')}
               </Button>
             </CardContent>
           </Card>
@@ -154,20 +165,37 @@ const AdminDashboard: React.FC = () => {
 
       {/* System Settings */}
       <div className="system-settings">
-        <h2>System Settings</h2>
+        <h2>{t('admin_system_settings')}</h2>
         <div className="settings-grid">
           <div className="setting-item">
-            <h4>User Registration</h4>
-            <button className="btn btn-secondary">Configure</button>
+            <h4>{t('admin_setting_user_registration')}</h4>
+            <p>{formatWithPlaceholder(t('admin_setting_min_password'), 8)}</p>
+            <p>{t('admin_setting_email_verification')}</p>
           </div>
-          <div className="setting-item">
-            <h4>Email Settings</h4>
-            <button className="btn btn-secondary">Configure</button>
-          </div>
-          <div className="setting-item">
-            <h4>Security Settings</h4>
-            <button className="btn btn-secondary">Configure</button>
-          </div>
+        </div>
+      </div>
+
+      {/* Activity Logs */}
+      <div className="activity-logs">
+        <h2>{t('admin_activity_logs')}</h2>
+        <div className="logs-actions">
+          <Button variant="outlined" color="primary">
+            {t('admin_activity_download')}
+          </Button>
+          <Button variant="text" color="primary">
+            {t('admin_activity_view')}
+          </Button>
+        </div>
+      </div>
+
+      {/* Maintenance Section */}
+      <div className="maintenance">
+        <h2>{t('admin_maintenance')}</h2>
+        <div className="maintenance-card">
+          <p>{t('admin_maintenance_tips')}</p>
+          <Button variant="contained" color="secondary">
+            {t('admin_maintenance_mode')}
+          </Button>
         </div>
       </div>
     </div>

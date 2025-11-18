@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ProductsRetrieved" xml:space="preserve"><value>Products retrieved successfully</value></data>
+  <data name="ProductNotFound" xml:space="preserve"><value>Product not found</value></data>
+  <data name="ProductRetrieved" xml:space="preserve"><value>Product retrieved successfully</value></data>
+  <data name="BaseProductCreated" xml:space="preserve"><value>Base product created successfully</value></data>
+  <data name="BaseProductCreateValidationError" xml:space="preserve"><value>Unable to create base product: {0}. Please check your input and try again.</value></data>
+  <data name="BaseProductCreateUnexpected" xml:space="preserve"><value>An error occurred while creating the base product</value></data>
+  <data name="BaseProductUpdated" xml:space="preserve"><value>Base product updated successfully</value></data>
+  <data name="BaseProductUpdateNotFound" xml:space="preserve"><value>The base product you're trying to update could not be found. Please verify the ID and try again.</value></data>
+  <data name="BaseProductUpdateValidationError" xml:space="preserve"><value>Unable to update base product: {0}. Please review your changes and try again.</value></data>
+  <data name="BaseProductUpdateUnexpected" xml:space="preserve"><value>An error occurred while updating the base product</value></data>
+  <data name="BaseProductDeleted" xml:space="preserve"><value>Base product deleted successfully</value></data>
+  <data name="BaseProductDeleteNotFound" xml:space="preserve"><value>The base product you're trying to delete could not be found. Please verify the ID and try again.</value></data>
+  <data name="BaseProductDeleteUnexpected" xml:space="preserve"><value>An error occurred while deleting the base product</value></data>
+  <data name="ProductVariantsRetrieved" xml:space="preserve"><value>Product variants retrieved successfully</value></data>
+  <data name="ProductVariantNotFound" xml:space="preserve"><value>Product variant not found</value></data>
+  <data name="ProductVariantRetrieved" xml:space="preserve"><value>Product variant retrieved successfully</value></data>
+  <data name="ProductVariantCreated" xml:space="preserve"><value>Product variant created successfully</value></data>
+  <data name="ProductVariantCreateValidationError" xml:space="preserve"><value>Unable to create product variant: {0}. Please check your input and try again.</value></data>
+  <data name="ProductVariantCreateUnexpected" xml:space="preserve"><value>An error occurred while creating the product variant</value></data>
+  <data name="ProductVariantUpdated" xml:space="preserve"><value>Product variant updated successfully</value></data>
+  <data name="ProductVariantUpdateNotFound" xml:space="preserve"><value>The product variant you're trying to update could not be found. Please verify the ID and try again.</value></data>
+  <data name="ProductVariantUpdateValidationError" xml:space="preserve"><value>Unable to update product variant: {0}. Please review your changes and try again.</value></data>
+  <data name="ProductVariantUpdateUnexpected" xml:space="preserve"><value>An error occurred while updating the product variant</value></data>
+  <data name="ProductVariantDeleted" xml:space="preserve"><value>Product variant deleted successfully</value></data>
+  <data name="ProductVariantDeleteNotFound" xml:space="preserve"><value>The product variant you're trying to delete could not be found. Please verify the ID and try again.</value></data>
+  <data name="ProductVariantDeleteUnexpected" xml:space="preserve"><value>An error occurred while deleting the product variant</value></data>
+  <data name="BulkUpdateCompleted" xml:space="preserve"><value>Bulk update completed successfully</value></data>
+  <data name="BulkUpdateError" xml:space="preserve"><value>An error occurred during bulk update</value></data>
+</root>

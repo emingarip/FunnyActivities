@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.DTOs.UserManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.UserManagement;
 
@@ -8,25 +9,25 @@ public class RegisterUserRequestValidator : AbstractValidator<RegisterUserReques
     public RegisterUserRequestValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress().WithMessage("Invalid email format.")
-            .Must(BeValidEmail).WithMessage("Email must be from a valid domain.");
+            .NotEmpty().WithMessage(ValidationMessageProvider.Get("EmailRequired"))
+            .EmailAddress().WithMessage(ValidationMessageProvider.Get("InvalidEmailFormat"))
+            .Must(BeValidEmail).WithMessage(ValidationMessageProvider.Get("EmailDomainInvalid"));
 
         RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")
-            .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
-            .Matches(@"[a-z]").WithMessage("Password must contain at least one lowercase letter.")
-            .Matches(@"[0-9]").WithMessage("Password must contain at least one number.")
-            .Matches(@"[\W]").WithMessage("Password must contain at least one special character.");
+            .NotEmpty().WithMessage(ValidationMessageProvider.Get("PasswordRequired"))
+            .MinimumLength(8).WithMessage(ValidationMessageProvider.Get("PasswordMinLength"))
+            .Matches(@"[A-Z]").WithMessage(ValidationMessageProvider.Get("PasswordUppercase"))
+            .Matches(@"[a-z]").WithMessage(ValidationMessageProvider.Get("PasswordLowercase"))
+            .Matches(@"[0-9]").WithMessage(ValidationMessageProvider.Get("PasswordNumber"))
+            .Matches(@"[\W]").WithMessage(ValidationMessageProvider.Get("PasswordSpecial"));
 
         RuleFor(x => x.FirstName)
-            .NotEmpty().WithMessage("First name is required.")
-            .MaximumLength(50).WithMessage("First name must not exceed 50 characters.");
+            .NotEmpty().WithMessage(ValidationMessageProvider.Get("FirstNameRequired"))
+            .MaximumLength(50).WithMessage(ValidationMessageProvider.Get("FirstNameMax"));
 
         RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("Last name is required.")
-            .MaximumLength(50).WithMessage("Last name must not exceed 50 characters.");
+            .NotEmpty().WithMessage(ValidationMessageProvider.Get("LastNameRequired"))
+            .MaximumLength(50).WithMessage(ValidationMessageProvider.Get("LastNameMax"));
     }
 
     private bool BeValidEmail(string email)

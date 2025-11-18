@@ -32,6 +32,7 @@ import {
   Person as PersonIcon,
 } from '@mui/icons-material';
 import api from '../services/api';
+import { useTranslation } from '../hooks/useTranslation';
 import PersonaForm from '../components/admin/PersonaForm';
 import PersonaDetails from '../components/admin/PersonaDetails';
 
@@ -104,6 +105,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const PersonaAdmin: React.FC = () => {
+  const { t } = useTranslation();
   console.log('[PersonaAdmin] Component rendered');
 
   const theme = useTheme();
@@ -146,7 +148,7 @@ const PersonaAdmin: React.FC = () => {
       setPersonas(personas);
     } catch (err: any) {
       console.error('[PersonaAdmin] Error loading personas:', err);
-      setError('Failed to load personas');
+      setError(t('personaAdmin.failedToLoad'));
     } finally {
       setLoading(false);
       console.log('[PersonaAdmin] loadData completed');
@@ -173,7 +175,8 @@ const PersonaAdmin: React.FC = () => {
   };
 
   const handleDeletePersona = async (persona: Persona) => {
-    if (!window.confirm(`Are you sure you want to delete "${persona.name}"?`)) {
+    const confirmText = t('personaAdmin.confirmDelete').replace('{0}', persona.name);
+    if (!window.confirm(confirmText)) {
       return;
     }
 
@@ -182,7 +185,7 @@ const PersonaAdmin: React.FC = () => {
       await loadData(); // Refresh the list
     } catch (err: any) {
       console.error('Error deleting persona:', err);
-      setError('Failed to delete persona');
+      setError(t('personaAdmin.failedToDelete'));
     }
   };
 
@@ -203,9 +206,9 @@ const PersonaAdmin: React.FC = () => {
   };
 
   const formatCharacteristics = (characteristics: PersonaCharacteristic[]) => {
-    if (!characteristics || characteristics.length === 0) return 'No characteristics';
+    if (!characteristics || characteristics.length === 0) return t('personaAdmin.noCharacteristics');
     return characteristics.slice(0, 3).map(c => `${c.name}: ${c.value}`).join(', ') +
-           (characteristics.length > 3 ? ` (+${characteristics.length - 3} more)` : '');
+           (characteristics.length > 3 ? ` (+${characteristics.length - 3} ${t('personaAdmin.moreCharacteristics')})` : '');
   };
 
   const getActivityCount = (activityAssociations: PersonaActivityAssociation[]) => {
@@ -225,7 +228,7 @@ const PersonaAdmin: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#333', fontWeight: 600 }}>
-        Persona Management
+        {t('personaAdmin.title')}
       </Typography>
 
       {error && (
@@ -237,7 +240,7 @@ const PersonaAdmin: React.FC = () => {
       <Paper sx={{ width: '100%', mb: 2, boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={activeTab} onChange={handleTabChange} aria-label="persona admin tabs">
-            <Tab label="Personas" id="persona-admin-tab-0" aria-controls="persona-admin-tabpanel-0" />
+            <Tab label={t('personaAdmin.tabPersonas')} id="persona-admin-tab-0" aria-controls="persona-admin-tabpanel-0" />
           </Tabs>
         </Box>
 
@@ -249,21 +252,21 @@ const PersonaAdmin: React.FC = () => {
               onClick={handleCreatePersona}
               sx={{ mb: 2 }}
             >
-              Create Persona
+              {t('personaAdmin.createPersona')}
             </Button>
           </Box>
 
           {/* Association Management Section */}
           <Box sx={{ mt: 4, mb: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Activity Association Management
+              {t('personaAdmin.activityAssociationManagement')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Manage activity preferences for personas. You can add, update, or remove activity associations.
+              {t('personaAdmin.activityAssociationDescription')}
             </Typography>
             <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="body2">
-                <strong>Tip:</strong> Use the "Edit" button on any persona to manage their activity associations directly in the form.
+                {t('personaAdmin.activityAssociationTip')}
               </Typography>
             </Alert>
           </Box>
@@ -272,13 +275,13 @@ const PersonaAdmin: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Demographics</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Characteristics</TableCell>
-                  <TableCell>Activities</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{t('personaAdmin.tableName')}</TableCell>
+                  <TableCell>{t('personaAdmin.tableDemographics')}</TableCell>
+                  <TableCell>{t('personaAdmin.tableDescription')}</TableCell>
+                  <TableCell>{t('personaAdmin.tableCharacteristics')}</TableCell>
+                  <TableCell>{t('personaAdmin.tableActivities')}</TableCell>
+                  <TableCell>{t('personaAdmin.tableCreated')}</TableCell>
+                  <TableCell align="right">{t('personaAdmin.tableActions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -296,7 +299,7 @@ const PersonaAdmin: React.FC = () => {
                           </Typography>
                           {avatar && (
                             <Typography variant="body2" color="text.secondary">
-                              Has avatar
+                              {t('personaAdmin.hasAvatar')}
                             </Typography>
                           )}
                         </Box>
@@ -306,29 +309,29 @@ const PersonaAdmin: React.FC = () => {
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                         {persona.age && (
                           <Typography variant="body2">
-                            Age: {persona.age}
+                            {t('personaAdmin.age')}: {persona.age}
                           </Typography>
                         )}
                         {persona.gender && (
                           <Typography variant="body2">
-                            Gender: {persona.gender}
+                            {t('personaAdmin.gender')}: {persona.gender}
                           </Typography>
                         )}
                         {persona.nationality && (
                           <Typography variant="body2">
-                            Nationality: {persona.nationality}
+                            {t('personaAdmin.nationality')}: {persona.nationality}
                           </Typography>
                         )}
                         {!persona.age && !persona.gender && !persona.nationality && (
                           <Typography variant="body2" color="text.secondary">
-                            No demographics
+                            {t('personaAdmin.noDemographics')}
                           </Typography>
                         )}
                       </Box>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
-                        {persona.description || 'No description'}
+                        {persona.description || t('personaAdmin.noDescription')}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -338,7 +341,7 @@ const PersonaAdmin: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={`${getActivityCount(persona.activityAssociations)} activities`}
+                        label={`${getActivityCount(persona.activityAssociations)} ${t('personaAdmin.activitiesCount')}`}
                         size="small"
                         variant="outlined"
                       />
@@ -353,7 +356,7 @@ const PersonaAdmin: React.FC = () => {
                         size="small"
                         onClick={() => handleViewPersona(persona)}
                         color="info"
-                        title="View details"
+                        title={t('personaAdmin.viewDetails')}
                       >
                         <PersonIcon />
                       </IconButton>
@@ -379,7 +382,7 @@ const PersonaAdmin: React.FC = () => {
                   <TableRow>
                     <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                       <Typography variant="body1" color="text.secondary">
-                        No personas found. Create your first persona to get started.
+                        {t('personaAdmin.noPersonasFound')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -399,7 +402,7 @@ const PersonaAdmin: React.FC = () => {
         fullScreen={isMobile}
       >
         <DialogTitle>
-          {selectedPersona ? 'Edit Persona' : 'Create New Persona'}
+          {selectedPersona ? t('personaAdmin.editPersona') : t('personaAdmin.createNewPersona')}
         </DialogTitle>
         <DialogContent>
           <PersonaForm
@@ -419,7 +422,7 @@ const PersonaAdmin: React.FC = () => {
         fullScreen={isMobile}
       >
         <DialogTitle>
-          Persona Details
+          {t('personaAdmin.personaDetails')}
         </DialogTitle>
         <DialogContent>
           {selectedPersona && (
@@ -427,7 +430,7 @@ const PersonaAdmin: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDetailsClose}>Close</Button>
+          <Button onClick={handleDetailsClose}>{t('personaAdmin.close')}</Button>
         </DialogActions>
       </Dialog>
     </Container>

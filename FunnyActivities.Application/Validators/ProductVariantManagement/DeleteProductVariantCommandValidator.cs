@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Commands.ProductVariantManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.ProductVariantManagement
 {
@@ -16,12 +17,12 @@ namespace FunnyActivities.Application.Validators.ProductVariantManagement
             // Id validation
             RuleFor(x => x.Id)
                 .NotEmpty()
-                .WithMessage("Product variant ID is required.");
+                .WithMessage(ValidationMessageProvider.Get("ProductVariantIdRequired"));
 
             // UserId validation
             RuleFor(x => x.UserId)
                 .NotEmpty()
-                .WithMessage("User ID is required.");
+                .WithMessage(ValidationMessageProvider.Get("UserIdRequired"));
         }
     }
 }

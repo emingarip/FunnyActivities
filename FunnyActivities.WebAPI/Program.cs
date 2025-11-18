@@ -1,14 +1,18 @@
-using FunnyActivities.CrossCuttingConcerns;
+ï»¿using FunnyActivities.CrossCuttingConcerns;
 using FunnyActivities.CrossCuttingConcerns.APIDocumentation;
+using FunnyActivities.CrossCuttingConcerns.Logging;
 using FunnyActivities.Infrastructure;
 using FunnyActivities.WebAPI.Extensions;
 using FunnyActivities.WebAPI.Middleware;
-using Microsoft.EntityFrameworkCore;
 using MediatR;
-using Prometheus;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Minio;
+using Prometheus;
 using Serilog;
-using FunnyActivities.CrossCuttingConcerns.Logging;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +23,13 @@ SerilogConfiguration.ConfigureSerilog(builder.Configuration);
 builder.Host.UseSerilog();
 
 // Controller'lari ekle
-FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddControllers(builder.Services);  
+FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddControllers(builder.Services);
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+var localizationSection = builder.Configuration.GetSection("Localization");
+var defaultCulture = localizationSection["DefaultCulture"] ?? "tr-TR";
+var supportedCultureCodes = localizationSection.GetSection("SupportedCultures").Get<string[]>() ?? new[] { "tr-TR", "en-US" };
+var supportedCultures = supportedCultureCodes.Select(code => new CultureInfo(code)).ToList();
 
 // Application Insights'i yapilandir
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddApplicationInsights(builder.Services);
@@ -36,13 +46,13 @@ FunnyActivities.CrossCuttingConcerns.ServiceCollectionExtensions.AddJwtAuthentic
 // Yetkilendirme (Authorization) politikalarini ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddAuthorizationPolicies(builder.Services);
 
-// Özel yetkilendirme handler'larini kaydet
+// ï¿½zel yetkilendirme handler'larini kaydet
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddAuthorizationHandlers(builder.Services);
 
 // API versiyonlamayi ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddApiVersioning(builder.Services);
 
-// Swagger (API dokümantasyonu) ekle
+// Swagger (API dokumantasyonu) ekle
 builder.Services.AddSwagger();
 
 // CORS (Cross-Origin Resource Sharing) politikasini ekle
@@ -60,10 +70,10 @@ builder.Services.AddMinio(builder.Configuration);
 // Resim isleme ve MinIO servislerini ekle
 builder.Services.AddImageProcessingServices();
 
-// Dosya yükleme ayarlarini ekle
+// Dosya yï¿½kleme ayarlarini ekle
 builder.Services.AddFileUploadConfiguration(builder.Configuration);
 
-// Dosya yükleme servislerini ekle
+// Dosya yï¿½kleme servislerini ekle
 builder.Services.AddFileUploadServices();
 
 // Bildirim servislerini ekle
@@ -81,10 +91,10 @@ builder.Services.AddLoggingServices();
 // MediatR'i ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddMediatR(builder.Services);
 
-// HttpContextAccessor'i ekle (Audit loglama gibi islemler için)
+// HttpContextAccessor'i ekle (Audit loglama gibi islemler icin)
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddHttpContextAccessor(builder.Services);
 
-// Redis (caching için) ekle
+// Redis (caching icin) ekle
 builder.Services.AddRedis(builder.Configuration);
 
 
@@ -92,7 +102,19 @@ builder.Services.AddRedis(builder.Configuration);
 
 var app = builder.Build();
 
-// Veritabani migration'larini uygula (sadece iliskisel veritabanlari için)
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures,
+    ApplyCurrentCultureToResponseHeaders = true,
+    FallBackToParentCultures = true,
+    FallBackToParentUICultures = true
+};
+localizationOptions.SetDefaultCulture(defaultCulture);
+app.UseRequestLocalization(localizationOptions);
+
+// Veritabani migration'larini uygula (sadece iliskisel veritabanlari icin)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -116,24 +138,24 @@ using (var scope = app.Services.CreateScope())
 // Gelistirme ortamindaysa Swagger ve gelistirici hata sayfasini kullan
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwaggerDocumentation(); // Özel Swagger extension metodunuz
+    app.UseSwaggerDocumentation(); // ï¿½zel Swagger extension metodunuz
 }
 
-// Hatalari merkezi olarak yakalamak için custom exception middleware'ini kullan
+// Hatalari merkezi olarak yakalamak icin custom exception middleware'ini kullan
 app.UseCustomExceptionHandling();
 
-// Gelen istekleri HTTP'den HTTPS'e yönlendir
+// Gelen istekleri HTTP'den HTTPS'e yonlendir
 app.UseHttpsRedirection();
 
-// Yönlendirme (Routing) middleware'ini ekle. Bu, istegin hangi endpoint'e gidecegini belirler.
+// Yonlendirme (Routing) middleware'ini ekle. Bu, istegin hangi endpoint'e gidecegini belirler.
 app.UseRouting();
 
-// Prometheus metriklerini toplamak için (UseRouting'den sonra gelmeli)
+// Prometheus metriklerini toplamak icin (UseRouting'den sonra gelmeli)
 app.UseHttpMetrics();
 
 // CORS middleware'ini ekle. Tarayicilarin farkli domain'lerden API'ye erisimine izin verir.
-// Güvenlik middleware'larindan (Authentication/Authorization) önce gelmelidir.
-app.UseCors("AllowAllOrigins"); // Development için tüm origin'lere izin ver
+// Guvenlik middleware'larindan (Authentication/Authorization) once gelmelidir.
+app.UseCors("AllowAllOrigins"); // Development icin tum origin'lere izin ver
 
 // Kimlik dogrulama (Authentication) middleware'ini ekle. Gelen JWT'yi dogrular.
 app.UseAuthentication();
@@ -142,25 +164,25 @@ app.UseAuthenticationMiddleware(); // Sizin custom middleware'iniz
 // Yetkilendirme (Authorization) middleware'ini ekle. [Authorize] attributelarini denetler.
 app.UseAuthorization();
 
-// Yanitlari önbellege almak için (istege bagli)
+// Yanitlari onbellege almak icin (istege bagli)
 app.UseResponseCaching();
 
-// Diger özel middleware'lariniz (rol dogrulama, loglama vb.)
+// Diger ozel middleware'lariniz (rol dogrulama, loglama vb.)
 app.UseMiddleware<RoleValidationMiddleware>();
 app.UseMiddleware<AuditLoggingMiddleware>();
 
 // Prometheus metrik sunucusunu endpoint olarak ekle
 app.UseMetricServer();
 
-// Controller endpoint'lerini haritala. Bu, gelen istegi dogru Controller Action'ina yönlendirir.
+// Controller endpoint'lerini haritala. Bu, gelen istegi dogru Controller Action'ina yonlendirir.
 app.MapControllers();
 
 // Health check endpoint'ini haritala
 app.MapHealthChecks("/health");
 
-// Uygulamayi çalistir
+// Uygulamayi calistir
 await app.RunAsync();
 
 
-// Entegrasyon testleri için Program sinifini public yap
+// Entegrasyon testleri icin Program sinifini public yap
 public partial class Program { }

@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.DTOs.UserManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.UserManagement;
 
@@ -8,10 +9,10 @@ public class LoginRequestValidator : AbstractValidator<LoginRequest>
     public LoginRequestValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress().WithMessage("Invalid email format.");
+            .NotEmpty().WithMessage(ValidationMessageProvider.Get("EmailRequired"))
+            .EmailAddress().WithMessage(ValidationMessageProvider.Get("InvalidEmailFormat"));
 
         RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required.");
+            .NotEmpty().WithMessage(ValidationMessageProvider.Get("PasswordRequired"));
     }
 }

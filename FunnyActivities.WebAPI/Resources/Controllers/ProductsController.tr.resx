@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ProductsRetrieved" xml:space="preserve"><value>Ürünler başarıyla getirildi</value></data>
+  <data name="ProductNotFound" xml:space="preserve"><value>Ürün bulunamadı</value></data>
+  <data name="ProductRetrieved" xml:space="preserve"><value>Ürün başarıyla getirildi</value></data>
+  <data name="BaseProductCreated" xml:space="preserve"><value>Temel ürün başarıyla oluşturuldu</value></data>
+  <data name="BaseProductCreateValidationError" xml:space="preserve"><value>Temel ürün oluşturulamadı: {0}. Lütfen girdilerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="BaseProductCreateUnexpected" xml:space="preserve"><value>Temel ürün oluşturulurken bir hata oluştu</value></data>
+  <data name="BaseProductUpdated" xml:space="preserve"><value>Temel ürün başarıyla güncellendi</value></data>
+  <data name="BaseProductUpdateNotFound" xml:space="preserve"><value>Güncellemeye çalıştığınız temel ürün bulunamadı. Lütfen ID'yi doğrulayıp tekrar deneyin.</value></data>
+  <data name="BaseProductUpdateValidationError" xml:space="preserve"><value>Temel ürün güncellenemedi: {0}. Lütfen değişikliklerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="BaseProductUpdateUnexpected" xml:space="preserve"><value>Temel ürün güncellenirken bir hata oluştu</value></data>
+  <data name="BaseProductDeleted" xml:space="preserve"><value>Temel ürün başarıyla silindi</value></data>
+  <data name="BaseProductDeleteNotFound" xml:space="preserve"><value>Silmek istediğiniz temel ürün bulunamadı. Lütfen ID'yi doğrulayıp tekrar deneyin.</value></data>
+  <data name="BaseProductDeleteUnexpected" xml:space="preserve"><value>Temel ürün silinirken bir hata oluştu</value></data>
+  <data name="ProductVariantsRetrieved" xml:space="preserve"><value>Ürün varyantları başarıyla getirildi</value></data>
+  <data name="ProductVariantNotFound" xml:space="preserve"><value>Ürün varyantı bulunamadı</value></data>
+  <data name="ProductVariantRetrieved" xml:space="preserve"><value>Ürün varyantı başarıyla getirildi</value></data>
+  <data name="ProductVariantCreated" xml:space="preserve"><value>Ürün varyantı başarıyla oluşturuldu</value></data>
+  <data name="ProductVariantCreateValidationError" xml:space="preserve"><value>Ürün varyantı oluşturulamadı: {0}. Lütfen girdilerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="ProductVariantCreateUnexpected" xml:space="preserve"><value>Ürün varyantı oluşturulurken bir hata oluştu</value></data>
+  <data name="ProductVariantUpdated" xml:space="preserve"><value>Ürün varyantı başarıyla güncellendi</value></data>
+  <data name="ProductVariantUpdateNotFound" xml:space="preserve"><value>Güncellemeye çalıştığınız ürün varyantı bulunamadı. Lütfen ID'yi doğrulayıp tekrar deneyin.</value></data>
+  <data name="ProductVariantUpdateValidationError" xml:space="preserve"><value>Ürün varyantı güncellenemedi: {0}. Lütfen değişikliklerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="ProductVariantUpdateUnexpected" xml:space="preserve"><value>Ürün varyantı güncellenirken bir hata oluştu</value></data>
+  <data name="ProductVariantDeleted" xml:space="preserve"><value>Ürün varyantı başarıyla silindi</value></data>
+  <data name="ProductVariantDeleteNotFound" xml:space="preserve"><value>Silmek istediğiniz ürün varyantı bulunamadı. Lütfen ID'yi doğrulayıp tekrar deneyin.</value></data>
+  <data name="ProductVariantDeleteUnexpected" xml:space="preserve"><value>Ürün varyantı silinirken bir hata oluştu</value></data>
+  <data name="BulkUpdateCompleted" xml:space="preserve"><value>Toplu güncelleme başarıyla tamamlandı</value></data>
+  <data name="BulkUpdateError" xml:space="preserve"><value>Toplu güncelleme sırasında bir hata oluştu</value></data>
+</root>

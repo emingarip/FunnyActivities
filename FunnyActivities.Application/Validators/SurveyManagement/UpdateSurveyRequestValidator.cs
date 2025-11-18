@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.DTOs.SurveyManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.SurveyManagement
 {
@@ -14,36 +15,36 @@ namespace FunnyActivities.Application.Validators.SurveyManagement
         public UpdateSurveyRequestValidator()
         {
             RuleFor(x => x.Title)
-                .MaximumLength(200).WithMessage("Survey title cannot exceed 200 characters")
-                .MinimumLength(3).WithMessage("Survey title must be at least 3 characters long")
+                .MaximumLength(200).WithMessage(ValidationMessageProvider.Get("SurveyTitleMax200"))
+                .MinimumLength(3).WithMessage(ValidationMessageProvider.Get("SurveyTitleMin3"))
                 .When(x => !string.IsNullOrEmpty(x.Title));
 
             RuleFor(x => x.Description)
-                .MaximumLength(1000).WithMessage("Survey description cannot exceed 1000 characters")
+                .MaximumLength(1000).WithMessage(ValidationMessageProvider.Get("SurveyDescriptionMax1000"))
                 .When(x => !string.IsNullOrEmpty(x.Description));
 
             RuleFor(x => x.StartDate)
                 .Must(date => date.HasValue && date.Value != default)
-                .WithMessage("Survey start date must be a valid date")
+                .WithMessage(ValidationMessageProvider.Get("SurveyStartDateValid"))
                 .When(x => x.StartDate.HasValue);
 
             RuleFor(x => x.EndDate)
                 .Must((request, endDate) => !endDate.HasValue || !request.StartDate.HasValue || endDate.Value > request.StartDate.Value)
-                .WithMessage("Survey end date must be after start date")
+                .WithMessage(ValidationMessageProvider.Get("SurveyEndDateAfterStart"))
                 .When(x => x.EndDate.HasValue && x.StartDate.HasValue);
 
             RuleFor(x => x.MaxParticipants)
-                .GreaterThan(0).WithMessage("Maximum participants must be greater than 0")
+                .GreaterThan(0).WithMessage(ValidationMessageProvider.Get("SurveyMaxParticipantsPositive"))
                 .When(x => x.MaxParticipants.HasValue);
 
             RuleFor(x => x.ActivityIds)
                 .Must(ids => ids == null || ids.Count == 0 || ids.All(id => id != Guid.Empty))
-                .WithMessage("Activity IDs cannot be empty")
+                .WithMessage(ValidationMessageProvider.Get("SurveyActivityIdInvalid"))
                 .When(x => x.ActivityIds != null);
 
             RuleFor(x => x)
                 .Must(request => request.IsValid())
-                .WithMessage("Request contains invalid data - at least one field must be provided for update");
+                .WithMessage(ValidationMessageProvider.Get("SurveyUpdateRequestInvalid"));
         }
     }
 }

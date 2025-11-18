@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="CartItemAdded" xml:space="preserve"><value>Item added to cart successfully</value></data>
+  <data name="CartAddValidationError" xml:space="preserve"><value>Unable to add item to cart: {0}. Please check your input and try again.</value></data>
+  <data name="CartAddUnexpected" xml:space="preserve"><value>We encountered an issue while adding the item to the cart. Please try again later.</value></data>
+  <data name="CartItemUpdated" xml:space="preserve"><value>Cart item updated successfully</value></data>
+  <data name="CartItemNotFound" xml:space="preserve"><value>The requested cart item could not be found.</value></data>
+  <data name="CartUpdateValidationError" xml:space="preserve"><value>Unable to update cart item: {0}. Please review your changes and try again.</value></data>
+  <data name="CartUpdateUnexpected" xml:space="preserve"><value>We encountered an issue while updating the cart item. Please try again later.</value></data>
+  <data name="CartItemRemoved" xml:space="preserve"><value>Item removed from cart successfully</value></data>
+  <data name="CartRemoveUnexpected" xml:space="preserve"><value>We encountered an issue while removing the item from the cart. Please try again later.</value></data>
+  <data name="CartRetrieved" xml:space="preserve"><value>Shopping cart retrieved successfully</value></data>
+</root>

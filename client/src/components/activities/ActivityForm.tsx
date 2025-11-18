@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -121,6 +122,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   onSuccess,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -603,9 +605,9 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            aria-label="activity form tabs"
            variant={isMobile ? 'fullWidth' : 'standard'}
          >
-           <Tab label="Basic Information" id="activity-form-tab-0" aria-controls="activity-form-tabpanel-0" />
-           <Tab label="Video & Steps" id="activity-form-tab-1" aria-controls="activity-form-tabpanel-1" />
-           <Tab label="Persona Associations" id="activity-form-tab-2" aria-controls="activity-form-tabpanel-2" />
+           <Tab label={t('activityForm.basicInformation')} id="activity-form-tab-0" aria-controls="activity-form-tabpanel-0" />
+           <Tab label={t('activityForm.videoAndSteps')} id="activity-form-tab-1" aria-controls="activity-form-tabpanel-1" />
+           <Tab label={t('activityForm.personaAssociations')} id="activity-form-tab-2" aria-controls="activity-form-tabpanel-2" />
          </Tabs>
        </Box>
 
@@ -620,7 +622,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                render={({ field }) => (
                  <TextField
                    {...field}
-                   label="Activity Name"
+                   label={t('activityForm.activityName')}
                    sx={{ flex: 1, minWidth: '200px' }}
                    error={!!errors.name}
                    helperText={errors.name?.message as string}
@@ -633,10 +635,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                control={control}
                render={({ field }) => (
                  <FormControl sx={{ minWidth: '200px' }}>
-                   <InputLabel>Category</InputLabel>
-                   <Select {...field} label="Category">
+                   <InputLabel>{t('activityForm.category')}</InputLabel>
+                   <Select {...field} label={t('activityForm.category')}>
                      <MenuItem value="">
-                       <em>No category</em>
+                       <em>{t('activityForm.noCategory')}</em>
                      </MenuItem>
                      {categories.map((category: ActivityCategory) => (
                        <MenuItem key={category.id} value={category.id}>
@@ -675,7 +677,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                  return (
                    <TextField
                      {...field}
-                     label="Hours"
+                     label={t('activityForm.hours')}
                      type="number"
                      sx={{ minWidth: '100px' }}
                      inputProps={{ min: 0 }}
@@ -692,7 +694,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                render={({ field }) => (
                  <TextField
                    {...field}
-                   label="Minutes"
+                   label={t('activityForm.minutes')}
                    type="number"
                    sx={{ minWidth: '100px' }}
                    inputProps={{ min: 0, max: 59 }}
@@ -708,7 +710,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                render={({ field }) => (
                  <TextField
                    {...field}
-                   label="Seconds"
+                   label={t('activityForm.seconds')}
                    type="number"
                    sx={{ minWidth: '100px' }}
                    inputProps={{ min: 0, max: 59 }}
@@ -727,10 +729,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            {/* Video Upload */}
            <Paper sx={{ p: 3 }}>
              <Typography variant="h6" gutterBottom>
-               Main Video
+               {t('activityForm.mainVideo')}
              </Typography>
              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-               This video contains the primary walkthrough used by the step manager.
+               {t('activityForm.mainVideoDescription')}
              </Typography>
              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                <Button
@@ -738,7 +740,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                  component="label"
                  startIcon={<UploadIcon />}
                >
-                 Upload Video
+                 {t('activityForm.uploadVideo')}
                  <input
                    type="file"
                    hidden
@@ -748,7 +750,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                </Button>
                {videoFile && (
                  <Typography variant="body2">
-                   {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                   {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} {t('activityForm.mb')})
                  </Typography>
                )}
                {!videoFile && videoUrl && (
@@ -759,18 +761,18 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                    rel="noopener noreferrer"
                    size="small"
                  >
-                   Preview Current Video
+                   {t('activityForm.previewCurrentVideo')}
                  </Button>
                )}
              </Box>
              {!videoFile && !videoUrl && existingVideoUrl && (
                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                 Stored video object: {existingVideoUrl}
+                 {t('activityForm.storedVideoObject')} {existingVideoUrl}
                </Typography>
              )}
              {!videoFile && !existingVideoUrl && (
                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                 No main video uploaded yet.
+                 {t('activityForm.noMainVideoUploaded')}
                </Typography>
              )}
            </Paper>
@@ -778,10 +780,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            {/* Intro Video Upload */}
            <Paper sx={{ p: 3 }}>
              <Typography variant="h6" gutterBottom>
-               Intro Video
+               {t('activityForm.introVideo')}
              </Typography>
              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-               Optional clip that plays before the main video to introduce the activity.
+               {t('activityForm.introVideoDescription')}
              </Typography>
              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                <Button
@@ -789,7 +791,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                  component="label"
                  startIcon={<UploadIcon />}
                >
-                 Upload Intro Video
+                 {t('activityForm.uploadIntroVideo')}
                  <input
                    type="file"
                    hidden
@@ -799,7 +801,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                </Button>
                {introVideoFile && (
                  <Typography variant="body2">
-                   {introVideoFile.name} ({(introVideoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                   {introVideoFile.name} ({(introVideoFile.size / (1024 * 1024)).toFixed(2)} {t('activityForm.mb')})
                  </Typography>
                )}
                {!introVideoFile && introVideoUrl && (
@@ -810,18 +812,18 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                    rel="noopener noreferrer"
                    size="small"
                  >
-                   Preview Intro Video
+                   {t('activityForm.previewIntroVideo')}
                  </Button>
                )}
              </Box>
              {!introVideoFile && !introVideoUrl && existingIntroVideoUrl && (
                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                 Stored intro video object: {existingIntroVideoUrl}
+                 {t('activityForm.storedIntroVideoObject')} {existingIntroVideoUrl}
                </Typography>
              )}
              {!introVideoFile && !existingIntroVideoUrl && (
                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                 No intro video uploaded yet.
+                 {t('activityForm.noIntroVideoUploaded')}
                </Typography>
              )}
            </Paper>
@@ -905,7 +907,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
          disabled={loading || reduxLoading}
          sx={{ minHeight: 44 }}
        >
-         Cancel
+         {t('activityForm.cancel')}
        </Button>
        <Button
          type="submit"
@@ -914,7 +916,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
          startIcon={(loading || stepOperationLoading || reduxLoading) ? <CircularProgress size={16} /> : null}
          sx={{ minHeight: 44 }}
        >
-         {(loading || stepOperationLoading || reduxLoading) ? 'Saving...' : (activity ? 'Update Activity' : 'Create Activity')}
+         {(loading || stepOperationLoading || reduxLoading) ? t('activityForm.saving') : (activity ? t('activityForm.updateActivity') : t('activityForm.createActivity'))}
        </Button>
      </Box>
    </Box>

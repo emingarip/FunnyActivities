@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="CategoriesRetrieved" xml:space="preserve"><value>Categories retrieved successfully</value></data>
+  <data name="CategoryNotFound" xml:space="preserve"><value>Category not found</value></data>
+  <data name="CategoryRetrieved" xml:space="preserve"><value>Category retrieved successfully</value></data>
+  <data name="CategoryWithProductsRetrieved" xml:space="preserve"><value>Category with products retrieved successfully</value></data>
+  <data name="SearchTermRequired" xml:space="preserve"><value>Search term is required</value></data>
+  <data name="CategoriesSearchCompleted" xml:space="preserve"><value>Categories search completed successfully</value></data>
+  <data name="CategoryCreated" xml:space="preserve"><value>Category created successfully</value></data>
+  <data name="CategoryCreateValidationError" xml:space="preserve"><value>Unable to create category: {0}. Please check your input and try again.</value></data>
+  <data name="CategoryCreateUnexpected" xml:space="preserve"><value>An error occurred while creating the category</value></data>
+  <data name="CategoryUpdated" xml:space="preserve"><value>Category updated successfully</value></data>
+  <data name="CategoryUpdateNotFound" xml:space="preserve"><value>The category you're trying to update could not be found. Please verify the ID and try again.</value></data>
+  <data name="CategoryUpdateValidationError" xml:space="preserve"><value>Unable to update category: {0}. Please review your changes and try again.</value></data>
+  <data name="CategoryUpdateUnexpected" xml:space="preserve"><value>An error occurred while updating the category</value></data>
+  <data name="CategoryDeleted" xml:space="preserve"><value>Category deleted successfully</value></data>
+  <data name="CategoryDeleteNotFound" xml:space="preserve"><value>The category you're trying to delete could not be found. Please verify the ID and try again.</value></data>
+  <data name="CategoryDeleteUnexpected" xml:space="preserve"><value>An error occurred while deleting the category</value></data>
+</root>

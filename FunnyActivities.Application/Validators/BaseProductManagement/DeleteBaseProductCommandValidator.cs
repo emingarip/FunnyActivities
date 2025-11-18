@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Commands.BaseProductManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.BaseProductManagement
 {
@@ -16,12 +17,12 @@ namespace FunnyActivities.Application.Validators.BaseProductManagement
             // Id validation
             RuleFor(x => x.Id)
                 .NotEmpty()
-                .WithMessage("Base product ID is required.");
+                .WithMessage(ValidationMessageProvider.Get("BaseProductIdRequired"));
 
             // UserId validation
             RuleFor(x => x.UserId)
                 .NotEmpty()
-                .WithMessage("User ID is required.");
+                .WithMessage(ValidationMessageProvider.Get("UserIdRequired"));
         }
     }
 }

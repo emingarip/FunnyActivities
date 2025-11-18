@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="PublicSurveyNotFoundOrAccessible" xml:space="preserve"><value>Survey not found or not accessible</value></data>
+  <data name="PublicSurveyRetrieved" xml:space="preserve"><value>Public survey retrieved successfully</value></data>
+  <data name="SurveyNotFound" xml:space="preserve"><value>Survey not found</value></data>
+  <data name="SurveyNotAvailable" xml:space="preserve"><value>Survey is not available</value></data>
+  <data name="PublicSurveyRetrieveUnexpected" xml:space="preserve"><value>An error occurred while retrieving the survey</value></data>
+  <data name="ParticipantRegistered" xml:space="preserve"><value>Participant registered successfully</value></data>
+  <data name="ParticipantRegistrationValidationError" xml:space="preserve"><value>Unable to register participant: {0}. Please check your input and try again.</value></data>
+  <data name="ParticipantRegistrationNotFound" xml:space="preserve"><value>The survey could not be found for participant registration. Please check the share token and try again.</value></data>
+  <data name="ParticipantRegistrationUnexpected" xml:space="preserve"><value>An error occurred while registering the participant</value></data>
+  <data name="VoteSubmitted" xml:space="preserve"><value>Vote submitted successfully</value></data>
+  <data name="VoteValidationError" xml:space="preserve"><value>Unable to submit vote: {0}. Please check your input and try again.</value></data>
+  <data name="VoteNotFound" xml:space="preserve"><value>The requested vote target could not be found. Please verify the survey activity and participant information.</value></data>
+  <data name="VoteUnexpected" xml:space="preserve"><value>An error occurred while submitting the vote</value></data>
+  <data name="SurveyActivitiesNotFound" xml:space="preserve"><value>No activities found for this survey</value></data>
+  <data name="SurveyActivitiesRetrieved" xml:space="preserve"><value>Survey activities retrieved successfully</value></data>
+  <data name="ParticipantVotesRetrieved" xml:space="preserve"><value>Participant votes retrieved successfully</value></data>
+  <data name="ParticipantVotesUnexpected" xml:space="preserve"><value>An error occurred while retrieving participant votes</value></data>
+  <data name="SurveyStatusRetrieved" xml:space="preserve"><value>Survey status retrieved successfully</value></data>
+</root>

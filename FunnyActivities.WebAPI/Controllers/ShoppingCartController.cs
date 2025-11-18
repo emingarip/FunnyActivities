@@ -6,6 +6,7 @@ using FunnyActivities.Application.Commands.ShoppingCartManagement;
 using FunnyActivities.Application.Queries.ShoppingCartManagement;
 using FunnyActivities.Application.DTOs.ShoppingCartManagement;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -25,17 +26,20 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<ShoppingCartController> _logger;
+        private readonly IStringLocalizer<ShoppingCartController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShoppingCartController"/> class.
         /// </summary>
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
-        public ShoppingCartController(IMediator mediator, ILogger<ShoppingCartController> logger)
+        /// <param name="localizer">The string localizer.</param>
+        public ShoppingCartController(IMediator mediator, ILogger<ShoppingCartController> logger, IStringLocalizer<ShoppingCartController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -84,17 +88,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Item added to cart successfully for user {UserId}", CurrentUserId);
-                return this.ApiSuccess(result, "Item added to cart successfully", 201);
+                return this.ApiSuccess(result, _localizer["CartItemAdded"], 201);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Add to cart failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["CartAddValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding item to cart");
-                return this.ApiError("An error occurred while adding item to cart", "InternalError", 500);
+                return this.ApiError(_localizer["CartAddUnexpected"], "InternalError", 500);
             }
         }
 
@@ -144,22 +148,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Cart item updated successfully for user {UserId}", CurrentUserId);
-                return this.ApiSuccess(result, "Cart item updated successfully");
+                return this.ApiSuccess(result, _localizer["CartItemUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Cart item update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["CartItemNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Cart item update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["CartUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating cart item");
-                return this.ApiError("An error occurred while updating cart item", "InternalError", 500);
+                return this.ApiError(_localizer["CartUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -194,17 +198,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Cart item removed successfully for user {UserId}", CurrentUserId);
-                return this.ApiSuccess<object>("Item removed from cart successfully", 204);
+                return this.ApiSuccess<object>(_localizer["CartItemRemoved"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Cart item removal failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["CartItemNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while removing cart item");
-                return this.ApiError("An error occurred while removing item from cart", "InternalError", 500);
+                return this.ApiError(_localizer["CartRemoveUnexpected"], "InternalError", 500);
             }
         }
 
@@ -242,7 +246,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Shopping cart retrieved successfully");
+            return this.ApiSuccess(result, _localizer["CartRetrieved"]);
         }
     }
 }

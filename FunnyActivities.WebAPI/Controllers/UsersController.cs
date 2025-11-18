@@ -10,6 +10,7 @@ using FunnyActivities.WebAPI.Controllers.Base;
 using System.Security.Claims;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -18,11 +19,13 @@ namespace FunnyActivities.WebAPI.Controllers
     public class UsersController : BaseController
     {
         private readonly IMediator _mediator;
+        private readonly IStringLocalizer<UsersController> _localizer;
 
-        public UsersController(IMediator mediator, ILogger<UsersController> logger)
+        public UsersController(IMediator mediator, ILogger<UsersController> logger, IStringLocalizer<UsersController> localizer)
             : base(logger)
         {
             _mediator = mediator;
+            _localizer = localizer;
         }
 
         [HttpPost("register")]
@@ -38,7 +41,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             await _mediator.Send(command);
-            return Ok();
+            return this.ApiSuccess<object>(_localizer["UserRegistered"]);
         }
 
         [HttpPost("login")]
@@ -52,7 +55,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var response = await _mediator.Send(command);
-            return Ok(response);
+            return this.ApiSuccess(response, _localizer["LoginSuccessful"]);
         }
 
         [HttpGet("{id}")]
@@ -63,10 +66,10 @@ namespace FunnyActivities.WebAPI.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                return this.ApiError(_localizer["UserNotFound"], "NotFound", 404);
             }
 
-            return Ok(user);
+            return this.ApiSuccess(user, _localizer["UserRetrieved"]);
         }
 
         [HttpGet("profile")]
@@ -79,10 +82,10 @@ namespace FunnyActivities.WebAPI.Controllers
 
             if (profile == null)
             {
-                return NotFound();
+                return this.ApiError(_localizer["ProfileNotFound"], "NotFound", 404);
             }
 
-            return Ok(profile);
+            return this.ApiSuccess(profile, _localizer["ProfileRetrieved"]);
         }
 
         [HttpPut("profile")]
@@ -114,11 +117,12 @@ namespace FunnyActivities.WebAPI.Controllers
                 }
                 catch (ArgumentException ex)
                 {
-                    return BadRequest(new { message = ex.Message });
+                    return this.ApiError(string.Format(_localizer["ProfileImageValidationError"], ex.Message), "ValidationError", 400);
                 }
                 catch (Exception ex)
                 {
-                    return StatusCode(500, new { message = "An error occurred while uploading the image.", details = ex.Message });
+                    _logger.LogError(ex, "Error uploading profile image for user {UserId}", CurrentUserId);
+                    return this.ApiError(_localizer["ProfileImageUploadUnexpected"], "InternalError", 500);
                 }
             }
 
@@ -130,8 +134,20 @@ namespace FunnyActivities.WebAPI.Controllers
                 ProfileImageUrl = profileImageUrl
             };
 
-            var updatedProfile = await _mediator.Send(command);
-            return Ok(updatedProfile);
+            try
+            {
+                var updatedProfile = await _mediator.Send(command);
+                return this.ApiSuccess(updatedProfile, _localizer["ProfileUpdated"]);
+            }
+            catch (ArgumentException ex)
+            {
+                return this.ApiError(string.Format(_localizer["ProfileUpdateValidationError"], ex.Message), "ValidationError", 400);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating profile for user {UserId}", CurrentUserId);
+                return this.ApiError(_localizer["ProfileUpdateUnexpected"], "InternalError", 500);
+            }
         }
 
         [HttpPost("request-password-reset")]
@@ -144,7 +160,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             await _mediator.Send(command);
-            return Ok(new { message = "If the email exists, a reset link has been sent." });
+            return this.ApiSuccess<object>(_localizer["PasswordResetRequested"]);
         }
 
         [HttpPost("reset-password")]
@@ -158,7 +174,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             await _mediator.Send(command);
-            return Ok(new { message = "Password has been reset successfully." });
+            return this.ApiSuccess<object>(_localizer["PasswordResetSuccess"]);
         }
 
         [HttpGet("search")]
@@ -175,7 +191,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var response = await _mediator.Send(query);
-            return Ok(response);
+            return this.ApiSuccess(response, _localizer["UsersSearched"]);
         }
 
         [HttpGet("admin/count")]
@@ -185,12 +201,12 @@ namespace FunnyActivities.WebAPI.Controllers
             try
             {
                 var count = await _mediator.Send(new GetUserCountQuery());
-                return Ok(new { totalUsers = count });
+                return this.ApiSuccess(new { totalUsers = count }, _localizer["UserCountRetrieved"]);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving user count");
-                return StatusCode(500, new { message = "An error occurred while retrieving user count." });
+                return this.ApiError(_localizer["UserCountError"], "InternalError", 500);
             }
         }
 
@@ -205,12 +221,12 @@ namespace FunnyActivities.WebAPI.Controllers
                     OnlineThreshold = TimeSpan.FromMinutes(thresholdMinutes)
                 };
                 var count = await _mediator.Send(query);
-                return Ok(new { onlineUsers = count });
+                return this.ApiSuccess(new { onlineUsers = count }, _localizer["OnlineUserCountRetrieved"]);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving online users count");
-                return StatusCode(500, new { message = "An error occurred while retrieving online users count." });
+                return this.ApiError(_localizer["OnlineUserCountError"], "InternalError", 500);
             }
         }
 
@@ -226,12 +242,12 @@ namespace FunnyActivities.WebAPI.Controllers
                     Days = days
                 };
                 var data = await _mediator.Send(query);
-                return Ok(new { data });
+                return this.ApiSuccess(new { data }, _localizer["UserGrowthRetrieved"]);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving user growth data");
-                return StatusCode(500, new { message = "An error occurred while retrieving user growth data." });
+                return this.ApiError(_localizer["UserGrowthError"], "InternalError", 500);
             }
         }
 
@@ -242,7 +258,7 @@ namespace FunnyActivities.WebAPI.Controllers
             // User ID is automatically validated and available through BaseController
             if (request.ImageFile == null || request.ImageFile.Length == 0)
             {
-                return BadRequest(new { message = "No image file provided." });
+                return this.ApiError(_localizer["ProfileImageRequired"], "ValidationError", 400);
             }
 
             try
@@ -260,15 +276,16 @@ namespace FunnyActivities.WebAPI.Controllers
                 };
 
                 var response = await _mediator.Send(command);
-                return Ok(response);
+                return this.ApiSuccess(response, _localizer["ProfileImageUploaded"]);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return this.ApiError(string.Format(_localizer["ProfileImageValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while uploading the image.", details = ex.Message });
+                _logger.LogError(ex, "An error occurred while uploading profile image for user {UserId}", CurrentUserId);
+                return this.ApiError(_localizer["ProfileImageUploadUnexpected"], "InternalError", 500);
             }
         }
     }

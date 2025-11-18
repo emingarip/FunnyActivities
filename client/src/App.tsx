@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { AuthProvider } from './contexts/AuthContext';
+import { LocalizationProvider } from './contexts/LocalizationContext';
+import { useTranslation } from './hooks/useTranslation';
 import BottomNavigation from './components/BottomNavigation';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -28,6 +30,7 @@ import {
   VoteSuccess
 } from './components/surveys';
 import './App.css';
+import LanguageSelector from './components/LanguageSelector';
 
 // Create Material-UI theme
 const theme = createTheme({
@@ -43,12 +46,17 @@ const theme = createTheme({
 
 function AppContent() {
   const location = useLocation();
+  const { t } = useTranslation();
   return (
     <div className="App">
       {/* Global loading indicator */}
       <div id="global-loading" className="global-loading">
         <div className="loading-spinner"></div>
-        <p>Loading...</p>
+        <p>{t('loading')}</p>
+      </div>
+
+      <div className="language-selector-wrapper">
+        <LanguageSelector />
       </div>
 
       <main className={`main-content ${location.pathname === '/login' ? 'login-page' : ''}`}>
@@ -93,9 +101,11 @@ function App() {
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Router>
-            <AppContent />
-          </Router>
+          <LocalizationProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </LocalizationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

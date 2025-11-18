@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="PersonaCreated" xml:space="preserve"><value>Persona başarıyla oluşturuldu</value></data>
+  <data name="PersonaNotFound" xml:space="preserve"><value>Persona bulunamadı</value></data>
+  <data name="PersonaRetrieved" xml:space="preserve"><value>Persona başarıyla getirildi</value></data>
+  <data name="PersonaListRetrieved" xml:space="preserve"><value>Personalar başarıyla getirildi</value></data>
+  <data name="PersonaUpdated" xml:space="preserve"><value>Persona başarıyla güncellendi</value></data>
+  <data name="PersonaImageFileRequired" xml:space="preserve"><value>Görüntü dosyası zorunludur</value></data>
+  <data name="PersonaImagesUploaded" xml:space="preserve"><value>Persona görselleri başarıyla yüklendi</value></data>
+  <data name="PersonaInvalidGender" xml:space="preserve"><value>Geçersiz cinsiyet değeri: {0}</value></data>
+  <data name="PersonaDeleted" xml:space="preserve"><value>Persona başarıyla silindi</value></data>
+  <data name="PersonaActivityAssociationCreated" xml:space="preserve"><value>Persona-aktivite ilişkisi başarıyla oluşturuldu</value></data>
+  <data name="PersonaActivityAssociationsRetrieved" xml:space="preserve"><value>Persona-aktivite ilişkileri başarıyla getirildi</value></data>
+  <data name="PersonaActivityAssociationUpdated" xml:space="preserve"><value>Persona-aktivite ilişkisi başarıyla güncellendi</value></data>
+  <data name="PersonaActivityAssociationDeleted" xml:space="preserve"><value>Persona-aktivite ilişkisi başarıyla silindi</value></data>
+  <data name="ActivityPersonaAssociationCreated" xml:space="preserve"><value>Aktivite-persona ilişkisi başarıyla oluşturuldu</value></data>
+  <data name="ActivityPersonaAssociationsRetrieved" xml:space="preserve"><value>Aktivite-persona ilişkileri başarıyla getirildi</value></data>
+  <data name="ActivityPersonaAssociationUpdated" xml:space="preserve"><value>Aktivite-persona ilişkisi başarıyla güncellendi</value></data>
+  <data name="ActivityPersonaAssociationDeleted" xml:space="preserve"><value>Aktivite-persona ilişkisi başarıyla silindi</value></data>
+</root>

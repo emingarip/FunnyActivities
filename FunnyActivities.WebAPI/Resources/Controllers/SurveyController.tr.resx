@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="SurveysRetrieved" xml:space="preserve"><value>Anketler basariyla getirildi</value></data>
+  <data name="SurveyNotFound" xml:space="preserve"><value>Istenen anket bulunamadi. Lutfen anket ID'sini kontrol edip tekrar deneyin.</value></data>
+  <data name="SurveyRetrieved" xml:space="preserve"><value>Anket basariyla getirildi</value></data>
+  <data name="SurveyCreated" xml:space="preserve"><value>Anket basariyla olusturuldu</value></data>
+  <data name="SurveyCreateValidationError" xml:space="preserve"><value>Anket olusturulamadi: {0}. Lutfen girdilerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="SurveyCreateUnexpected" xml:space="preserve"><value>Anket olusturulurken bir sorun olustu. Lutfen daha sonra tekrar deneyin veya destekle iletisime gecin.</value></data>
+  <data name="SurveyUpdated" xml:space="preserve"><value>Anket basariyla guncellendi</value></data>
+  <data name="SurveyUpdateNotFound" xml:space="preserve"><value>Guncellemeye calistiginiz anket bulunamadi. Lutfen anket ID'sini dogrulayin ve tekrar deneyin.</value></data>
+  <data name="SurveyUpdateValidationError" xml:space="preserve"><value>Anket guncellenemedi: {0}. Lutfen degisikliklerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="SurveyUpdateUnexpected" xml:space="preserve"><value>Anket guncellenirken bir sorun olustu. Lutfen daha sonra tekrar deneyin veya destekle iletisime gecin.</value></data>
+  <data name="SurveyDeleted" xml:space="preserve"><value>Anket basariyla silindi</value></data>
+  <data name="SurveyDeleteNotFound" xml:space="preserve"><value>Silmek istediginiz anket bulunamadi. Lutfen anket ID'sini dogrulayin ve tekrar deneyin.</value></data>
+  <data name="SurveyDeleteUnexpected" xml:space="preserve"><value>Anket silinirken bir sorun olustu. Lutfen daha sonra tekrar deneyin veya destekle iletisime gecin.</value></data>
+  <data name="SurveyResultsRetrieved" xml:space="preserve"><value>Anket sonuclari basariyla getirildi</value></data>
+  <data name="SurveyResultsNotFound" xml:space="preserve"><value>Istenen anket icin sonuc bulunamadi.</value></data>
+  <data name="SurveyStatisticsRetrieved" xml:space="preserve"><value>Anket istatistikleri basariyla getirildi</value></data>
+  <data name="SurveyStatisticsNotFound" xml:space="preserve"><value>Istenen anket icin istatistik bulunamadi.</value></data>
+  <data name="SurveyParticipantsRetrieved" xml:space="preserve"><value>Anket katilimcilari basariyla getirildi</value></data>
+  <data name="ShareUrlGenerated" xml:space="preserve"><value>Paylasim URL'i basariyla olusturuldu</value></data>
+  <data name="ShareUrlNotFound" xml:space="preserve"><value>Paylasmak istediginiz anket bulunamadi. Lutfen anket ID'sini dogrulayin ve tekrar deneyin.</value></data>
+  <data name="ShareUrlUnexpected" xml:space="preserve"><value>Paylasim URL'i olusturulurken bir sorun olustu. Lutfen daha sonra tekrar deneyin veya destekle iletisime gecin.</value></data>
+</root>

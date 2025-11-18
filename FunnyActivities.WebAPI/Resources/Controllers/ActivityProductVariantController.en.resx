@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ActivityProductVariantNotFound" xml:space="preserve"><value>The requested activity product variant could not be found. Please check the variant ID and try again.</value></data>
+  <data name="ActivityProductVariantRetrieved" xml:space="preserve"><value>Activity product variant retrieved successfully</value></data>
+  <data name="ActivityProductVariantsRetrieved" xml:space="preserve"><value>Activity product variants retrieved successfully</value></data>
+  <data name="ActivityProductVariantCreated" xml:space="preserve"><value>Activity product variant created successfully</value></data>
+  <data name="ActivityProductVariantCreateValidationError" xml:space="preserve"><value>Unable to create activity product variant: {0}. Please check your input and try again.</value></data>
+  <data name="ActivityProductVariantCreateUnexpected" xml:space="preserve"><value>We encountered an issue while creating your activity product variant. Please try again later or contact support if the problem persists.</value></data>
+  <data name="ActivityProductVariantUpdated" xml:space="preserve"><value>Activity product variant updated successfully</value></data>
+  <data name="ActivityProductVariantUpdateNotFound" xml:space="preserve"><value>The activity product variant you're trying to update could not be found. Please verify the variant ID and try again.</value></data>
+  <data name="ActivityProductVariantUpdateValidationError" xml:space="preserve"><value>Unable to update activity product variant: {0}. Please review your changes and try again.</value></data>
+  <data name="ActivityProductVariantUpdateUnexpected" xml:space="preserve"><value>We encountered an issue while updating your activity product variant. Please try again later or contact support if the problem persists.</value></data>
+  <data name="ActivityProductVariantDeleted" xml:space="preserve"><value>Activity product variant deleted successfully</value></data>
+  <data name="ActivityProductVariantDeleteNotFound" xml:space="preserve"><value>The activity product variant you're trying to delete could not be found. Please verify the variant ID and try again.</value></data>
+  <data name="ActivityProductVariantDeleteUnexpected" xml:space="preserve"><value>We encountered an issue while deleting your activity product variant. Please try again later or contact support if the problem persists.</value></data>
+</root>

@@ -1,7 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './BottomNavigation.css';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface NavItem {
   path: string;
@@ -13,9 +14,7 @@ interface NavItem {
 const BottomNavigation: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
-
-  console.log('BottomNavigation - User:', user);
-  console.log('BottomNavigation - User role:', user?.role);
+  const { t } = useTranslation();
 
   const baseNavItems: NavItem[] = [
     {
@@ -26,7 +25,7 @@ const BottomNavigation: React.FC = () => {
           <polyline points="9,22 9,12 15,12 15,22"/>
         </svg>
       ),
-      label: 'Ana Sayfa'
+      label: t('nav_home')
     },
     {
       path: '/dashboard',
@@ -35,7 +34,7 @@ const BottomNavigation: React.FC = () => {
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
         </svg>
       ),
-      label: 'Keşfet'
+      label: t('nav_activity')
     },
     {
       path: '/wallet',
@@ -45,7 +44,7 @@ const BottomNavigation: React.FC = () => {
           <line x1="1" y1="10" x2="23" y2="10"/>
         </svg>
       ),
-      label: 'Cüzdan'
+      label: 'Wallet'
     },
     {
       path: '/profile',
@@ -55,7 +54,7 @@ const BottomNavigation: React.FC = () => {
           <circle cx="12" cy="7" r="4"/>
         </svg>
       ),
-      label: 'Profil'
+      label: t('nav_profile')
     }
   ];
 
@@ -67,7 +66,7 @@ const BottomNavigation: React.FC = () => {
         <rect x="9" y="9" width="6" height="6" rx="1" fill="white"/>
       </svg>
     ),
-    label: 'Dashboard',
+    label: t('nav_dashboard'),
     isCenter: true
   };
 
@@ -79,7 +78,7 @@ const BottomNavigation: React.FC = () => {
         <path d="M9 12l2 2 4-4"/>
       </svg>
     ),
-    label: 'Products'
+    label: t('nav_products')
   };
 
   const surveysNavItem: NavItem = {
@@ -100,15 +99,13 @@ const BottomNavigation: React.FC = () => {
   const navItems = isAdmin
     ? [...baseNavItems.slice(0, 2), adminNavItem, productsNavItem, surveysNavItem, ...baseNavItems.slice(2)]
     : baseNavItems;
-  console.log('BottomNavigation - Nav items:', navItems);
-  console.log('BottomNavigation - Is admin?', isAdmin);
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   return (
-    <nav className="modern-bottom-nav" role="navigation" aria-label="Ana navigasyon">
+    <nav className="modern-bottom-nav" role="navigation" aria-label={t('nav_home')}>
       <div className="nav-container">
         {navItems.map((item) => (
           <Link

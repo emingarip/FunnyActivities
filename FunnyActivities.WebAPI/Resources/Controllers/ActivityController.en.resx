@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ActivitiesRetrieved" xml:space="preserve"><value>Activities retrieved successfully</value></data>
+  <data name="AnonymousAccessWorks" xml:space="preserve"><value>Anonymous access works!</value></data>
+  <data name="TestSuccessful" xml:space="preserve"><value>Test successful</value></data>
+  <data name="SimpleAnonymousAccessWorks" xml:space="preserve"><value>Simple anonymous access works!</value></data>
+  <data name="PublicActivitiesRetrieved" xml:space="preserve"><value>Public activities retrieved successfully</value></data>
+  <data name="ActivityNotFound" xml:space="preserve"><value>The requested activity could not be found. Please check the activity ID and try again.</value></data>
+  <data name="ActivityRetrieved" xml:space="preserve"><value>Activity retrieved successfully</value></data>
+  <data name="ActivityNotFoundPublic" xml:space="preserve"><value>The requested activity could not be found or is not publicly available.</value></data>
+  <data name="PublicActivityRetrieved" xml:space="preserve"><value>Public activity retrieved successfully</value></data>
+  <data name="ActivityWithDetailsRetrieved" xml:space="preserve"><value>Activity with details retrieved successfully</value></data>
+  <data name="ActivityCreated" xml:space="preserve"><value>Activity created successfully</value></data>
+  <data name="ActivityCreateValidationError" xml:space="preserve"><value>Unable to create activity: {0}. Please check your input and try again.</value></data>
+  <data name="ActivityCreateUnexpected" xml:space="preserve"><value>We encountered an issue while creating your activity. Please try again later or contact support if the problem persists.</value></data>
+  <data name="ActivityUpdated" xml:space="preserve"><value>Activity updated successfully</value></data>
+  <data name="ActivityUpdateNotFound" xml:space="preserve"><value>The activity you're trying to update could not be found. Please verify the activity ID and try again.</value></data>
+  <data name="ActivityUpdateValidationError" xml:space="preserve"><value>Unable to update activity: {0}. Please review your changes and try again.</value></data>
+  <data name="ActivityUpdateUnexpected" xml:space="preserve"><value>We encountered an issue while updating your activity. Please try again later or contact support if the problem persists.</value></data>
+  <data name="ActivityDeleted" xml:space="preserve"><value>Activity deleted successfully</value></data>
+  <data name="ActivityDeleteNotFound" xml:space="preserve"><value>The activity you're trying to delete could not be found. Please verify the activity ID and try again.</value></data>
+  <data name="ActivityDeleteUnexpected" xml:space="preserve"><value>We encountered an issue while deleting your activity. Please try again later or contact support if the problem persists.</value></data>
+  <data name="InvalidVideoType" xml:space="preserve"><value>Invalid video type. Allowed values are 'main' or 'intro'.</value></data>
+  <data name="NoVideoFileProvided" xml:space="preserve"><value>No video file provided</value></data>
+  <data name="VideoUploaded" xml:space="preserve"><value>Video uploaded successfully</value></data>
+  <data name="VideoUploadError" xml:space="preserve"><value>An error occurred while uploading the video</value></data>
+  <data name="VideoUrlGenerated" xml:space="preserve"><value>Video URL generated successfully</value></data>
+  <data name="VideoUrlGenerateError" xml:space="preserve"><value>An error occurred while generating the video URL</value></data>
+  <data name="VideoUrlStorageUnavailable" xml:space="preserve"><value>Unable to generate video URL. Storage service unavailable.</value></data>
+  <data name="VideoObjectKeyRequired" xml:space="preserve"><value>Video object key is required</value></data>
+  <data name="VideoNotFound" xml:space="preserve"><value>Video not found</value></data>
+  <data name="VideoMetadataRetrieved" xml:space="preserve"><value>Video metadata retrieved successfully</value></data>
+  <data name="VideoMetadataStorageUnavailable" xml:space="preserve"><value>Unable to retrieve video metadata. Storage service unavailable.</value></data>
+  <data name="VideoMetadataError" xml:space="preserve"><value>An error occurred while retrieving video metadata</value></data>
+  <data name="ObjectKeyRequired" xml:space="preserve"><value>Object key is required</value></data>
+  <data name="ObjectMetadataRetrieved" xml:space="preserve"><value>Object metadata retrieved successfully</value></data>
+  <data name="ObjectNotFound" xml:space="preserve"><value>Object not found</value></data>
+  <data name="ObjectMetadataStorageUnavailable" xml:space="preserve"><value>Unable to retrieve object metadata. Storage service unavailable.</value></data>
+  <data name="ObjectMetadataError" xml:space="preserve"><value>An error occurred while retrieving object metadata</value></data>
+  <data name="VideoDeletionFailed" xml:space="preserve"><value>Failed to delete the video</value></data>
+  <data name="VideoDeleted" xml:space="preserve"><value>Video deleted successfully</value></data>
+  <data name="VideoDeleteError" xml:space="preserve"><value>An error occurred while deleting the video</value></data>
+</root>

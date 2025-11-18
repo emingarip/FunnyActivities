@@ -8,6 +8,7 @@ using FunnyActivities.Application.Queries.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -28,6 +29,7 @@ namespace FunnyActivities.WebAPI.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger<ActivityProductVariantController> _logger;
         private readonly IInputSanitizer _inputSanitizer;
+        private readonly IStringLocalizer<ActivityProductVariantController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivityProductVariantController"/> class.
@@ -35,12 +37,17 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="inputSanitizer">The input sanitizer for security.</param>
-        public ActivityProductVariantController(IMediator mediator, ILogger<ActivityProductVariantController> logger, IInputSanitizer inputSanitizer)
+        public ActivityProductVariantController(
+            IMediator mediator,
+            ILogger<ActivityProductVariantController> logger,
+            IInputSanitizer inputSanitizer,
+            IStringLocalizer<ActivityProductVariantController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
             _inputSanitizer = inputSanitizer;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -63,10 +70,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (variant == null)
             {
                 _logger.LogWarning("Activity product variant with ID {VariantId} not found", id);
-                return this.ApiError("The requested activity product variant could not be found. Please check the variant ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityProductVariantNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(variant, "Activity product variant retrieved successfully");
+            return this.ApiSuccess(variant, _localizer["ActivityProductVariantRetrieved"]);
         }
 
         /// <summary>
@@ -85,7 +92,7 @@ namespace FunnyActivities.WebAPI.Controllers
             var query = new GetActivityProductVariantsByActivityIdQuery { ActivityId = activityId };
             var variants = await _mediator.Send(query);
 
-            return this.ApiSuccess(variants, "Activity product variants retrieved successfully");
+            return this.ApiSuccess(variants, _localizer["ActivityProductVariantsRetrieved"]);
         }
 
         /// <summary>
@@ -114,17 +121,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Activity product variant created successfully with ID: {Id}", result.Id);
-                return this.ApiCreated(nameof(GetActivityProductVariant), new { id = result.Id }, result, "Activity product variant created successfully");
+                return this.ApiCreated(nameof(GetActivityProductVariant), new { id = result.Id }, result, _localizer["ActivityProductVariantCreated"]);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity product variant creation failed: {Message}", ex.Message);
-                return this.ApiError($"Unable to create activity product variant: {ex.Message}. Please check your input and try again.", "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["ActivityProductVariantCreateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while creating activity product variant");
-                return this.ApiError("We encountered an issue while creating your activity product variant. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityProductVariantCreateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -155,22 +162,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Activity product variant updated successfully with ID: {VariantId}", result.Id);
-                return this.ApiSuccess(result, "Activity product variant updated successfully");
+                return this.ApiSuccess(result, _localizer["ActivityProductVariantUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity product variant update failed: {Message}", ex.Message);
-                return this.ApiError("The activity product variant you're trying to update could not be found. Please verify the variant ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityProductVariantUpdateNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity product variant update failed: {Message}", ex.Message);
-                return this.ApiError($"Unable to update activity product variant: {ex.Message}. Please review your changes and try again.", "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["ActivityProductVariantUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while updating activity product variant");
-                return this.ApiError("We encountered an issue while updating your activity product variant. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityProductVariantUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -197,17 +204,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Activity product variant deleted successfully with ID: {VariantId}", id);
-                return this.ApiSuccess<object>("Activity product variant deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["ActivityProductVariantDeleted"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity product variant deletion failed: {Message}", ex.Message);
-                return this.ApiError("The activity product variant you're trying to delete could not be found. Please verify the variant ID and try again.", "NotFound", 404);
+                return this.ApiError(_localizer["ActivityProductVariantDeleteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while deleting activity product variant");
-                return this.ApiError("We encountered an issue while deleting your activity product variant. Please try again later or contact support if the problem persists.", "InternalError", 500);
+                return this.ApiError(_localizer["ActivityProductVariantDeleteUnexpected"], "InternalError", 500);
             }
         }
     }

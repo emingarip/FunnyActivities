@@ -8,6 +8,7 @@ using FunnyActivities.Application.Commands.SurveyManagement;
 using FunnyActivities.Application.DTOs.SurveyManagement;
 using FunnyActivities.Application.Services;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -27,6 +28,7 @@ namespace FunnyActivities.WebAPI.Controllers
         private readonly IMediator _mediator;
         private readonly IVotingService _votingService;
         private readonly ILogger<PublicSurveyController> _logger;
+        private readonly IStringLocalizer<PublicSurveyController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublicSurveyController"/> class.
@@ -34,12 +36,18 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="votingService">The voting service.</param>
         /// <param name="logger">The logger.</param>
-        public PublicSurveyController(IMediator mediator, IVotingService votingService, ILogger<PublicSurveyController> logger)
+        /// <param name="localizer">The string localizer.</param>
+        public PublicSurveyController(
+            IMediator mediator,
+            IVotingService votingService,
+            ILogger<PublicSurveyController> logger,
+            IStringLocalizer<PublicSurveyController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _votingService = votingService;
             _logger = logger;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -65,10 +73,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (survey == null)
             {
                 _logger.LogWarning("Public survey with ID {SurveyId} not found or not accessible", surveyId);
-                return this.ApiError("Survey not found or not accessible", "NotFound", 404);
+                return this.ApiError(_localizer["PublicSurveyNotFoundOrAccessible"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(survey, "Public survey retrieved successfully");
+            return this.ApiSuccess(survey, _localizer["PublicSurveyRetrieved"]);
         }
 
         /// <summary>
@@ -93,22 +101,22 @@ namespace FunnyActivities.WebAPI.Controllers
                 var query = new GetSurveyByShareTokenQuery { ShareToken = shareToken };
                 var survey = await _mediator.Send(query);
 
-                return this.ApiSuccess(survey, "Public survey retrieved successfully");
+                return this.ApiSuccess(survey, _localizer["PublicSurveyRetrieved"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Public survey with share token {ShareToken} not found: {Message}", shareToken, ex.Message);
-                return this.ApiError("Survey not found", "NotFound", 404);
+                return this.ApiError(_localizer["SurveyNotFound"], "NotFound", 404);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning("Public survey with share token {ShareToken} not available: {Message}", shareToken, ex.Message);
-                return this.ApiError("Survey is not available", "NotAvailable", 404);
+                return this.ApiError(_localizer["SurveyNotAvailable"], "NotAvailable", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving survey with share token {ShareToken}", shareToken);
-                return this.ApiError("An error occurred while retrieving the survey", "InternalError", 500);
+                return this.ApiError(_localizer["PublicSurveyRetrieveUnexpected"], "InternalError", 500);
             }
         }
 
@@ -143,12 +151,12 @@ namespace FunnyActivities.WebAPI.Controllers
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Survey not found for share token {ShareToken}: {Message}", shareToken, ex.Message);
-                return this.ApiError("Survey not found", "NotFound", 404);
+                return this.ApiError(_localizer["SurveyNotFound"], "NotFound", 404);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning("Survey not available for share token {ShareToken}: {Message}", shareToken, ex.Message);
-                return this.ApiError("Survey is not available", "NotAvailable", 404);
+                return this.ApiError(_localizer["SurveyNotAvailable"], "NotAvailable", 404);
             }
 
             var command = new RegisterParticipantCommand
@@ -163,22 +171,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Participant registered successfully with ID: {ParticipantId}", result.Id);
-                return this.ApiSuccess(result, "Participant registered successfully");
+                return this.ApiSuccess(result, _localizer["ParticipantRegistered"]);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Participant registration failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["ParticipantRegistrationValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Participant registration failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["ParticipantRegistrationNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while registering participant for share token {ShareToken}", shareToken);
-                return this.ApiError("An error occurred while registering the participant", "InternalError", 500);
+                return this.ApiError(_localizer["ParticipantRegistrationUnexpected"], "InternalError", 500);
             }
         }
 
@@ -215,22 +223,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Vote submitted successfully for activity ID: {ActivityId}", request.SurveyActivityId);
-                return this.ApiSuccess(result, "Vote submitted successfully");
+                return this.ApiSuccess(result, _localizer["VoteSubmitted"]);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Vote submission failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["VoteValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Vote submission failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["VoteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while submitting vote for activity {ActivityId}", request.SurveyActivityId);
-                return this.ApiError("An error occurred while submitting the vote", "InternalError", 500);
+                return this.ApiError(_localizer["VoteUnexpected"], "InternalError", 500);
             }
         }
 
@@ -257,10 +265,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (activities == null || !activities.Any())
             {
                 _logger.LogWarning("No activities found for survey ID {SurveyId}", surveyId);
-                return this.ApiError("No activities found for this survey", "NotFound", 404);
+                return this.ApiError(_localizer["SurveyActivitiesNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(activities, "Survey activities retrieved successfully");
+            return this.ApiSuccess(activities, _localizer["SurveyActivitiesRetrieved"]);
         }
 
         /// <summary>
@@ -282,12 +290,12 @@ namespace FunnyActivities.WebAPI.Controllers
             try
             {
                 var votes = await _votingService.GetParticipantVotesAsync(participantId);
-                return this.ApiSuccess(votes, "Participant votes retrieved successfully");
+                return this.ApiSuccess(votes, _localizer["ParticipantVotesRetrieved"]);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving votes for participant {ParticipantId}", participantId);
-                return this.ApiError("An error occurred while retrieving participant votes", "InternalError", 500);
+                return this.ApiError(_localizer["ParticipantVotesUnexpected"], "InternalError", 500);
             }
         }
 
@@ -313,7 +321,7 @@ namespace FunnyActivities.WebAPI.Controllers
             if (survey == null)
             {
                 _logger.LogWarning("Survey status check failed - survey not found: {SurveyId}", surveyId);
-                return this.ApiError("Survey not found", "NotFound", 404);
+                return this.ApiError(_localizer["SurveyNotFound"], "NotFound", 404);
             }
 
             var status = new
@@ -328,7 +336,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 CanVote = survey.IsActive && survey.StartDate <= DateTime.UtcNow && (!survey.EndDate.HasValue || survey.EndDate.Value >= DateTime.UtcNow)
             };
 
-            return this.ApiSuccess(status, "Survey status retrieved successfully");
+            return this.ApiSuccess(status, _localizer["SurveyStatusRetrieved"]);
         }
     }
 }

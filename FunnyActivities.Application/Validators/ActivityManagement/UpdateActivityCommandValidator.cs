@@ -1,6 +1,7 @@
 using System;
 using FluentValidation;
 using FunnyActivities.Application.Commands.ActivityManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.ActivityManagement
 {
@@ -15,40 +16,40 @@ namespace FunnyActivities.Application.Validators.ActivityManagement
         public UpdateActivityCommandValidator()
         {
             RuleFor(x => x.Id)
-                .NotEmpty().WithMessage("Activity ID is required. Please provide a valid activity identifier.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("ActivityIdRequired"));
 
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Activity name is required. Please enter a name for the activity.")
-                .Length(1, 200).WithMessage("Activity name must be between 1 and 200 characters. For example: 'Morning Yoga Session' or 'Basic Cooking Class'.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("ActivityNameRequired"))
+                .Length(1, 200).WithMessage(ValidationMessageProvider.Get("ActivityNameLength1To200"));
 
             RuleFor(x => x.Description)
-                .MaximumLength(1000).WithMessage("Activity description cannot exceed 1000 characters. Please keep your description concise and informative.")
+                .MaximumLength(1000).WithMessage(ValidationMessageProvider.Get("ActivityDescriptionMax1000"))
                 .When(x => !string.IsNullOrEmpty(x.Description));
 
             RuleFor(x => x.VideoUrl)
                 .Must(url => string.IsNullOrEmpty(url) || IsValidVideoUrl(url))
-                .WithMessage("Invalid video URL format. Please provide a valid video URL (e.g., https://youtube.com/watch?v=...) or leave empty to remove the current video.")
+                .WithMessage(ValidationMessageProvider.Get("ActivityVideoUrlInvalid"))
                 .When(x => !string.IsNullOrEmpty(x.VideoUrl));
 
             RuleFor(x => x.IntroVideoUrl)
                 .Must(url => string.IsNullOrEmpty(url) || IsValidVideoUrl(url))
-                .WithMessage("Invalid intro video URL format. Please provide a valid video URL or leave empty to remove the existing intro.")
+                .WithMessage(ValidationMessageProvider.Get("ActivityIntroVideoUrlInvalid"))
                 .When(x => !string.IsNullOrEmpty(x.IntroVideoUrl));
 
             RuleFor(x => x.DurationHours)
-                .InclusiveBetween(0, 23).WithMessage("Hours must be between 0 and 23. For activities longer than 24 hours, consider breaking them into multiple sessions.")
+                .InclusiveBetween(0, 23).WithMessage(ValidationMessageProvider.Get("DurationHoursRange"))
                 .When(x => x.DurationHours.HasValue);
 
             RuleFor(x => x.DurationMinutes)
-                .InclusiveBetween(0, 59).WithMessage("Minutes must be between 0 and 59. Use this field to specify additional minutes beyond the hours.")
+                .InclusiveBetween(0, 59).WithMessage(ValidationMessageProvider.Get("DurationMinutesRange"))
                 .When(x => x.DurationMinutes.HasValue);
 
             RuleFor(x => x.DurationSeconds)
-                .InclusiveBetween(0, 59).WithMessage("Seconds must be between 0 and 59. This is typically used for very short activities or precise timing.")
+                .InclusiveBetween(0, 59).WithMessage(ValidationMessageProvider.Get("DurationSecondsRange"))
                 .When(x => x.DurationSeconds.HasValue);
 
             RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User ID is required. Please ensure you are properly authenticated.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("UserIdRequired"));
         }
 
         /// <summary>

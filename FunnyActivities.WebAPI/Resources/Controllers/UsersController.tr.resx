@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="UserRegistered" xml:space="preserve"><value>Kullanici basariyla kaydedildi.</value></data>
+  <data name="LoginSuccessful" xml:space="preserve"><value>Giris basarili.</value></data>
+  <data name="UserNotFound" xml:space="preserve"><value>Kullanici bulunamadi.</value></data>
+  <data name="UserRetrieved" xml:space="preserve"><value>Kullanici basariyla getirildi.</value></data>
+  <data name="ProfileNotFound" xml:space="preserve"><value>Profil bulunamadi.</value></data>
+  <data name="ProfileRetrieved" xml:space="preserve"><value>Profil basariyla getirildi.</value></data>
+  <data name="ProfileUpdated" xml:space="preserve"><value>Profil basariyla guncellendi.</value></data>
+  <data name="ProfileUpdateValidationError" xml:space="preserve"><value>Profil guncellenemedi: {0}. Lutfen degisikliklerinizi kontrol edip tekrar deneyin.</value></data>
+  <data name="ProfileUpdateUnexpected" xml:space="preserve"><value>Profil guncellenirken bir hata olustu. Lutfen daha sonra tekrar deneyin.</value></data>
+  <data name="ProfileImageValidationError" xml:space="preserve"><value>Profil resmi islenemedi: {0}. Lutfen dosyayi kontrol edip tekrar deneyin.</value></data>
+  <data name="ProfileImageUploadUnexpected" xml:space="preserve"><value>Profil resmi yuklenirken bir hata olustu. Lutfen daha sonra tekrar deneyin.</value></data>
+  <data name="PasswordResetRequested" xml:space="preserve"><value>Eger email varsa, sifre sifirlama baglantisi gonderildi.</value></data>
+  <data name="PasswordResetSuccess" xml:space="preserve"><value>Sifre basariyla sifirlandi.</value></data>
+  <data name="UserCountRetrieved" xml:space="preserve"><value>Kullanici sayisi basariyla getirildi.</value></data>
+  <data name="UserCountError" xml:space="preserve"><value>Kullanici sayisi getirilirken bir hata olustu.</value></data>
+  <data name="OnlineUserCountRetrieved" xml:space="preserve"><value>Cevirimiçi kullanici sayisi basariyla getirildi.</value></data>
+  <data name="OnlineUserCountError" xml:space="preserve"><value>Cevirimiçi kullanici sayisi getirilirken bir hata olustu.</value></data>
+  <data name="UserGrowthRetrieved" xml:space="preserve"><value>Kullanici buyumesi verisi basariyla getirildi.</value></data>
+  <data name="UserGrowthError" xml:space="preserve"><value>Kullanici buyume verisi getirilirken bir hata olustu.</value></data>
+  <data name="ProfileImageRequired" xml:space="preserve"><value>Herhangi bir resim dosyasi gonderilmedi.</value></data>
+  <data name="ProfileImageUploaded" xml:space="preserve"><value>Profil resmi basariyla yuklendi.</value></data>
+  <data name="UsersSearched" xml:space="preserve"><value>Kullanicilar basariyla getirildi.</value></data>
+</root>

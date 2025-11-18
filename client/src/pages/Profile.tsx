@@ -11,10 +11,12 @@ import {
   Alert,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from '../hooks/useTranslation';
 
 const Profile: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -26,7 +28,7 @@ const Profile: React.FC = () => {
       logout();
       setSnackbar({
         open: true,
-        message: 'Successfully logged out',
+        message: t('profile_logout_success'),
         severity: 'success',
       });
       // Redirect to login page after successful logout
@@ -35,7 +37,7 @@ const Profile: React.FC = () => {
       console.error('Logout error:', error);
       setSnackbar({
         open: true,
-        message: 'Failed to logout. Please try again.',
+        message: t('profile_logout_error'),
         severity: 'error',
       });
     }
@@ -48,7 +50,7 @@ const Profile: React.FC = () => {
   if (!user) {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Typography variant="h6">Please log in to view your profile.</Typography>
+        <Typography variant="h6">{t('profile_login_prompt')}</Typography>
       </Container>
     );
   }
@@ -58,14 +60,14 @@ const Profile: React.FC = () => {
       <Card>
         <CardContent sx={{ p: 3 }}>
           <Typography variant="h5" gutterBottom>
-            Profile
+            {t('profile_title')}
           </Typography>
           <Box sx={{ mt: 2 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Name:</strong> {user.firstName} {user.lastName}
+              <strong>{t('profile_name_label')}</strong> {user.firstName} {user.lastName}
             </Typography>
             <Typography variant="body1" sx={{ mb: 3 }}>
-              <strong>Email:</strong> {user.email}
+              <strong>{t('profile_email_label')}</strong> {user.email}
             </Typography>
             <Button
               variant="outlined"
@@ -73,7 +75,7 @@ const Profile: React.FC = () => {
               onClick={handleLogout}
               sx={{ mt: 1 }}
             >
-              Logout
+              {t('profile_logout')}
             </Button>
           </Box>
         </CardContent>

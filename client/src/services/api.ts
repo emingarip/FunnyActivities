@@ -48,6 +48,12 @@ api.interceptors.request.use(
       timestamp: new Date().toISOString()
     });
 
+    // Add locale header from persisted selection
+    const storedLocale = localStorage.getItem('app-locale');
+    if (storedLocale && config.headers) {
+      config.headers['Accept-Language'] = storedLocale;
+    }
+
     // Add auth token if available, but skip for anonymous endpoints
     const token = localStorage.getItem('accessToken');
     if (token && config.headers) {

@@ -5,6 +5,7 @@ using FunnyActivities.Application.Commands.FavoritesManagement;
 using FunnyActivities.Application.Queries.FavoritesManagement;
 using FunnyActivities.Application.DTOs.FavoritesManagement;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -24,17 +25,20 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<FavoritesController> _logger;
+        private readonly IStringLocalizer<FavoritesController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FavoritesController"/> class.
         /// </summary>
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
-        public FavoritesController(IMediator mediator, ILogger<FavoritesController> logger)
+        /// <param name="localizer">The string localizer.</param>
+        public FavoritesController(IMediator mediator, ILogger<FavoritesController> logger, IStringLocalizer<FavoritesController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -79,22 +83,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Activity added to favorites successfully for user {UserId}", CurrentUserId);
-                return this.ApiSuccess(result, "Activity added to favorites successfully", 201);
+                return this.ApiSuccess(result, _localizer["FavoriteAdded"], 201);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Add to favorites failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["FavoriteAddNotFound"], "NotFound", 404);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning("Add to favorites failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "Conflict", 409);
+                return this.ApiError(_localizer["FavoriteAlreadyExists"], "Conflict", 409);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding activity to favorites");
-                return this.ApiError("An error occurred while adding activity to favorites", "InternalError", 500);
+                return this.ApiError(_localizer["FavoriteAddUnexpected"], "InternalError", 500);
             }
         }
 
@@ -129,17 +133,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Activity removed from favorites successfully for user {UserId}", CurrentUserId);
-                return this.ApiSuccess<object>("Activity removed from favorites successfully", 204);
+                return this.ApiSuccess<object>(_localizer["FavoriteRemoved"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Remove from favorites failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["FavoriteRemoveNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while removing activity from favorites");
-                return this.ApiError("An error occurred while removing activity from favorites", "InternalError", 500);
+                return this.ApiError(_localizer["FavoriteRemoveUnexpected"], "InternalError", 500);
             }
         }
 
@@ -176,7 +180,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Favorites retrieved successfully");
+            return this.ApiSuccess(result, _localizer["FavoritesRetrieved"]);
         }
 
         /// <summary>
@@ -208,7 +212,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Favorite check completed successfully");
+            return this.ApiSuccess(result, _localizer["FavoriteCheckCompleted"]);
         }
     }
 }

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ActivitiesRetrieved" xml:space="preserve"><value>Aktiviteler başarıyla getirildi</value></data>
+  <data name="AnonymousAccessWorks" xml:space="preserve"><value>Anonim erişim çalışıyor!</value></data>
+  <data name="TestSuccessful" xml:space="preserve"><value>Test başarılı</value></data>
+  <data name="SimpleAnonymousAccessWorks" xml:space="preserve"><value>Basit anonim erişim çalışıyor!</value></data>
+  <data name="PublicActivitiesRetrieved" xml:space="preserve"><value>Herkese açık aktiviteler başarıyla getirildi</value></data>
+  <data name="ActivityNotFound" xml:space="preserve"><value>İstenen aktivite bulunamadı. Lütfen aktivite ID'sini kontrol edin ve tekrar deneyin.</value></data>
+  <data name="ActivityRetrieved" xml:space="preserve"><value>Aktivite başarıyla getirildi</value></data>
+  <data name="ActivityNotFoundPublic" xml:space="preserve"><value>İstenen aktivite bulunamadı veya herkese açık değil.</value></data>
+  <data name="PublicActivityRetrieved" xml:space="preserve"><value>Herkese açık aktivite başarıyla getirildi</value></data>
+  <data name="ActivityWithDetailsRetrieved" xml:space="preserve"><value>Aktivite detaylarıyla birlikte başarıyla getirildi</value></data>
+  <data name="ActivityCreated" xml:space="preserve"><value>Aktivite başarıyla oluşturuldu</value></data>
+  <data name="ActivityCreateValidationError" xml:space="preserve"><value>Aktivite oluşturulamadı: {0}. Lütfen girdilerinizi kontrol edin ve tekrar deneyin.</value></data>
+  <data name="ActivityCreateUnexpected" xml:space="preserve"><value>Aktivite oluştururken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
+  <data name="ActivityUpdated" xml:space="preserve"><value>Aktivite başarıyla güncellendi</value></data>
+  <data name="ActivityUpdateNotFound" xml:space="preserve"><value>Güncellemeye çalıştığınız aktivite bulunamadı. Lütfen aktivite ID'sini doğrulayın ve tekrar deneyin.</value></data>
+  <data name="ActivityUpdateValidationError" xml:space="preserve"><value>Aktivite güncellenemedi: {0}. Lütfen değişikliklerinizi kontrol edin ve tekrar deneyin.</value></data>
+  <data name="ActivityUpdateUnexpected" xml:space="preserve"><value>Aktivite güncellenirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
+  <data name="ActivityDeleted" xml:space="preserve"><value>Aktivite başarıyla silindi</value></data>
+  <data name="ActivityDeleteNotFound" xml:space="preserve"><value>Silmek istediğiniz aktivite bulunamadı. Lütfen aktivite ID'sini doğrulayın ve tekrar deneyin.</value></data>
+  <data name="ActivityDeleteUnexpected" xml:space="preserve"><value>Aktivite silinirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
+  <data name="InvalidVideoType" xml:space="preserve"><value>Geçersiz video türü. İzin verilen değerler 'main' veya 'intro'dur.</value></data>
+  <data name="NoVideoFileProvided" xml:space="preserve"><value>Video dosyası belirtilmedi</value></data>
+  <data name="VideoUploaded" xml:space="preserve"><value>Video başarıyla yüklendi</value></data>
+  <data name="VideoUploadError" xml:space="preserve"><value>Video yüklenirken bir hata oluştu</value></data>
+  <data name="VideoUrlGenerated" xml:space="preserve"><value>Video URL'si başarıyla oluşturuldu</value></data>
+  <data name="VideoUrlGenerateError" xml:space="preserve"><value>Video URL'si oluşturulurken bir hata oluştu</value></data>
+  <data name="VideoUrlStorageUnavailable" xml:space="preserve"><value>Video URL'si oluşturulamıyor. Depolama hizmeti kullanım dışı.</value></data>
+  <data name="VideoObjectKeyRequired" xml:space="preserve"><value>Video nesne anahtarı zorunludur</value></data>
+  <data name="VideoNotFound" xml:space="preserve"><value>Video bulunamadı</value></data>
+  <data name="VideoMetadataRetrieved" xml:space="preserve"><value>Video metadatası başarıyla getirildi</value></data>
+  <data name="VideoMetadataStorageUnavailable" xml:space="preserve"><value>Video metadatası alınamıyor. Depolama hizmeti kullanım dışı.</value></data>
+  <data name="VideoMetadataError" xml:space="preserve"><value>Video metadatası alınırken bir hata oluştu</value></data>
+  <data name="ObjectKeyRequired" xml:space="preserve"><value>Nesne anahtarı zorunludur</value></data>
+  <data name="ObjectMetadataRetrieved" xml:space="preserve"><value>Nesne metadatası başarıyla getirildi</value></data>
+  <data name="ObjectNotFound" xml:space="preserve"><value>Nesne bulunamadı</value></data>
+  <data name="ObjectMetadataStorageUnavailable" xml:space="preserve"><value>Nesne metadatası alınamıyor. Depolama hizmeti kullanım dışı.</value></data>
+  <data name="ObjectMetadataError" xml:space="preserve"><value>Nesne metadatası alınırken bir hata oluştu</value></data>
+  <data name="VideoDeletionFailed" xml:space="preserve"><value>Video silinemedi</value></data>
+  <data name="VideoDeleted" xml:space="preserve"><value>Video başarıyla silindi</value></data>
+  <data name="VideoDeleteError" xml:space="preserve"><value>Video silinirken bir hata oluştu</value></data>
+</root>

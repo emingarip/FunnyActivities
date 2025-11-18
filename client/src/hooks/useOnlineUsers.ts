@@ -29,7 +29,7 @@ export const useOnlineUsers = () => {
       }
 
       const result = await response.json();
-      return result;
+      return result.data || result;
     },
     enabled: !!token,
     staleTime: 30000,

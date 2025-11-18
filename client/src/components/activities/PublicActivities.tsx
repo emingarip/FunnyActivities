@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material';
 import { activitiesAPI, favoritesAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../hooks/useTranslation';
 import VideoPreview from './VideoPreview';
 import { getJsonItem } from '../../utils/storage';
 
@@ -57,6 +58,7 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
   showTitle = true,
   title = "Featured Activities"
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { isAuthenticated } = useAuth();
@@ -421,12 +423,12 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
   return (
     <Box sx={{ py: { xs: 2, md: 4 }, px: { xs: 2, md: 3 } }}>
       {showTitle && (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 3, md: 4 } }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: { xs: 3, md: 4 } }}>
           <Typography
             variant={isMobile ? "h4" : "h3"}
             component="h2"
             sx={{
-              textAlign: isMobile ? 'center' : 'left',
+              textAlign: 'center',
               fontWeight: 700,
               color: theme.palette.primary.main,
               mb: isMobile ? 1 : 0
@@ -434,35 +436,6 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
           >
             {title}
           </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {/* Last Updated Timestamp */}
-            {lastUpdated && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <ScheduleIcon fontSize="small" color="action" />
-                <Typography variant="body2" color="text.secondary">
-                  Last updated: {lastUpdated.toLocaleTimeString()}
-                </Typography>
-              </Box>
-            )}
-
-            {/* Manual Refresh Button */}
-            <Tooltip title="Refresh activities">
-              <IconButton
-                onClick={handleManualRefresh}
-                disabled={loading || isPolling}
-                size="small"
-                sx={{
-                  color: theme.palette.primary.main,
-                  '&:hover': {
-                    backgroundColor: theme.palette.primary.main + '10',
-                  },
-                }}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
         </Box>
       )}
 
@@ -485,10 +458,10 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
       {activities.length === 0 ? (
         <Box textAlign="center" py={8}>
           <Typography variant="h6" color="text.secondary" gutterBottom>
-            No activities available
+            {t('publicActivities.noActivitiesAvailable')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Check back later for new activities
+            {t('publicActivities.checkBackLater')}
           </Typography>
         </Box>
       ) : (

@@ -6,6 +6,7 @@ using FunnyActivities.Application.Commands.BaseProductManagement;
 using FunnyActivities.Application.Queries.BaseProductManagement;
 using FunnyActivities.Application.DTOs.BaseProductManagement;
 using FunnyActivities.WebAPI.Controllers.Base;
+using Microsoft.Extensions.Localization;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -24,17 +25,19 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<BaseProductController> _logger;
+        private readonly IStringLocalizer<BaseProductController> _localizer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseProductController"/> class.
         /// </summary>
         /// <param name="mediator">The mediator for handling commands and queries.</param>
         /// <param name="logger">The logger.</param>
-        public BaseProductController(IMediator mediator, ILogger<BaseProductController> logger)
+        public BaseProductController(IMediator mediator, ILogger<BaseProductController> logger, IStringLocalizer<BaseProductController> localizer)
             : base(logger)
         {
             _mediator = mediator;
             _logger = logger;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -88,17 +91,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Base product created successfully with ID: {Id}", result.Id);
-                return this.ApiSuccess(result, "Base product created successfully", 201);
+                return this.ApiSuccess(result, _localizer["BaseProductCreated"], 201);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Base product creation failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["BaseProductCreateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating base product");
-                return this.ApiError("An error occurred while creating the base product", "InternalError", 500);
+                return this.ApiError(_localizer["BaseProductCreateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -142,10 +145,10 @@ namespace FunnyActivities.WebAPI.Controllers
             if (baseProduct == null)
             {
                 _logger.LogWarning("Base product with ID {BaseProductId} not found", id);
-                return this.ApiError("Base product not found", "NotFound", 404);
+                return this.ApiError(_localizer["BaseProductNotFound"], "NotFound", 404);
             }
 
-            return this.ApiSuccess(baseProduct, "Base product retrieved successfully");
+            return this.ApiSuccess(baseProduct, _localizer["BaseProductRetrieved"]);
         }
 
         /// <summary>
@@ -204,22 +207,22 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Base product updated successfully with ID: {BaseProductId}", result.Id);
-                return this.ApiSuccess(result, "Base product updated successfully");
+                return this.ApiSuccess(result, _localizer["BaseProductUpdated"]);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Base product update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["BaseProductUpdateNotFound"], "NotFound", 404);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Base product update failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "ValidationError", 400);
+                return this.ApiError(string.Format(_localizer["BaseProductUpdateValidationError"], ex.Message), "ValidationError", 400);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating base product");
-                return this.ApiError("An error occurred while updating the base product", "InternalError", 500);
+                return this.ApiError(_localizer["BaseProductUpdateUnexpected"], "InternalError", 500);
             }
         }
 
@@ -259,17 +262,17 @@ namespace FunnyActivities.WebAPI.Controllers
             {
                 await _mediator.Send(command);
                 _logger.LogInformation("Base product deleted successfully with ID: {BaseProductId}", id);
-                return this.ApiSuccess<object>("Base product deleted successfully", 204);
+                return this.ApiSuccess<object>(_localizer["BaseProductDeleted"], 204);
             }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Base product deletion failed: {Message}", ex.Message);
-                return this.ApiError(ex.Message, "NotFound", 404);
+                return this.ApiError(_localizer["BaseProductDeleteNotFound"], "NotFound", 404);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting base product");
-                return this.ApiError("An error occurred while deleting the base product", "InternalError", 500);
+                return this.ApiError(_localizer["BaseProductDeleteUnexpected"], "InternalError", 500);
             }
         }
 
@@ -333,7 +336,7 @@ namespace FunnyActivities.WebAPI.Controllers
             };
 
             var result = await _mediator.Send(query);
-            return this.ApiSuccess(result, "Base products retrieved successfully");
+            return this.ApiSuccess(result, _localizer["BaseProductsRetrieved"]);
         }
     }
 }

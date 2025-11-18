@@ -1,6 +1,7 @@
 using FluentValidation;
 using FunnyActivities.Application.DTOs.SurveyManagement;
 using Microsoft.Extensions.Logging;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.SurveyManagement
 {
@@ -19,18 +20,18 @@ namespace FunnyActivities.Application.Validators.SurveyManagement
             _logger = logger;
 
             RuleFor(x => x.SurveyActivityId)
-                .NotEmpty().WithMessage("Survey activity ID is required")
-                .NotEqual(Guid.Empty).WithMessage("Survey activity ID cannot be empty");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("SurveyActivityIdRequired"))
+                .NotEqual(Guid.Empty).WithMessage(ValidationMessageProvider.Get("SurveyActivityIdInvalid"));
 
             RuleFor(x => x.VoteValue)
-                .NotEmpty().WithMessage("Vote value is required")
-                .InclusiveBetween(1, 5).WithMessage("Vote value must be between 1 and 5");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("VoteValueRequired"))
+                .InclusiveBetween(1, 5).WithMessage(ValidationMessageProvider.Get("VoteValueRange"));
 
             // Comment is optional - no validation required
 
             RuleFor(x => x)
                 .Must(request => request.IsValid())
-                .WithMessage("Request contains invalid data");
+                .WithMessage(ValidationMessageProvider.Get("RequestInvalid"));
         }
 
         public override FluentValidation.Results.ValidationResult Validate(ValidationContext<VoteRequest> context)

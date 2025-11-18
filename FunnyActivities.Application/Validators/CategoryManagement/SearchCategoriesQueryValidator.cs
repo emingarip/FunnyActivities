@@ -1,5 +1,6 @@
 using FluentValidation;
 using FunnyActivities.Application.Queries.CategoryManagement;
+using FunnyActivities.Application.Validators;
 
 namespace FunnyActivities.Application.Validators.CategoryManagement
 {
@@ -14,16 +15,16 @@ namespace FunnyActivities.Application.Validators.CategoryManagement
         public SearchCategoriesQueryValidator()
         {
             RuleFor(x => x.SearchTerm)
-                .NotEmpty().WithMessage("Search term is required.")
-                .MinimumLength(1).WithMessage("Search term must be at least 1 character long.")
-                .MaximumLength(100).WithMessage("Search term cannot exceed 100 characters.");
+                .NotEmpty().WithMessage(ValidationMessageProvider.Get("SearchTermRequired"))
+                .MinimumLength(1).WithMessage(ValidationMessageProvider.Get("SearchTermMin1"))
+                .MaximumLength(100).WithMessage(ValidationMessageProvider.Get("SearchTermMax100"));
 
             RuleFor(x => x.PageNumber)
-                .GreaterThan(0).WithMessage("Page number must be greater than 0.");
+                .GreaterThan(0).WithMessage(ValidationMessageProvider.Get("PageNumberMin1"));
 
             RuleFor(x => x.PageSize)
-                .GreaterThan(0).WithMessage("Page size must be greater than 0.")
-                .LessThanOrEqualTo(100).WithMessage("Page size cannot exceed 100.");
+                .GreaterThan(0).WithMessage(ValidationMessageProvider.Get("PageSizeMin1"))
+                .LessThanOrEqualTo(100).WithMessage(ValidationMessageProvider.Get("PageSizeMax100"));
         }
     }
 }
