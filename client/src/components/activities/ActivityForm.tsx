@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -40,13 +41,13 @@ import {
 interface ActivityCategory {
   id: string;
   name: string;
-  description: string;
+  description?: string;
 }
 
 interface ProductVariant {
   id: string;
   name: string;
-  baseProduct: {
+  baseProduct?: {
     id: string;
     name: string;
   };
@@ -59,35 +60,35 @@ interface UnitOfMeasure {
 }
 
 interface ActivityStep {
-  id: string;
+  id?: string;
   order: number;
   description: string;
   timestampSeconds: number;
 }
 
 interface ActivityMaterial {
-  id: string;
+  id?: string;
   productVariantId: string;
   quantity: number;
   unitOfMeasureId: string;
-  productVariant: ProductVariant;
-  unitOfMeasure: UnitOfMeasure;
+  productVariant?: ProductVariant;
+  unitOfMeasure?: UnitOfMeasure;
 }
 
 interface ActivityFormData {
   name: string;
-  description: string;
-  activityCategoryId: string;
-  durationHours: number;
-  durationMinutes: number;
-  durationSeconds: number;
-  videoFile: File;
+  description?: string;
+  activityCategoryId?: string;
+  durationHours?: number;
+  durationMinutes?: number;
+  durationSeconds?: number;
+  videoFile?: File;
   steps: ActivityStep[];
   materials: ActivityMaterial[];
 }
 
 interface TabPanelProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   index: number;
   value: number;
 }
@@ -109,7 +110,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 interface ActivityFormProps {
-  activity: any; // The activity being edited, if any
+  activity?: any; // The activity being edited, if any
   categories: ActivityCategory[];
   onSuccess: () => void;
   onCancel: () => void;
@@ -121,6 +122,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   onSuccess,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -139,7 +141,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   // Get steps, error, and loading state from Redux using selectors
   const reduxSteps = useAppSelector((state) => {
     // Get steps for the current activity
-    return activity.id  selectStepsForActivity(state, activity.id) : [];
+    return activity?.id ? selectStepsForActivity(state, activity.id) : [];
   });
   const reduxError = useAppSelector(selectActivityErrors);
   const reduxLoading = useAppSelector(selectActivityLoading);
@@ -151,7 +153,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
       activityId: step.activityId, // Use the activityId from Redux state
       order: step.order,
       description: step.description,
-      timestampSeconds: step.timestampSeconds  0,
+      timestampSeconds: step.timestampSeconds ?? 0,
     }));
   }, [reduxSteps]);
 
@@ -194,13 +196,13 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
          activityProductVariantsAPI.getActivityProductVariantsByActivityId(activity.id),
        ]);
 
-       let detailVideoUrl = activity.videoUrl;
-       let detailIntroVideoUrl = activity.introVideoUrl;
+       let detailVideoUrl = activity?.videoUrl;
+       let detailIntroVideoUrl = activity?.introVideoUrl;
 
        if (activityDetailsResponse.data.success && activityDetailsResponse.data.data) {
          const activityData = activityDetailsResponse.data.data;
-         detailVideoUrl = activityData.videoUrl  detailVideoUrl;
-         detailIntroVideoUrl = activityData.introVideoUrl  detailIntroVideoUrl;
+         detailVideoUrl = activityData.videoUrl ?? detailVideoUrl;
+         detailIntroVideoUrl = activityData.introVideoUrl ?? detailIntroVideoUrl;
 
          // Parse duration from string format if needed
          let durationHours = 0, durationMinutes = 0, durationSeconds = 0;
@@ -245,7 +247,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
          setExisting: React.Dispatch<React.SetStateAction<string | undefined>>,
          setPreview: React.Dispatch<React.SetStateAction<string | undefined>>
        ) => {
-         if (!rawUrl || !activity.id) {
+         if (!rawUrl || !activity?.id) {
            setExisting(undefined);
            setPreview(undefined);
            return;
@@ -259,7 +261,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            isMinioObjectKey: VideoUtils.isMinioObjectKey(rawUrl)
          });
 
-         let finalObjectKey = objectKey || (VideoUtils.isMinioObjectKey(rawUrl)  rawUrl : null);
+         let finalObjectKey = objectKey || (VideoUtils.isMinioObjectKey(rawUrl) ? rawUrl : null);
 
          if (finalObjectKey && finalObjectKey.startsWith('activity-videos/')) {
            finalObjectKey = finalObjectKey.substring('activity-videos/'.length);
@@ -322,7 +324,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
  // Update duration fields when activity changes - memoized to prevent infinite loops
   const updateDurationFields = useCallback(() => {
     if (activity) {
-      console.log('[ActivityForm] ðŸ”„ updateDurationFields called:', {
+      console.log('[ActivityForm] 🔄 updateDurationFields called:', {
         activityId: activity.id,
         durationHours: activity.durationHours,
         durationMinutes: activity.durationMinutes,
@@ -337,7 +339,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
 
  useEffect(() => {
    updateDurationFields();
- }, [updateDurationFields, activity.id]);
+ }, [updateDurationFields, activity?.id]);
 
  // Debug: Watch form values (only in development) - reduced frequency to prevent infinite loops
  useEffect(() => {
@@ -381,14 +383,14 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
        activityId: step.activityId,
        order: step.order,
        description: step.description,
-        timestampSeconds: step.timestampSeconds  0,
+        timestampSeconds: step.timestampSeconds ?? 0,
      }));
 
     // Update Redux with the new steps
-    if (activity.id && reduxSteps.length > 0) {
+    if (activity?.id && reduxSteps.length > 0) {
       dispatch(setSteps({ activityId: activity.id, steps: reduxSteps }));
     }
-  }, [activity.id, dispatch]);
+  }, [activity?.id, dispatch]);
 
 
  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -396,7 +398,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
  };
 
  const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-   const file = event.target.files.[0];
+   const file = event.target.files?.[0];
    if (file) {
      // Validate file type
      if (!file.type.startsWith('video/')) {
@@ -416,7 +418,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
  };
 
  const handleIntroVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-   const file = event.target.files.[0];
+   const file = event.target.files?.[0];
    if (file) {
      if (!file.type.startsWith('video/')) {
        setError('Please select a valid video file');
@@ -491,7 +493,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
        return;
      }
 
-     let activityId = activity.id;
+     let activityId = activity?.id;
 
      // Create or update activity
      if (activityId) {
@@ -573,7 +575,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
      onSuccess();
    } catch (err: any) {
      console.error('Error saving activity:', err);
-     setError(err.response.data.message || 'Failed to save activity');
+     setError(err.response?.data?.message || 'Failed to save activity');
    } finally {
      setLoading(false);
    }
@@ -601,11 +603,11 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            value={activeTab}
            onChange={handleTabChange}
            aria-label="activity form tabs"
-           variant={isMobile  'fullWidth' : 'standard'}
+           variant={isMobile ? 'fullWidth' : 'standard'}
          >
-           <Tab label="Basic Information" id="activity-form-tab-0" aria-controls="activity-form-tabpanel-0" />
-           <Tab label="Video & Steps" id="activity-form-tab-1" aria-controls="activity-form-tabpanel-1" />
-           <Tab label="Persona Associations" id="activity-form-tab-2" aria-controls="activity-form-tabpanel-2" />
+           <Tab label={t('activityForm.basicInformation')} id="activity-form-tab-0" aria-controls="activity-form-tabpanel-0" />
+           <Tab label={t('activityForm.videoAndSteps')} id="activity-form-tab-1" aria-controls="activity-form-tabpanel-1" />
+           <Tab label={t('activityForm.personaAssociations')} id="activity-form-tab-2" aria-controls="activity-form-tabpanel-2" />
          </Tabs>
        </Box>
 
@@ -620,10 +622,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                render={({ field }) => (
                  <TextField
                    {...field}
-                   label="Activity Name"
+                   label={t('activityForm.activityName')}
                    sx={{ flex: 1, minWidth: '200px' }}
                    error={!!errors.name}
-                   helperText={errors.name.message as string}
+                   helperText={errors.name?.message as string}
                    required
                  />
                )}
@@ -633,10 +635,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                control={control}
                render={({ field }) => (
                  <FormControl sx={{ minWidth: '200px' }}>
-                   <InputLabel>Category</InputLabel>
-                   <Select {...field} label="Category">
+                   <InputLabel>{t('activityForm.category')}</InputLabel>
+                   <Select {...field} label={t('activityForm.category')}>
                      <MenuItem value="">
-                       <em>No category</em>
+                       <em>{t('activityForm.noCategory')}</em>
                      </MenuItem>
                      {categories.map((category: ActivityCategory) => (
                        <MenuItem key={category.id} value={category.id}>
@@ -663,57 +665,57 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            />
            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
              <Controller
-               key={`durationHours-${activity.id || 'new'}`}
+               key={`durationHours-${activity?.id || 'new'}`}
                name="durationHours"
                control={control}
                render={({ field }) => {
                  console.log('[ActivityForm] DurationHours Controller render:', {
                    fieldValue: field.value,
-                   activityId: activity.id,
-                   key: `durationHours-${activity.id || 'new'}`
+                   activityId: activity?.id,
+                   key: `durationHours-${activity?.id || 'new'}`
                  });
                  return (
                    <TextField
                      {...field}
-                     label="Hours"
+                     label={t('activityForm.hours')}
                      type="number"
                      sx={{ minWidth: '100px' }}
                      inputProps={{ min: 0 }}
                      value={field.value || ''}
-                     onChange={(e) => field.onChange(e.target.value === ''  0 : parseInt(e.target.value) || 0)}
+                     onChange={(e) => field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
                    />
                  );
                }}
              />
              <Controller
-               key={`durationMinutes-${activity.id || 'new'}`}
+               key={`durationMinutes-${activity?.id || 'new'}`}
                name="durationMinutes"
                control={control}
                render={({ field }) => (
                  <TextField
                    {...field}
-                   label="Minutes"
+                   label={t('activityForm.minutes')}
                    type="number"
                    sx={{ minWidth: '100px' }}
                    inputProps={{ min: 0, max: 59 }}
                    value={field.value || ''}
-                   onChange={(e) => field.onChange(e.target.value === ''  0 : parseInt(e.target.value) || 0)}
+                   onChange={(e) => field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
                  />
                )}
              />
              <Controller
-               key={`durationSeconds-${activity.id || 'new'}`}
+               key={`durationSeconds-${activity?.id || 'new'}`}
                name="durationSeconds"
                control={control}
                render={({ field }) => (
                  <TextField
                    {...field}
-                   label="Seconds"
+                   label={t('activityForm.seconds')}
                    type="number"
                    sx={{ minWidth: '100px' }}
                    inputProps={{ min: 0, max: 59 }}
                    value={field.value || ''}
-                   onChange={(e) => field.onChange(e.target.value === ''  0 : parseInt(e.target.value) || 0)}
+                   onChange={(e) => field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value) || 0)}
                  />
                )}
              />
@@ -727,10 +729,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            {/* Video Upload */}
            <Paper sx={{ p: 3 }}>
              <Typography variant="h6" gutterBottom>
-               Main Video
+               {t('activityForm.mainVideo')}
              </Typography>
              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-               This video contains the primary walkthrough used by the step manager.
+               {t('activityForm.mainVideoDescription')}
              </Typography>
              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                <Button
@@ -738,7 +740,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                  component="label"
                  startIcon={<UploadIcon />}
                >
-                 Upload Video
+                 {t('activityForm.uploadVideo')}
                  <input
                    type="file"
                    hidden
@@ -748,7 +750,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                </Button>
                {videoFile && (
                  <Typography variant="body2">
-                   {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                   {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} {t('activityForm.mb')})
                  </Typography>
                )}
                {!videoFile && videoUrl && (
@@ -759,18 +761,18 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                    rel="noopener noreferrer"
                    size="small"
                  >
-                   Preview Current Video
+                   {t('activityForm.previewCurrentVideo')}
                  </Button>
                )}
              </Box>
              {!videoFile && !videoUrl && existingVideoUrl && (
                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                 Stored video object: {existingVideoUrl}
+                 {t('activityForm.storedVideoObject')} {existingVideoUrl}
                </Typography>
              )}
              {!videoFile && !existingVideoUrl && (
                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                 No main video uploaded yet.
+                 {t('activityForm.noMainVideoUploaded')}
                </Typography>
              )}
            </Paper>
@@ -778,10 +780,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            {/* Intro Video Upload */}
            <Paper sx={{ p: 3 }}>
              <Typography variant="h6" gutterBottom>
-               Intro Video
+               {t('activityForm.introVideo')}
              </Typography>
              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-               Optional clip that plays before the main video to introduce the activity.
+               {t('activityForm.introVideoDescription')}
              </Typography>
              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                <Button
@@ -789,7 +791,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                  component="label"
                  startIcon={<UploadIcon />}
                >
-                 Upload Intro Video
+                 {t('activityForm.uploadIntroVideo')}
                  <input
                    type="file"
                    hidden
@@ -799,7 +801,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                </Button>
                {introVideoFile && (
                  <Typography variant="body2">
-                   {introVideoFile.name} ({(introVideoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                   {introVideoFile.name} ({(introVideoFile.size / (1024 * 1024)).toFixed(2)} {t('activityForm.mb')})
                  </Typography>
                )}
                {!introVideoFile && introVideoUrl && (
@@ -810,18 +812,18 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                    rel="noopener noreferrer"
                    size="small"
                  >
-                   Preview Intro Video
+                   {t('activityForm.previewIntroVideo')}
                  </Button>
                )}
              </Box>
              {!introVideoFile && !introVideoUrl && existingIntroVideoUrl && (
                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                 Stored intro video object: {existingIntroVideoUrl}
+                 {t('activityForm.storedIntroVideoObject')} {existingIntroVideoUrl}
                </Typography>
              )}
              {!introVideoFile && !existingIntroVideoUrl && (
                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                 No intro video uploaded yet.
+                 {t('activityForm.noIntroVideoUploaded')}
                </Typography>
              )}
            </Paper>
@@ -829,12 +831,12 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
            {/* Enhanced Steps Manager */}
            <Paper sx={{ p: 3 }}>
              <EnhancedStepManager
-               activityId={activity.id || 'new'}
+               activityId={activity?.id || 'new'}
                videoUrl={videoUrl}
                steps={existingSteps}
                onStepsChange={handleStepsChange}
                onStepCreate={async (step) => {
-                 if (activity.id) {
+                 if (activity?.id) {
                    try {
                      setStepOperationLoading(true);
                      setError(null);
@@ -844,7 +846,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
                        stepData: {
                          order: step.order,
                          description: step.description,
-                         timestampSeconds: step.timestampSeconds  0,
+                         timestampSeconds: step.timestampSeconds ?? 0,
                        }
                      })).unwrap();
                      console.log('[ActivityForm] Step created successfully via Redux');
@@ -894,7 +896,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
 
        {/* Tab 3: Persona Associations */}
        <TabPanel value={activeTab} index={2}>
-         <PersonaAssociationsTab activityId={activity.id} />
+         <PersonaAssociationsTab activityId={activity?.id} />
        </TabPanel>
      </Paper>
 
@@ -905,16 +907,16 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
          disabled={loading || reduxLoading}
          sx={{ minHeight: 44 }}
        >
-         Cancel
+         {t('activityForm.cancel')}
        </Button>
        <Button
          type="submit"
          variant="contained"
          disabled={loading || stepOperationLoading || reduxLoading}
-         startIcon={(loading || stepOperationLoading || reduxLoading)  <CircularProgress size={16} /> : null}
+         startIcon={(loading || stepOperationLoading || reduxLoading) ? <CircularProgress size={16} /> : null}
          sx={{ minHeight: 44 }}
        >
-         {(loading || stepOperationLoading || reduxLoading)  'Saving...' : (activity  'Update Activity' : 'Create Activity')}
+         {(loading || stepOperationLoading || reduxLoading) ? t('activityForm.saving') : (activity ? t('activityForm.updateActivity') : t('activityForm.createActivity'))}
        </Button>
      </Box>
    </Box>
@@ -922,4 +924,3 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
 };
 
 export default ActivityForm;
-

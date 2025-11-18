@@ -31,9 +31,7 @@ interface UserGrowthDataPoint {
   count: number;
 }
 
-interface UserGrowthResponse {
-  data: UserGrowthDataPoint[];
-}
+type UserGrowthResponse = UserGrowthDataPoint[];
 
 type PeriodType = 'weekly' | 'monthly' | 'quarterly';
 
@@ -54,23 +52,30 @@ const UserGrowthChart: React.FC<UserGrowthChartProps> = ({
   const [period, setPeriod] = useState<PeriodType>('weekly');
 
   const { data, isLoading, error, refetch } = useQuery<UserGrowthResponse>({
-    queryKey: ['userGrowth', period],
+    queryKey: ['userGrowth', period, 'v2'],
     queryFn: async () => {
+      console.log('Fetching user growth for period:', period);
       const response = await adminAPI.getUserGrowth({ period });
-      return response.data;
+      console.log('User growth response:', response);
+      return response.data.data.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 10 * 60 * 1000, // 10 minutes
   });
 
   const chartData = useMemo(() => {
-    if (!data?.data) return [];
+    console.log('UserGrowthChart data:', data);
+    if (!Array.isArray(data)) {
+      console.log('data is not array');
+      return [];
+    }
 
     // For performance with large datasets, limit to last 100 points
-    const limitedData = data.data.length > 100
-      ? data.data.slice(-100)
-      : data.data;
+    const limitedData = data.length > 100
+      ? data.slice(-100)
+      : data;
 
+    console.log('limitedData length:', limitedData.length);
     return limitedData.map(point => ({
       ...point,
       formattedDate: new Date(point.date).toLocaleDateString('en-US', {

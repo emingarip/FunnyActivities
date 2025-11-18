@@ -27,8 +27,8 @@ export const useUserCount = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      return data;
+      const result = await response.json();
+      return result.data || result;
     },
     enabled: !!token,
     staleTime: 30000,

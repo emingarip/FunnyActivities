@@ -168,7 +168,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             // Race between profile fetch and timeout
             const response = await Promise.race([userAPI.getProfile(), timeoutPromise]);
-            const user = response.data;
+            const responseData = response.data;
+            const user = responseData.data || responseData;
             console.log('[AuthContext] User profile received from API:', {
               userId: user.id,
               email: user.email,
