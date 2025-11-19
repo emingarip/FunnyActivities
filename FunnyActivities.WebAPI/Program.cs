@@ -5,6 +5,7 @@ using FunnyActivities.Infrastructure;
 using FunnyActivities.WebAPI.Extensions;
 using FunnyActivities.WebAPI.Middleware;
 using MediatR;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Minio;
@@ -15,6 +16,16 @@ using System.Globalization;
 using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Allow effectively unlimited request sizes for uploads
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = null;
+});
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = long.MaxValue;
+});
 
 // --- 1. SERVIS YAPILANDIRMASI (DEPENDENCY INJECTION) ---
 

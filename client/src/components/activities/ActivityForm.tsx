@@ -406,16 +406,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
        return;
      }
 
-     // Validate file size (max 100MB)
-     if (file.size > 100 * 1024 * 1024) {
-       setError('Video file size must be less than 100MB');
-       return;
-     }
-
-     setVideoFile(file);
-     setError(null);
-   }
- };
+    setVideoFile(file);
+    setError(null);
+  }
+};
 
  const handleIntroVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
    const file = event.target.files?.[0];
@@ -425,15 +419,10 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
        return;
      }
 
-     if (file.size > 100 * 1024 * 1024) {
-       setError('Video file size must be less than 100MB');
-       return;
-     }
-
-     setIntroVideoFile(file);
-     setError(null);
-   }
- };
+    setIntroVideoFile(file);
+    setError(null);
+  }
+};
 
 
  const onSubmit = async (data: ActivityFormData) => {
