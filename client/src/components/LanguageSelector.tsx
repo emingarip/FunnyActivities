@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 
 const LanguageSelector: React.FC = () => {
-  const { locale, setLocale, t } = useTranslation();
+  const { locale, setLocale, t, availableLocales, localeMeta } = useTranslation();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  const flagIcons: Record<'en' | 'tr', React.ReactElement> = {
+  const flagIcons: Record<string, React.ReactElement> = {
     en: (
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
         <rect width="16" height="16" fill="#00247d" />
@@ -26,10 +26,45 @@ const LanguageSelector: React.FC = () => {
     ),
   };
 
-  const languages: Array<{ code: 'en' | 'tr'; label: string }> = [
-    { code: 'en', label: t('language_en') },
-    { code: 'tr', label: t('language_tr') },
-  ];
+  const renderFlag = (code: string) => {
+    if (flagIcons[code]) {
+      return flagIcons[code];
+    }
+    const meta = localeMeta[code];
+    if (meta?.flagImage) {
+      return (
+        <img
+          src={meta.flagImage}
+          alt=""
+          className="language-flag-image"
+          width={16}
+          height={16}
+        />
+      );
+    }
+    if (meta?.flag) {
+      return (
+        <span aria-hidden="true" className="language-flag-custom">
+          {meta.flag}
+        </span>
+      );
+    }
+    return (
+      <span aria-hidden="true" className="language-flag-fallback">
+        {code.toUpperCase()}
+      </span>
+    );
+  };
+
+  const languages = availableLocales.map((code) => {
+    const metaLabel = localeMeta[code]?.label?.trim();
+    if (metaLabel) {
+      return { code, label: metaLabel };
+    }
+    const translated = t(`language_${code}`);
+    const label = translated === `language_${code}` ? code.toUpperCase() : translated;
+    return { code, label };
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,12 +88,11 @@ const LanguageSelector: React.FC = () => {
         aria-expanded={open}
       >
         <span className="language-flag" aria-hidden="true">
-          {flagIcons[locale]}
+          {renderFlag(locale)}
         </span>
         <span className="language-label">
           {languages.find((l) => l.code === locale)?.label ?? locale.toUpperCase()}
         </span>
-        <span className="language-toggle" aria-hidden="true">▼</span>
         <span className="sr-only">{t('language_select')}</span>
       </button>
 
@@ -76,7 +110,7 @@ const LanguageSelector: React.FC = () => {
                 role="option"
                 aria-selected={locale === lang.code}
               >
-                <span className="language-flag" aria-hidden="true">{flagIcons[lang.code]}</span>
+                <span className="language-flag" aria-hidden="true">{renderFlag(lang.code)}</span>
                 <span className="language-label">{lang.label}</span>
               </button>
             </li>
