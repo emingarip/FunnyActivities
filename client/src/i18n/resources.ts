@@ -192,6 +192,12 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     activity_admin_category_cancel: 'Cancel',
     activity_admin_category_validation: 'Name is required.',
     activity_admin_actions: 'Actions',
+    activity_admin_public_status: 'Visibility',
+    activity_admin_public_label_public: 'Public',
+    activity_admin_public_label_private: 'Private',
+    activity_admin_make_public: 'Make Public',
+    activity_admin_make_private: 'Make Private',
+    activity_admin_public_update_error: 'Failed to update activity visibility.',
 
     // Activity form modal
     activity_form_create_title: 'Create New Activity',
@@ -499,6 +505,12 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     activity_admin_category_cancel: 'İptal',
     activity_admin_category_validation: 'İsim zorunludur.',
     activity_admin_actions: 'İşlemler',
+    activity_admin_public_status: 'Görünürlük',
+    activity_admin_public_label_public: 'Herkese Açık',
+    activity_admin_public_label_private: 'Özel',
+    activity_admin_make_public: 'Public Yap',
+    activity_admin_make_private: 'Özele Çevir',
+    activity_admin_public_update_error: 'Aktivite görünürlüğü güncellenemedi.',
 
     // Activity form modal
     activity_form_create_title: 'Yeni Aktivite Oluştur',

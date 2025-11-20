@@ -57,8 +57,8 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 Id = activity.Id,
                 Name = activity.Name,
                 Description = activity.Description,
-                VideoUrl = activity.VideoUrl?.Value,
-                IntroVideoUrl = activity.IntroVideoUrl?.Value,
+                VideoUrl = NormalizeVideoValue(activity.VideoUrl?.Value),
+                IntroVideoUrl = NormalizeVideoValue(activity.IntroVideoUrl?.Value),
                 Duration = activity.Duration?.ToString(),
                 ActivityCategoryId = activity.ActivityCategoryId,
                 ActivityCategoryName = "Unknown", // Temporarily disable navigation property loading
@@ -71,6 +71,31 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             _logger.LogInformation("Successfully retrieved activity with ID: {ActivityId}", request.Id);
 
             return activityDto;
+        }
+
+        private string? NormalizeVideoValue(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+
+            if (value.StartsWith("videos/") && !Uri.TryCreate(value, UriKind.Absolute, out _))
+            {
+                return value;
+            }
+
+            if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
+            {
+                var path = uri.AbsolutePath.TrimStart('/');
+                const string bucketPrefix = "activity-videos/";
+                if (path.StartsWith(bucketPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return path.Substring(bucketPrefix.Length);
+                }
+            }
+
+            return value;
         }
     }
 }
