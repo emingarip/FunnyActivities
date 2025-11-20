@@ -40,6 +40,7 @@ interface Activity {
   name: string;
   description?: string;
   videoUrl?: string;
+  introVideoUrl?: string;
   durationHours?: number;
   durationMinutes?: number;
   durationSeconds?: number;
@@ -50,6 +51,7 @@ interface Activity {
   };
   createdAt: string;
   updatedAt: string;
+  isPublic?: boolean;
 }
 
 interface ActivityCategory {
@@ -97,6 +99,7 @@ const ActivityAdmin: React.FC = () => {
     description: '',
   });
   const [categoryFormErrors, setCategoryFormErrors] = useState<{ name?: string }>({});
+  const [updatingPublicId, setUpdatingPublicId] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -112,27 +115,57 @@ const ActivityAdmin: React.FC = () => {
         activityCategoriesAPI.getActivityCategories(),
       ]);
 
+      const fetchedCategories = categoriesResponse.data.success
+        ? categoriesResponse.data.data?.items || []
+        : [];
+      setCategories(fetchedCategories);
+
       if (activitiesResponse.data.success) {
         const list = activitiesResponse.data.data?.items || [];
         const enhancedActivities = list.map((activity: any) => {
           if (activity.activityCategoryId && !activity.activityCategory) {
+            const found = fetchedCategories.find(
+              (c: ActivityCategory) => c.id === activity.activityCategoryId
+            );
             return {
               ...activity,
-              activityCategory: categories.find((c) => c.id === activity.activityCategoryId),
+              activityCategory: found ? { id: found.id, name: found.name } : activity.activityCategory,
             };
           }
           return activity;
         });
         setActivities(enhancedActivities);
       }
-
-      if (categoriesResponse.data.success) {
-        setCategories(categoriesResponse.data.data?.items || []);
-      }
     } catch (err: any) {
       setError(t('activity_admin_error'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTogglePublicStatus = async (activity: Activity) => {
+    try {
+      setUpdatingPublicId(activity.id);
+      setError(null);
+      const payload = {
+        name: activity.name,
+        description: activity.description || '',
+        durationHours: activity.durationHours ?? 0,
+        durationMinutes: activity.durationMinutes ?? 0,
+        durationSeconds: activity.durationSeconds ?? 0,
+        isPublic: !activity.isPublic,
+      };
+      await activitiesAPI.updateActivity(activity.id, payload);
+      setActivities((prev) =>
+        prev.map((item) =>
+          item.id === activity.id ? { ...item, isPublic: !activity.isPublic } : item
+        )
+      );
+    } catch (toggleError) {
+      console.error('Failed to update activity visibility', toggleError);
+      setError(t('activity_admin_public_update_error'));
+    } finally {
+      setUpdatingPublicId(null);
     }
   };
 
@@ -271,6 +304,7 @@ const ActivityAdmin: React.FC = () => {
                   <TableCell>{t('activity_admin_tab_activities')}</TableCell>
                   <TableCell>{t('activity_admin_category_label')}</TableCell>
                   <TableCell>{t('activity_admin_duration_label')}</TableCell>
+                  <TableCell>{t('activity_admin_public_status')}</TableCell>
                   <TableCell>{t('activity_admin_created_at')}</TableCell>
                   <TableCell align="right">{t('activity_admin_actions')}</TableCell>
                 </TableRow>
@@ -300,6 +334,29 @@ const ActivityAdmin: React.FC = () => {
                       )}
                     </TableCell>
                     <TableCell>{formatDuration(activity)}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Chip
+                          label={
+                            activity.isPublic
+                              ? t('activity_admin_public_label_public')
+                              : t('activity_admin_public_label_private')
+                          }
+                          color={activity.isPublic ? 'success' : 'default'}
+                          size="small"
+                        />
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => handleTogglePublicStatus(activity)}
+                          disabled={updatingPublicId === activity.id}
+                        >
+                          {activity.isPublic
+                            ? t('activity_admin_make_private')
+                            : t('activity_admin_make_public')}
+                        </Button>
+                      </Box>
+                    </TableCell>
                     <TableCell>{new Date(activity.createdAt).toLocaleDateString()}</TableCell>
                     <TableCell align="right">
                       <IconButton size="small" sx={{ mr: 1 }}>
@@ -319,7 +376,7 @@ const ActivityAdmin: React.FC = () => {
                 ))}
                 {activities.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
+                    <TableCell colSpan={6} align="center">
                       {t('activity_admin_no_activities')}
                     </TableCell>
                   </TableRow>

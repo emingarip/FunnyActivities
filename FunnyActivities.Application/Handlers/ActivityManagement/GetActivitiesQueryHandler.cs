@@ -33,18 +33,34 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             _minioService = minioService;
         }
 
-        /// <summary>
-        /// Determines if a video URL is a MinIO object key that needs signed URL conversion.
-        /// </summary>
-        /// <param name="videoUrl">The video URL to check.</param>
-        /// <returns>True if the URL is a MinIO object key, false otherwise.</returns>
-        private bool IsMinioObjectKey(string videoUrl)
+        private bool TryGetObjectKey(string? value, out string objectKey)
         {
-            // MinIO object keys for videos start with "videos/" pattern
-            // They are not valid HTTP/HTTPS URLs
-            return !string.IsNullOrEmpty(videoUrl) &&
-                   videoUrl.StartsWith("videos/") &&
-                   !Uri.TryCreate(videoUrl, UriKind.Absolute, out _);
+            objectKey = string.Empty;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            // Direct object key (older records)
+            if (value.StartsWith("videos/") && !Uri.TryCreate(value, UriKind.Absolute, out _))
+            {
+                objectKey = value;
+                return true;
+            }
+
+            // Signed URL that contains bucket/object path
+            if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
+            {
+                var path = uri.AbsolutePath.TrimStart('/');
+                const string bucketPrefix = "activity-videos/";
+                if (path.StartsWith(bucketPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    objectKey = path.Substring(bucketPrefix.Length);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -75,7 +91,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 string introVideoUrl = null;
 
                 // Check if the activity has a video URL and if it's a MinIO object key
-                if (activity.VideoUrl != null && IsMinioObjectKey(activity.VideoUrl.Value))
+                if (TryGetObjectKey(activity.VideoUrl?.Value, out var objectKey))
                 {
                     try
                     {
@@ -83,21 +99,21 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                         if (_minioService != null)
                         {
                             // Generate signed URL for MinIO object key
-                            videoUrl = await _minioService.GenerateVideoPreSignedUrlAsync(activity.VideoUrl.Value);
-                            _logger.LogInformation("Generated signed URL for video object key: {ObjectKey}", activity.VideoUrl.Value);
+                            videoUrl = await _minioService.GenerateVideoPreSignedUrlAsync(objectKey);
+                            _logger.LogInformation("Generated signed URL for video object key: {ObjectKey}", objectKey);
                         }
                         else
                         {
-                            _logger.LogWarning("MinIO service is not available for object key: {ObjectKey}", activity.VideoUrl.Value);
+                            _logger.LogWarning("MinIO service is not available for object key: {ObjectKey}", objectKey);
                             // Fallback to object key if MinIO service is not available
-                            videoUrl = activity.VideoUrl.Value;
+                            videoUrl = objectKey;
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to generate signed URL for video object key: {ObjectKey}", activity.VideoUrl.Value);
+                        _logger.LogError(ex, "Failed to generate signed URL for video object key: {ObjectKey}", objectKey);
                         // Fallback to object key if signed URL generation fails
-                        videoUrl = activity.VideoUrl.Value;
+                        videoUrl = objectKey;
                     }
                 }
                 else
@@ -107,25 +123,25 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 }
 
                 // Resolve intro video URL if available
-                if (activity.IntroVideoUrl != null && IsMinioObjectKey(activity.IntroVideoUrl.Value))
+                if (TryGetObjectKey(activity.IntroVideoUrl?.Value, out var introObjectKey))
                 {
                     try
                     {
                         if (_minioService != null)
                         {
-                            introVideoUrl = await _minioService.GenerateVideoPreSignedUrlAsync(activity.IntroVideoUrl.Value);
-                            _logger.LogInformation("Generated signed URL for intro video object key: {ObjectKey}", activity.IntroVideoUrl.Value);
+                            introVideoUrl = await _minioService.GenerateVideoPreSignedUrlAsync(introObjectKey);
+                            _logger.LogInformation("Generated signed URL for intro video object key: {ObjectKey}", introObjectKey);
                         }
                         else
                         {
-                            _logger.LogWarning("MinIO service is not available for intro object key: {ObjectKey}", activity.IntroVideoUrl.Value);
-                            introVideoUrl = activity.IntroVideoUrl.Value;
+                            _logger.LogWarning("MinIO service is not available for intro object key: {ObjectKey}", introObjectKey);
+                            introVideoUrl = introObjectKey;
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to generate signed URL for intro video object key: {ObjectKey}", activity.IntroVideoUrl.Value);
-                        introVideoUrl = activity.IntroVideoUrl.Value;
+                        _logger.LogError(ex, "Failed to generate signed URL for intro video object key: {ObjectKey}", introObjectKey);
+                        introVideoUrl = introObjectKey;
                     }
                 }
                 else

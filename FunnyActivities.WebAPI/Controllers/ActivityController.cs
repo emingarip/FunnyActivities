@@ -241,7 +241,7 @@ namespace FunnyActivities.WebAPI.Controllers
         [Authorize(Policy = "CanViewActivity")]
         [ProducesResponseType(typeof(ActivityWithDetailsDto), 200)]
         [ProducesResponseType(404)]
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Client)]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> GetActivityWithDetails(Guid id)
         {
             _logger.LogInformation("Retrieving activity with details for ID: {ActivityId}", id);

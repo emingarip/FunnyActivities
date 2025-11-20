@@ -1,8 +1,9 @@
+using FunnyActivities.CrossCuttingConcerns.Serialization;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FunnyActivities.CrossCuttingConcerns.Caching;
@@ -16,6 +17,11 @@ public class RedisCacheService : ICacheService
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
         WriteIndented = false
     };
+
+    static RedisCacheService()
+    {
+        _serializerOptions.Converters.Add(new VideoUrlJsonConverter());
+    }
 
     public RedisCacheService(IDistributedCache cache, ILogger<RedisCacheService> logger)
     {
