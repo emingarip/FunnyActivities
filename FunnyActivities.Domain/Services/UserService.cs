@@ -1,8 +1,9 @@
 using System;
+using BCrypt.Net;
 using FunnyActivities.Domain.Entities;
 using FunnyActivities.Domain.ValueObjects;
-using BCrypt.Net;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FunnyActivities.Domain.Services
 {
@@ -10,9 +11,9 @@ namespace FunnyActivities.Domain.Services
     {
         private readonly ILogger<UserService> _logger;
 
-        public UserService(ILogger<UserService> logger)
+        public UserService(ILogger<UserService>? logger = null)
         {
-            _logger = logger;
+            _logger = logger ?? NullLogger<UserService>.Instance;
         }
 
         public bool IsValidEmail(Email email)

@@ -2,9 +2,10 @@ using FluentAssertions;
 using FunnyActivities.Application.Commands.UserManagement;
 using FunnyActivities.Application.DTOs.UserManagement;
 using FunnyActivities.Application.Handlers.UserManagement;
-using FunnyActivities.Domain.Interfaces;
 using FunnyActivities.Domain.Entities;
+using FunnyActivities.Domain.Interfaces;
 using FunnyActivities.Domain.Services;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
 using Xunit;
@@ -15,6 +16,7 @@ namespace FunnyActivities.Application.UnitTests
     {
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<FunnyActivities.Domain.Interfaces.IJwtTokenService> _jwtTokenServiceMock;
+        private readonly Mock<ILogger<LoginUserCommandHandler>> _loggerMock;
         private readonly UserService _userService;
         private readonly LoginUserCommandHandler _handler;
 
@@ -22,12 +24,14 @@ namespace FunnyActivities.Application.UnitTests
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _jwtTokenServiceMock = new Mock<FunnyActivities.Domain.Interfaces.IJwtTokenService>();
+            _loggerMock = new Mock<ILogger<LoginUserCommandHandler>>();
             _userService = new UserService();
 
             _handler = new LoginUserCommandHandler(
                 _userRepositoryMock.Object,
                 _userService,
-                _jwtTokenServiceMock.Object);
+                _jwtTokenServiceMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]

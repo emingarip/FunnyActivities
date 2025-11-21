@@ -1,13 +1,16 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.AutoMoq;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Minio;
+using Minio.DataModel;
 using Minio.DataModel.Args;
 using Moq;
 using Xunit;
+using FunnyActivities.Infrastructure;
 using FunnyActivities.Infrastructure.Services;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Entities;
@@ -53,11 +56,11 @@ public class MinioServiceTests
         var expectedUrl = "http://localhost:9000/activity-videos/videos/activity-123/test-video.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test-access-key%2F20250101%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250101T000000Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=test-signature";
 
         // Setup mocks
-        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>()))
+        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
-        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>()))
-            .ReturnsAsync(new Minio.DataModel.Response.StatObjectResponse());
+        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Minio.DataModel.ObjectStat)null);
 
         // Create a separate mock for the external client
         var externalMinioClientMock = new Mock<IMinioClient>();
@@ -116,11 +119,11 @@ public class MinioServiceTests
         var sut127 = new MinioService(_minioClientMock.Object, _contextMock.Object, config127, _loggerMock.Object);
 
         // Setup mocks
-        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>()))
+        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
-        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>()))
-            .ReturnsAsync(new Minio.DataModel.Response.StatObjectResponse());
+        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Minio.DataModel.ObjectStat)null);
 
         // Create a separate mock for the external client
         var externalMinioClientMock = new Mock<IMinioClient>();
@@ -180,11 +183,11 @@ public class MinioServiceTests
         var sutExternal = new MinioService(_minioClientMock.Object, _contextMock.Object, configExternal, _loggerMock.Object);
 
         // Setup mocks
-        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>()))
+        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
-        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>()))
-            .ReturnsAsync(new Minio.DataModel.Response.StatObjectResponse());
+        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Minio.DataModel.ObjectStat)null);
 
         // Create a separate mock for the external client
         var externalMinioClientMock = new Mock<IMinioClient>();
@@ -245,10 +248,10 @@ public class MinioServiceTests
         // Arrange
         var objectKey = "videos/activity-123/non-existent-video.mp4";
 
-        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>()))
+        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
-        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>()))
+        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Object not found"));
 
         // Act & Assert
@@ -264,11 +267,11 @@ public class MinioServiceTests
         var expectedGetUrl = "http://localhost:9000/activity-videos/videos/activity-123/test-video.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test-access-key%2F20250101%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250101T000000Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=test-signature";
 
         // Setup mocks
-        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>()))
+        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
-        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>()))
-            .ReturnsAsync(new Minio.DataModel.Response.StatObjectResponse());
+        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Minio.DataModel.ObjectStat)null);
 
         // Create a separate mock for the external client that throws 403 error
         var externalMinioClientMock = new Mock<IMinioClient>();
@@ -322,11 +325,11 @@ public class MinioServiceTests
         var expectedGetUrl = "http://localhost:9000/activity-videos/videos/activity-456/test-video-2.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test-access-key%2F20250101%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250101T000000Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=test-signature";
 
         // Setup mocks
-        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>()))
+        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
-        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>()))
-            .ReturnsAsync(new Minio.DataModel.Response.StatObjectResponse());
+        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Minio.DataModel.ObjectStat)null);
 
         // Create a separate mock for the external client that throws 403 error
         var externalMinioClientMock = new Mock<IMinioClient>();
@@ -380,11 +383,11 @@ public class MinioServiceTests
         var expectedFinalUrl = "http://minio:9000/activity-videos/videos/activity-789/test-video-3.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test-access-key%2F20250101%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250101T000000Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=test-signature";
 
         // Setup mocks
-        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>()))
+        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
-        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>()))
-            .ReturnsAsync(new Minio.DataModel.Response.StatObjectResponse());
+        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Minio.DataModel.ObjectStat)null);
 
         // Create external client mock that throws 403
         var externalMinioClientMock = new Mock<IMinioClient>();
@@ -488,11 +491,11 @@ public class MinioServiceTests
         var objectKey = "videos/activity-999/test-video-4.mp4";
 
         // Setup mocks
-        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>()))
+        _minioClientMock.Setup(x => x.BucketExistsAsync(It.IsAny<BucketExistsArgs>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
-        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>()))
-            .ReturnsAsync(new Minio.DataModel.Response.StatObjectResponse());
+        _minioClientMock.Setup(x => x.StatObjectAsync(It.IsAny<StatObjectArgs>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Minio.DataModel.ObjectStat)null);
 
         // Create external client mock that throws non-403 error
         var externalMinioClientMock = new Mock<IMinioClient>();

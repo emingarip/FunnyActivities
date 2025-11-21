@@ -32,6 +32,7 @@ import {
 import './App.css';
 import LanguageSelector from './components/LanguageSelector';
 import TranslationAdmin from './pages/TranslationAdmin';
+import AdminAiSettings from './pages/AdminAiSettings';
 
 // Create Material-UI theme
 const theme = createTheme({
@@ -75,6 +76,7 @@ function AppContent() {
           <Route path="/admin/product-wizard-demo" element={<AdminRoute><ProductWizardDemo /></AdminRoute>} />
           <Route path="/admin/surveys" element={<AdminRoute><SurveyList /></AdminRoute>} />
           <Route path="/admin/translations" element={<AdminRoute><TranslationAdmin /></AdminRoute>} />
+          <Route path="/admin/ai-settings" element={<AdminRoute><AdminAiSettings /></AdminRoute>} />
           <Route path="/admin/surveys/create" element={<AdminRoute><SurveyCreate /></AdminRoute>} />
           <Route path="/admin/surveys/:id/edit" element={<AdminRoute><SurveyEdit /></AdminRoute>} />
           <Route path="/admin/surveys/:id/results" element={<AdminRoute><SurveyResults /></AdminRoute>} />

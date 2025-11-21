@@ -1,5 +1,13 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { BulkUpdateProductVariantsRequest, ActivityVideoType, UploadActivityVideoResponse } from './api.types';
+import {
+  BulkUpdateProductVariantsRequest,
+  ActivityVideoType,
+  UploadActivityVideoResponse,
+  LlmSettings,
+  UpdateLlmSettingsPayload,
+  ApiResponse,
+  ProviderModelsResponse,
+} from './api.types';
 
 // API Base URL - pointing to .NET WebAPI
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
@@ -389,6 +397,16 @@ export const adminAPI = {
   // User growth endpoint
   getUserGrowth: (params?: { period?: string; days?: number }) =>
     api.get('/users/admin/growth', { params }),
+};
+
+export const aiSettingsAPI = {
+  getSettings: () => api.get<ApiResponse<LlmSettings>>('/settings/ai'),
+  updateSettings: (data: UpdateLlmSettingsPayload) =>
+    api.put<ApiResponse<LlmSettings>>('/settings/ai', data),
+  getProviderModels: (provider: string, forceRefresh = false) =>
+    api.get<ApiResponse<ProviderModelsResponse>>('/settings/ai/models', {
+      params: { provider, force: forceRefresh },
+    }),
 };
 
 export const materialsAPI = {

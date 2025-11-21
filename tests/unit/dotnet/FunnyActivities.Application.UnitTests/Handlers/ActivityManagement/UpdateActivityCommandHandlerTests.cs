@@ -9,15 +9,17 @@ using Xunit;
 using FunnyActivities.Domain.Entities;
 using FunnyActivities.Domain.ValueObjects;
 using FunnyActivities.Application.Commands.ActivityManagement;
+using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.Handlers.ActivityManagement;
 using FunnyActivities.Application.Interfaces;
-using FunnyActivities.Application.DTOs.ActivityManagement;
+using FunnyActivities.CrossCuttingConcerns.Caching;
 
 namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
 {
     public class UpdateActivityCommandHandlerTests
     {
         private readonly Mock<IActivityRepository> _activityRepositoryMock;
+        private readonly Mock<ICacheService> _cacheMock;
         private readonly Mock<ILogger<UpdateActivityCommandHandler>> _loggerMock;
         private readonly UpdateActivityCommandHandler _handler;
         private readonly Fixture _fixture;
@@ -25,11 +27,15 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
         public UpdateActivityCommandHandlerTests()
         {
             _activityRepositoryMock = new Mock<IActivityRepository>();
+            _cacheMock = new Mock<ICacheService>();
             _loggerMock = new Mock<ILogger<UpdateActivityCommandHandler>>();
             _fixture = new Fixture();
 
+            _cacheMock.Setup(c => c.RemoveAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
+
             _handler = new UpdateActivityCommandHandler(
                 _activityRepositoryMock.Object,
+                _cacheMock.Object,
                 _loggerMock.Object);
         }
 

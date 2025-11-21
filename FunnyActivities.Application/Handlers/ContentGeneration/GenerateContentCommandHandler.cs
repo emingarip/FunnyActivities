@@ -2,6 +2,7 @@ using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using FunnyActivities.Domain.Interfaces;
+using FunnyActivities.Application.AI;
 using FunnyActivities.Application.Commands.ContentGeneration;
 using FunnyActivities.Application.Interfaces;
 
@@ -52,23 +53,31 @@ namespace FunnyActivities.Application.Handlers.ContentGeneration
             // Build activity description
             var activityDescription = activity.Description ?? activity.Name;
 
+            // Build selection info for AI service
+            var selection = new LlmSelection(
+                request.Provider,
+                request.Model,
+                request.Temperature,
+                request.MaxTokens,
+                request.SystemPrompt);
+
             // Generate content based on content type
             string content;
             if (!string.IsNullOrEmpty(request.CustomPrompt))
             {
                 // Use custom prompt with persona and activity context
                 var enhancedPrompt = $"{request.CustomPrompt}\n\nPersona: {personaDescription}\nActivity: {activityDescription}";
-                content = await _aiService.GenerateContentAsync(enhancedPrompt, request.Model);
+                content = await _aiService.GenerateContentAsync(enhancedPrompt, selection, cancellationToken);
             }
             else
             {
                 // Use specific content type generation
                 content = request.ContentType switch
                 {
-                    ContentType.Story => await _aiService.GenerateStoryAsync(personaDescription, activityDescription, request.Model),
-                    ContentType.Narrative => await _aiService.GenerateNarrativeAsync(personaDescription, activityDescription, request.Model),
-                    ContentType.Tips => await _aiService.GenerateTipsAsync(personaDescription, activityDescription, request.Model),
-                    _ => await _aiService.GeneratePersonaContentAsync(personaDescription, activityDescription, request.Model)
+                    ContentType.Story => await _aiService.GenerateStoryAsync(personaDescription, activityDescription, selection, cancellationToken),
+                    ContentType.Narrative => await _aiService.GenerateNarrativeAsync(personaDescription, activityDescription, selection, cancellationToken),
+                    ContentType.Tips => await _aiService.GenerateTipsAsync(personaDescription, activityDescription, selection, cancellationToken),
+                    _ => await _aiService.GeneratePersonaContentAsync(personaDescription, activityDescription, selection, cancellationToken)
                 };
             }
 

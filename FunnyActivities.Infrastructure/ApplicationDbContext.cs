@@ -37,6 +37,7 @@ namespace FunnyActivities.Infrastructure
         public DbSet<Persona> Personas { get; set; }
         public DbSet<PersonaCharacteristic> PersonaCharacteristics { get; set; }
         public DbSet<PersonaActivityAssociation> PersonaActivityAssociations { get; set; }
+        public DbSet<LlmSetting> LlmSettings { get; set; }
         // public DbSet<UnitType> UnitTypes { get; set; } // Commented out - UnitType entity not found
         // public DbSet<Unit> Units { get; set; } // Commented out - Unit entity not found
 
@@ -459,6 +460,24 @@ namespace FunnyActivities.Infrastructure
                 entity.HasIndex(paa => paa.ActivityId);
                 entity.HasIndex(paa => new { paa.PersonaId, paa.ActivityId }).IsUnique();
                 entity.HasIndex(paa => paa.CreatedAt);
+            });
+
+            modelBuilder.Entity<LlmSetting>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id).ValueGeneratedNever();
+                entity.Property(x => x.DefaultProvider).IsRequired().HasMaxLength(50);
+                entity.Property(x => x.DefaultModel).IsRequired().HasMaxLength(100);
+                entity.Property(x => x.OllamaBaseUrl).IsRequired().HasMaxLength(255);
+                entity.Property(x => x.OllamaHealthCheckModel).IsRequired().HasMaxLength(100);
+                entity.Property(x => x.OllamaPreferredModelsJson).IsRequired().HasColumnType("text");
+                entity.Property(x => x.OpenAiBaseUrl).IsRequired().HasMaxLength(255);
+                entity.Property(x => x.OpenAiDefaultModel).IsRequired().HasMaxLength(100);
+                entity.Property(x => x.OpenAiAllowedModelsJson).IsRequired().HasColumnType("text");
+                entity.Property(x => x.OpenAiOrganizationId).HasMaxLength(200);
+                entity.Property(x => x.OpenAiApiKey).HasMaxLength(2000);
+                entity.Property(x => x.ModelCacheSeconds).HasDefaultValue(300);
+                entity.Property(x => x.UpdatedAt).IsRequired();
             });
         }
     }

@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FunnyActivities.CrossCuttingConcerns.ErrorHandling;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Net;
@@ -17,6 +18,7 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
     public class ExceptionMiddlewareTests
     {
         private readonly Mock<ILogger<ExceptionMiddleware>> _loggerMock;
+        private readonly Mock<IStringLocalizer<ExceptionMiddleware>> _localizerMock;
         private readonly ExceptionMiddleware _middleware;
         private readonly Mock<RequestDelegate> _nextMock;
 
@@ -26,8 +28,27 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
         public ExceptionMiddlewareTests()
         {
             _loggerMock = new Mock<ILogger<ExceptionMiddleware>>();
+            _localizerMock = new Mock<IStringLocalizer<ExceptionMiddleware>>();
             _nextMock = new Mock<RequestDelegate>();
-            _middleware = new ExceptionMiddleware(_nextMock.Object, _loggerMock.Object);
+
+            _localizerMock.Setup(l => l[It.IsAny<string>()])
+                .Returns((string key) => new LocalizedString(key, key switch
+                {
+                    "ValidationErrorTitle" => "Validation Error",
+                    "ValidationErrorDetail" => "One or more validation errors occurred.",
+                    "BusinessRuleViolationTitle" => "Business Rule Violation",
+                    "AccessDeniedTitle" => "Access Denied",
+                    "AccessDeniedDetail" => "You do not have permission to perform this action.",
+                    "InternalServerErrorTitle" => "Internal Server Error",
+                    "InternalServerErrorDetail" => "An unexpected error occurred.",
+                    _ => key
+                }));
+
+            _localizerMock.Setup(l => l[It.IsAny<string>(), It.IsAny<object[]>()])
+                .Returns((string key, object[] arguments) =>
+                    new LocalizedString(key, string.Format(_localizerMock.Object[key].Value, arguments ?? Array.Empty<object>())));
+
+            _middleware = new ExceptionMiddleware(_nextMock.Object, _loggerMock.Object, _localizerMock.Object);
         }
 
         #region Successful Request Processing

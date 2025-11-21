@@ -134,6 +134,47 @@ export interface RoleResponse {
   };
 }
 
+export interface LlmSettings {
+  defaultProvider: string;
+  defaultModel: string;
+  ollamaBaseUrl: string;
+  ollamaHealthCheckModel: string;
+  ollamaPreferredModels: string[];
+  openAiBaseUrl: string;
+  openAiDefaultModel: string;
+  openAiAllowedModels: string[];
+  openAiOrganizationId: string;
+  hasOpenAiApiKey: boolean;
+  modelCacheSeconds: number;
+}
+
+export interface UpdateLlmSettingsPayload {
+  defaultProvider: string;
+  defaultModel: string;
+  ollamaBaseUrl: string;
+  ollamaHealthCheckModel: string;
+  ollamaPreferredModels: string[];
+  openAiBaseUrl: string;
+  openAiDefaultModel: string;
+  openAiAllowedModels: string[];
+  openAiOrganizationId: string;
+  openAiApiKey?: string;
+  modelCacheSeconds: number;
+}
+
+export interface LlmModelInfo {
+  name: string;
+  displayName: string;
+  provider: string;
+  isDefault: boolean;
+  isAvailable: boolean;
+}
+
+export interface ProviderModelsResponse {
+  provider: string;
+  models: LlmModelInfo[];
+}
+
 // Upload types
 export interface UploadImageResponse {
   success: boolean;

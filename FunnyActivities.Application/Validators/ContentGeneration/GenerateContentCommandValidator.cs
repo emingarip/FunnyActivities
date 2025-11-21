@@ -21,15 +21,20 @@ namespace FunnyActivities.Application.Validators.ContentGeneration
                 .MaximumLength(1000).WithMessage(ValidationMessageProvider.Get("CustomPromptMax1000"))
                 .When(x => !string.IsNullOrEmpty(x.CustomPrompt));
 
-            RuleFor(x => x.Model)
-                .NotEmpty().WithMessage(ValidationMessageProvider.Get("ModelRequired"))
-                .Must(BeValidModel).WithMessage(ValidationMessageProvider.Get("ModelInvalid"));
-        }
+            RuleFor(x => x.Provider)
+                .IsInEnum().WithMessage(ValidationMessageProvider.Get("ProviderInvalid"));
 
-        private bool BeValidModel(string model)
-        {
-            var validModels = new[] { "llama2", "codellama", "mistral", "vicuna" };
-            return validModels.Contains(model.ToLower());
+            RuleFor(x => x.Model)
+                .MaximumLength(100).WithMessage(ValidationMessageProvider.Get("ModelInvalid"))
+                .When(x => !string.IsNullOrWhiteSpace(x.Model));
+
+            RuleFor(x => x.Temperature)
+                .InclusiveBetween(0f, 2f).WithMessage(ValidationMessageProvider.Get("TemperatureRange"))
+                .When(x => x.Temperature.HasValue);
+
+            RuleFor(x => x.MaxTokens)
+                .GreaterThan(0).WithMessage(ValidationMessageProvider.Get("MaxTokensRange"))
+                .When(x => x.MaxTokens.HasValue);
         }
     }
 }
