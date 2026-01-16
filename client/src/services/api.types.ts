@@ -175,6 +175,57 @@ export interface ProviderModelsResponse {
   models: LlmModelInfo[];
 }
 
+// Prompt templates
+export interface PromptTemplateDto {
+  id: string;
+  key: string;
+  title: string;
+  locale: string;
+  providerHint?: string;
+  content: string;
+  outputFormatHint?: string;
+  description?: string;
+  isActive: boolean;
+  updatedAt: string;
+  updatedBy?: string;
+}
+
+export interface PromptTemplatePayload {
+  key: string;
+  title: string;
+  locale: string;
+  providerHint?: string;
+  content: string;
+  outputFormatHint?: string;
+  description?: string;
+  isActive: boolean;
+}
+
+export interface PromptCallLog {
+  id: string;
+  templateId?: string;
+  templateKey: string;
+  locale?: string;
+  provider: string;
+  model: string;
+  duration: number;
+  tokenUsage?: number;
+  success: boolean;
+  resultSummary?: string;
+  errorMessage?: string;
+  isTest: boolean;
+  createdAt: string;
+}
+
+export interface PromptTemplateTestResult {
+  template?: PromptTemplateDto;
+  prompt: string;
+  response: string;
+  duration: number;
+  provider: string;
+  model: string;
+}
+
 // Upload types
 export interface UploadImageResponse {
   success: boolean;

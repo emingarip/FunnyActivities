@@ -46,7 +46,10 @@ namespace FunnyActivities.WebAPI.Controllers
                 Provider = request.Provider,
                 Temperature = request.Temperature,
                 MaxTokens = request.MaxTokens,
-                SystemPrompt = request.SystemPrompt
+                SystemPrompt = request.SystemPrompt,
+                ContentType = request.ContentType,
+                PromptKey = request.PromptKey,
+                PromptLocale = request.PromptLocale
             };
 
             try
@@ -75,9 +78,12 @@ namespace FunnyActivities.WebAPI.Controllers
         public Guid ActivityId { get; set; }
         public string? CustomPrompt { get; set; }
         public string? Model { get; set; }
-        public LlmProvider Provider { get; set; } = LlmProvider.Ollama;
+        public LlmProvider? Provider { get; set; }
         public float? Temperature { get; set; }
         public int? MaxTokens { get; set; }
         public string? SystemPrompt { get; set; }
+        public ContentType ContentType { get; set; } = ContentType.General;
+        public string? PromptKey { get; set; }
+        public string? PromptLocale { get; set; }
     }
 }

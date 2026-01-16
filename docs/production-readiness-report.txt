@@ -1,0 +1,71 @@
+FunnyActivities Production Readiness Report
+
+Scope
+- Static review of key backend and frontend configuration, middleware, auth, and deployment defaults.
+- Files reviewed include: FunnyActivities.WebAPI/Program.cs, FunnyActivities.WebAPI/Extensions/ServiceCollectionExtensions.cs, FunnyActivities.CrossCuttingConcerns/ServiceCollectionExtensions.cs, FunnyActivities.CrossCuttingConcerns/CORS/CorsConfiguration.cs, FunnyActivities.WebAPI/appsettings.json, docker-compose.yml, client/src/services/api.ts.
+- No runtime tests, infra review, or security scanning was performed.
+
+Overall status
+- Not production ready. There is a critical auth bypass risk and multiple high severity config issues.
+
+Findings (ordered by severity)
+
+[CRITICAL] Authorization default and fallback policies allow all requests.
+- DefaultPolicy and FallbackPolicy are set to "allow all" via RequireAssertion(context => true). This makes [Authorize] without an explicit policy effectively no-op.
+- Endpoints that rely on [Authorize] without a policy or role are exposed to anonymous users.
+- References: FunnyActivities.WebAPI/Extensions/ServiceCollectionExtensions.cs:225, FunnyActivities.WebAPI/Extensions/ServiceCollectionExtensions.cs:230, FunnyActivities.WebAPI/Controllers/UsersController.cs:76, FunnyActivities.WebAPI/Controllers/ShoppingCartController.cs:24, FunnyActivities.WebAPI/Controllers/RoleManagementController.cs:17.
+- Recommendation: Remove the allow-all default/fallback. Require authenticated users by default and explicitly mark public endpoints with [AllowAnonymous].
+
+[HIGH] CORS allows any origin in the runtime pipeline.
+- The pipeline uses AllowAllOrigins which is defined to AllowAnyOrigin/AllowAnyMethod/AllowAnyHeader. This is unsafe for production APIs.
+- References: FunnyActivities.WebAPI/Program.cs:176, FunnyActivities.CrossCuttingConcerns/CORS/CorsConfiguration.cs:20.
+- Recommendation: Use a strict allowlist for production origins and avoid AllowAllOrigins outside dev.
+
+[HIGH] Hard-coded secrets and credentials in repo and compose.
+- JWT secret, DB password, MinIO root password, and provider API keys are in config. This is not safe for production or public repos.
+- References: FunnyActivities.WebAPI/appsettings.json:3, FunnyActivities.WebAPI/appsettings.json:154, FunnyActivities.WebAPI/appsettings.json:157, FunnyActivities.WebAPI/appsettings.json:162, docker-compose.yml:10, docker-compose.yml:56, docker-compose.yml:146.
+- Recommendation: Move to secret manager or environment variables; rotate existing secrets.
+
+[MEDIUM] Rate limiting is configured but not enabled.
+- IpRateLimiting options exist, and AddRateLimiting is defined, but services and middleware are not wired in Program.cs.
+- References: FunnyActivities.WebAPI/appsettings.json:170, FunnyActivities.CrossCuttingConcerns/ServiceCollectionExtensions.cs:127, FunnyActivities.WebAPI/Program.cs.
+- Recommendation: Register rate limiting services and add UseIpRateLimiting/UseClientRateLimiting (as applicable).
+
+[MEDIUM] JWT event handlers log claims to console.
+- OnTokenValidated writes all claims to console, which can leak PII in production logs.
+- References: FunnyActivities.CrossCuttingConcerns/ServiceCollectionExtensions.cs:59.
+- Recommendation: Remove or gate these logs to development only.
+
+[MEDIUM] HTTPS redirection without forwarded headers configuration.
+- App forces HTTPS but container is bound to HTTP only. Without forwarded headers in a reverse-proxy setup, this can cause redirect loops or wrong scheme handling.
+- References: FunnyActivities.WebAPI/Program.cs:166, docker-compose.yml:47.
+- Recommendation: Add ForwardedHeaders configuration or terminate TLS at the app.
+
+[MEDIUM] MinIO configuration path is inconsistent.
+- AddMinio allows a null client if config missing, but AddImageProcessingServices registers MinioConfiguration and throws if config is incomplete.
+- References: FunnyActivities.WebAPI/Extensions/ServiceCollectionExtensions.cs:327, FunnyActivities.WebAPI/Extensions/ServiceCollectionExtensions.cs:396.
+- Recommendation: Make MinIO consistently optional or required; avoid runtime exceptions when disabled.
+
+[LOW] Frontend API logging is verbose.
+- Requests/responses (including headers) are logged to console, which can expose tokens or sensitive data in production.
+- References: client/src/services/api.ts:54, client/src/services/api.ts:127, client/src/services/api.ts:176, client/src/services/api.ts:327.
+- Recommendation: Remove or gate logs by environment.
+
+[LOW] AllowedHosts is wildcard.
+- This is acceptable in dev but should be restricted in production.
+- Reference: FunnyActivities.WebAPI/appsettings.json:153.
+
+[LOW] Security headers are not configured.
+- AddSecurityHeaders is present but TODO and not wired into the pipeline.
+- Reference: FunnyActivities.CrossCuttingConcerns/ServiceCollectionExtensions.cs:139.
+
+Production readiness checklist (high level)
+- Fix auth default/fallback policies and re-audit public vs protected endpoints.
+- Lock down CORS and AllowedHosts to production domains.
+- Move all secrets to env or secret manager and rotate credentials.
+- Enable rate limiting in services and middleware.
+- Remove debug logging and console claim dumps for production.
+- Configure HTTPS and forwarded headers for reverse proxy deployments.
+- Decide on MinIO dependency and handle missing config gracefully.
+
+End of report.

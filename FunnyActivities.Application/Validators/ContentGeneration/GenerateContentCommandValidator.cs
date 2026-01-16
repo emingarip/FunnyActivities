@@ -22,7 +22,8 @@ namespace FunnyActivities.Application.Validators.ContentGeneration
                 .When(x => !string.IsNullOrEmpty(x.CustomPrompt));
 
             RuleFor(x => x.Provider)
-                .IsInEnum().WithMessage(ValidationMessageProvider.Get("ProviderInvalid"));
+                .IsInEnum().WithMessage(ValidationMessageProvider.Get("ProviderInvalid"))
+                .When(x => x.Provider.HasValue);
 
             RuleFor(x => x.Model)
                 .MaximumLength(100).WithMessage(ValidationMessageProvider.Get("ModelInvalid"))

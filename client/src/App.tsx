@@ -21,6 +21,7 @@ import Wallet from './pages/Wallet';
 import MaterialsAdmin from './pages/MaterialsAdmin';
 import PersonaAdmin from './pages/PersonaAdmin';
 import { ProductsOverview, ProductWizardDemo } from './components/products';
+import PromptTemplates from './pages/PromptTemplates';
 import {
   SurveyList,
   SurveyCreate,
@@ -77,6 +78,7 @@ function AppContent() {
           <Route path="/admin/surveys" element={<AdminRoute><SurveyList /></AdminRoute>} />
           <Route path="/admin/translations" element={<AdminRoute><TranslationAdmin /></AdminRoute>} />
           <Route path="/admin/ai-settings" element={<AdminRoute><AdminAiSettings /></AdminRoute>} />
+          <Route path="/admin/prompts" element={<AdminRoute><PromptTemplates /></AdminRoute>} />
           <Route path="/admin/surveys/create" element={<AdminRoute><SurveyCreate /></AdminRoute>} />
           <Route path="/admin/surveys/:id/edit" element={<AdminRoute><SurveyEdit /></AdminRoute>} />
           <Route path="/admin/surveys/:id/results" element={<AdminRoute><SurveyResults /></AdminRoute>} />

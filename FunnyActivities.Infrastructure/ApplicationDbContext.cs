@@ -38,6 +38,8 @@ namespace FunnyActivities.Infrastructure
         public DbSet<PersonaCharacteristic> PersonaCharacteristics { get; set; }
         public DbSet<PersonaActivityAssociation> PersonaActivityAssociations { get; set; }
         public DbSet<LlmSetting> LlmSettings { get; set; }
+        public DbSet<PromptTemplate> PromptTemplates { get; set; }
+        public DbSet<PromptCallLog> PromptCallLogs { get; set; }
         // public DbSet<UnitType> UnitTypes { get; set; } // Commented out - UnitType entity not found
         // public DbSet<Unit> Units { get; set; } // Commented out - Unit entity not found
 
@@ -478,6 +480,41 @@ namespace FunnyActivities.Infrastructure
                 entity.Property(x => x.OpenAiApiKey).HasMaxLength(2000);
                 entity.Property(x => x.ModelCacheSeconds).HasDefaultValue(300);
                 entity.Property(x => x.UpdatedAt).IsRequired();
+            });
+
+            modelBuilder.Entity<PromptTemplate>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Key).IsRequired().HasMaxLength(150);
+                entity.Property(x => x.Title).IsRequired().HasMaxLength(200);
+                entity.Property(x => x.Locale).IsRequired().HasMaxLength(10);
+                entity.Property(x => x.ProviderHint).HasMaxLength(50);
+                entity.Property(x => x.OutputFormatHint).HasMaxLength(2000);
+                entity.Property(x => x.Description).HasMaxLength(500);
+                entity.Property(x => x.Content).IsRequired();
+                entity.Property(x => x.IsActive).HasDefaultValue(true);
+                entity.Property(x => x.UpdatedAt).HasColumnType("timestamp with time zone");
+                entity.Property(x => x.UpdatedBy).HasColumnType("uuid");
+                entity.HasIndex(x => new { x.Key, x.Locale }).IsUnique();
+            });
+
+            modelBuilder.Entity<PromptCallLog>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.TemplateKey).IsRequired().HasMaxLength(150);
+                entity.Property(x => x.Locale).HasMaxLength(10);
+                entity.Property(x => x.Provider).IsRequired().HasMaxLength(50);
+                entity.Property(x => x.Model).HasMaxLength(100);
+                entity.Property(x => x.ResultSummary).HasMaxLength(500);
+                entity.Property(x => x.ErrorMessage).HasMaxLength(500);
+                entity.Property(x => x.IsTest).HasDefaultValue(false);
+                entity.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone");
+                entity.HasIndex(x => x.TemplateKey);
+                entity.HasIndex(x => x.CreatedAt);
+                entity.HasOne(x => x.Template)
+                      .WithMany()
+                      .HasForeignKey(x => x.TemplateId)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

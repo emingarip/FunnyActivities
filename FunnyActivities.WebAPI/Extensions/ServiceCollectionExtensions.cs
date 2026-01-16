@@ -15,6 +15,7 @@ using FunnyActivities.Infrastructure.Repositories;
 using FunnyActivities.Infrastructure.Services;
 using FunnyActivities.Infrastructure.Services.AI;
 using FunnyActivities.Infrastructure.Services.Settings;
+using FunnyActivities.Infrastructure.Services.Prompts;
 using FunnyActivities.WebAPI.Middleware;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
@@ -305,6 +306,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<FunnyActivities.Domain.Interfaces.IPersonaRepository, FunnyActivities.Infrastructure.PersonaRepository>();
         services.AddScoped<FunnyActivities.Domain.Interfaces.IPersonaActivityAssociationRepository, FunnyActivities.Infrastructure.PersonaActivityAssociationRepository>();
 
+        // Prompt template repositories
+        services.AddScoped<IPromptTemplateRepository, PromptTemplateRepository>();
+        services.AddScoped<IPromptCallLogRepository, PromptCallLogRepository>();
+
         return services;
     }
 
@@ -475,6 +480,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILlmSettingsRepository, LlmSettingsRepository>();
         services.AddScoped<ILlmSettingsService, LlmSettingsService>();
         services.AddScoped<ILlmSettingsInitializer, LlmSettingsInitializer>();
+        services.AddScoped<IPromptTemplateService, PromptTemplateService>();
 
         return services;
     }

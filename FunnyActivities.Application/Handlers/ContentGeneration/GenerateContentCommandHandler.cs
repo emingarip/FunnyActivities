@@ -1,10 +1,16 @@
-using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FunnyActivities.Domain.Interfaces;
 using FunnyActivities.Application.AI;
 using FunnyActivities.Application.Commands.ContentGeneration;
 using FunnyActivities.Application.Interfaces;
+using FunnyActivities.Application.PromptTemplates;
+using FunnyActivities.Domain.Interfaces;
+using MediatR;
 
 namespace FunnyActivities.Application.Handlers.ContentGeneration
 {
@@ -13,15 +19,18 @@ namespace FunnyActivities.Application.Handlers.ContentGeneration
         private readonly IPersonaRepository _personaRepository;
         private readonly FunnyActivities.Application.Interfaces.IActivityRepository _activityRepository;
         private readonly IAIService _aiService;
+        private readonly IPromptTemplateService _promptTemplateService;
 
         public GenerateContentCommandHandler(
             IPersonaRepository personaRepository,
             FunnyActivities.Application.Interfaces.IActivityRepository activityRepository,
-            IAIService aiService)
+            IAIService aiService,
+            IPromptTemplateService promptTemplateService)
         {
             _personaRepository = personaRepository;
             _activityRepository = activityRepository;
             _aiService = aiService;
+            _promptTemplateService = promptTemplateService;
         }
 
         public async Task<string> Handle(GenerateContentCommand request, CancellationToken cancellationToken)
@@ -53,35 +62,69 @@ namespace FunnyActivities.Application.Handlers.ContentGeneration
             // Build activity description
             var activityDescription = activity.Description ?? activity.Name;
 
-            // Build selection info for AI service
+            var locale = !string.IsNullOrWhiteSpace(request.PromptLocale)
+                ? request.PromptLocale!
+                : CultureInfo.CurrentUICulture?.Name ?? "en-US";
+            var scenario = GetScenarioName(request.ContentType);
+
+            var renderContext = new PromptTemplateRenderContext
+            {
+                PersonaDescription = personaDescription,
+                PersonaName = persona.Name,
+                ActivityDescription = activityDescription,
+                ActivityName = activity.Name,
+                CustomPrompt = request.CustomPrompt,
+                SystemPrompt = request.SystemPrompt,
+                Locale = locale,
+                Scenario = scenario
+            };
+
+            var renderResult = await _promptTemplateService.RenderAsync(request.PromptKey, renderContext, cancellationToken);
+            var provider = ResolveProvider(request.Provider, renderResult.ProviderHint);
             var selection = new LlmSelection(
-                request.Provider,
+                provider,
                 request.Model,
                 request.Temperature,
                 request.MaxTokens,
                 request.SystemPrompt);
 
-            // Generate content based on content type
-            string content;
-            if (!string.IsNullOrEmpty(request.CustomPrompt))
+            var stopwatch = Stopwatch.StartNew();
+            try
             {
-                // Use custom prompt with persona and activity context
-                var enhancedPrompt = $"{request.CustomPrompt}\n\nPersona: {personaDescription}\nActivity: {activityDescription}";
-                content = await _aiService.GenerateContentAsync(enhancedPrompt, selection, cancellationToken);
-            }
-            else
-            {
-                // Use specific content type generation
-                content = request.ContentType switch
-                {
-                    ContentType.Story => await _aiService.GenerateStoryAsync(personaDescription, activityDescription, selection, cancellationToken),
-                    ContentType.Narrative => await _aiService.GenerateNarrativeAsync(personaDescription, activityDescription, selection, cancellationToken),
-                    ContentType.Tips => await _aiService.GenerateTipsAsync(personaDescription, activityDescription, selection, cancellationToken),
-                    _ => await _aiService.GeneratePersonaContentAsync(personaDescription, activityDescription, selection, cancellationToken)
-                };
-            }
+                var content = await _aiService.GenerateContentAsync(renderResult.Prompt, selection, cancellationToken);
+                stopwatch.Stop();
 
-            return content;
+                await _promptTemplateService.LogAsync(new PromptCallLogEntry
+                {
+                    TemplateId = renderResult.Template?.Id,
+                    TemplateKey = renderResult.Template?.Key ?? request.PromptKey ?? scenario,
+                    Locale = locale,
+                    Provider = selection.Provider.ToString(),
+                    Model = selection.Model ?? string.Empty,
+                    Duration = stopwatch.Elapsed.TotalMilliseconds,
+                    Success = true,
+                    ResultSummary = BuildResultSummary(content)
+                }, cancellationToken);
+
+                return content;
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                await _promptTemplateService.LogAsync(new PromptCallLogEntry
+                {
+                    TemplateId = renderResult.Template?.Id,
+                    TemplateKey = renderResult.Template?.Key ?? request.PromptKey ?? scenario,
+                    Locale = locale,
+                    Provider = selection.Provider.ToString(),
+                    Model = selection.Model ?? string.Empty,
+                    Duration = stopwatch.Elapsed.TotalMilliseconds,
+                    Success = false,
+                    ErrorMessage = ex.Message
+                }, cancellationToken);
+
+                throw;
+            }
         }
 
         private string BuildPersonaDescription(Domain.Entities.Persona persona)
@@ -103,6 +146,43 @@ namespace FunnyActivities.Application.Handlers.ContentGeneration
             }
 
             return description;
+        }
+
+        private static string GetScenarioName(ContentType contentType)
+        {
+            return contentType switch
+            {
+                ContentType.Story => "story",
+                ContentType.Narrative => "narrative",
+                ContentType.Tips => "tips",
+                _ => "general"
+            };
+        }
+
+        private static LlmProvider ResolveProvider(LlmProvider? requested, string? hint)
+        {
+            if (requested.HasValue)
+            {
+                return requested.Value;
+            }
+
+            if (!string.IsNullOrWhiteSpace(hint) && Enum.TryParse<LlmProvider>(hint, true, out var parsed))
+            {
+                return parsed;
+            }
+
+            return LlmProvider.Ollama;
+        }
+
+        private static string BuildResultSummary(string? content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return string.Empty;
+            }
+
+            var normalized = content.Replace("\r\n", " ").Replace("\n", " ");
+            return normalized.Length <= 240 ? normalized : normalized[..240];
         }
     }
 }

@@ -468,15 +468,17 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 440px))',
             gap: 3,
             width: '100%',
+            justifyContent: 'center',
           }}
         >
           {activities.map((activity, index) => (
             <Card
               key={activity.id}
               sx={{
+                width: '100%',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
@@ -509,10 +511,11 @@ const PublicActivities: React.FC<PublicActivitiesProps> = ({
                   sx={{
                     position: 'relative',
                     width: '100%',
-                    height: isMobile ? 200 : 250,
+                    aspectRatio: '16 / 9',
                     overflow: 'hidden',
                     borderTopLeftRadius: 8,
                     borderTopRightRadius: 8,
+                    bgcolor: 'black',
                   }}
                 >
                   <VideoPreview
