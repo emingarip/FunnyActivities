@@ -1,3 +1,4 @@
+using FunnyActivities.Application.AI;
 using MediatR;
 
 namespace FunnyActivities.Application.Commands.ContentGeneration
@@ -16,7 +17,13 @@ namespace FunnyActivities.Application.Commands.ContentGeneration
         public Guid PersonaId { get; set; }
         public Guid ActivityId { get; set; }
         public string? CustomPrompt { get; set; }
-        public string Model { get; set; } = "llama2";
+        public string? Model { get; set; }
+        public LlmProvider? Provider { get; set; }
+        public float? Temperature { get; set; }
+        public int? MaxTokens { get; set; }
+        public string? SystemPrompt { get; set; }
         public ContentType ContentType { get; set; } = ContentType.General;
+        public string? PromptKey { get; set; }
+        public string? PromptLocale { get; set; }
     }
 }

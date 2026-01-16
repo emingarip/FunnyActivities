@@ -1,8 +1,21 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { BulkUpdateProductVariantsRequest, ActivityVideoType, UploadActivityVideoResponse } from './api.types';
+import {
+  BulkUpdateProductVariantsRequest,
+  ActivityVideoType,
+  UploadActivityVideoResponse,
+  LlmSettings,
+  UpdateLlmSettingsPayload,
+  ApiResponse,
+  ProviderModelsResponse,
+  PromptTemplateDto,
+  PromptTemplatePayload,
+  PromptCallLog,
+  PromptTemplateTestResult,
+} from './api.types';
 
 // API Base URL - pointing to .NET WebAPI
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_TIMEOUT = Number(process.env.REACT_APP_API_TIMEOUT_MS ?? 30000);
 
 // Logout callback - will be set by AuthContext
 let logoutCallback: (() => void) | null = null;
@@ -15,7 +28,7 @@ export const setLogoutCallback = (callback: () => void) => {
 // Create axios instance with optimized settings
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -389,6 +402,30 @@ export const adminAPI = {
   // User growth endpoint
   getUserGrowth: (params?: { period?: string; days?: number }) =>
     api.get('/users/admin/growth', { params }),
+};
+
+export const aiSettingsAPI = {
+  getSettings: () => api.get<ApiResponse<LlmSettings>>('/settings/ai'),
+  updateSettings: (data: UpdateLlmSettingsPayload) =>
+    api.put<ApiResponse<LlmSettings>>('/settings/ai', data),
+  getProviderModels: (provider: string, forceRefresh = false) =>
+    api.get<ApiResponse<ProviderModelsResponse>>('/settings/ai/models', {
+      params: { provider, force: forceRefresh },
+    }),
+};
+
+export const promptAPI = {
+  list: (params?: { locale?: string; includeInactive?: boolean }) =>
+    api.get<ApiResponse<PromptTemplateDto[]>>('/prompts', { params }),
+  get: (id: string) => api.get<ApiResponse<PromptTemplateDto>>(`/prompts/${id}`),
+  create: (payload: PromptTemplatePayload) => api.post<ApiResponse<PromptTemplateDto>>('/prompts', payload),
+  update: (id: string, payload: PromptTemplatePayload) => api.put<ApiResponse<PromptTemplateDto>>(`/prompts/${id}`, payload),
+  remove: (id: string) => api.delete<ApiResponse<void>>(`/prompts/${id}`),
+  clone: (id: string, payload?: Partial<PromptTemplatePayload>) =>
+    api.post<ApiResponse<PromptTemplateDto>>(`/prompts/${id}/clone`, payload ?? {}),
+  test: (key: string, payload?: Record<string, any>) =>
+    api.post<ApiResponse<PromptTemplateTestResult>>(`/prompts/${key}/test`, payload ?? {}),
+  logs: (take: number = 50) => api.get<ApiResponse<PromptCallLog[]>>('/prompts/logs', { params: { take } }),
 };
 
 export const materialsAPI = {

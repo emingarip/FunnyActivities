@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using FunnyActivities.Domain.Interfaces;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Entities;
+using FunnyActivities.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FunnyActivities.Infrastructure
 {
@@ -16,10 +17,10 @@ namespace FunnyActivities.Infrastructure
         private readonly ApplicationDbContext _context;
         private readonly ILogger<UserRepository> _logger;
 
-        public UserRepository(ApplicationDbContext context, ILogger<UserRepository> logger)
+        public UserRepository(ApplicationDbContext context, ILogger<UserRepository>? logger = null)
         {
             _context = context;
-            _logger = logger;
+            _logger = logger ?? NullLogger<UserRepository>.Instance;
         }
 
         public async Task<User> GetByIdAsync(Guid id)

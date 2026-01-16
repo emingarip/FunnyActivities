@@ -1,4 +1,5 @@
 using System;
+using FunnyActivities.Application.AI;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Interfaces;
 using FunnyActivities.CrossCuttingConcerns;
@@ -10,7 +11,11 @@ using FunnyActivities.CrossCuttingConcerns.Caching;
 using FunnyActivities.CrossCuttingConcerns.FileUpload;
 using FunnyActivities.CrossCuttingConcerns.FileUpload.Configuration;
 using FunnyActivities.Infrastructure;
+using FunnyActivities.Infrastructure.Repositories;
 using FunnyActivities.Infrastructure.Services;
+using FunnyActivities.Infrastructure.Services.AI;
+using FunnyActivities.Infrastructure.Services.Settings;
+using FunnyActivities.Infrastructure.Services.Prompts;
 using FunnyActivities.WebAPI.Middleware;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
@@ -18,6 +23,7 @@ using StackExchange.Redis;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Metrics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Prometheus;
 using Minio;
@@ -300,6 +306,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<FunnyActivities.Domain.Interfaces.IPersonaRepository, FunnyActivities.Infrastructure.PersonaRepository>();
         services.AddScoped<FunnyActivities.Domain.Interfaces.IPersonaActivityAssociationRepository, FunnyActivities.Infrastructure.PersonaActivityAssociationRepository>();
 
+        // Prompt template repositories
+        services.AddScoped<IPromptTemplateRepository, PromptTemplateRepository>();
+        services.AddScoped<IPromptCallLogRepository, PromptCallLogRepository>();
+
         return services;
     }
 
@@ -448,7 +458,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddDomainServices(this IServiceCollection services)
+    public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<FunnyActivities.Domain.Services.UserService>();
 
@@ -459,16 +469,18 @@ public static class ServiceCollectionExtensions
         // Input sanitization service
         services.AddScoped<FunnyActivities.Application.Interfaces.IInputSanitizer, FunnyActivities.Infrastructure.Services.InputSanitizer>();
 
-        // AI service
-        services.AddScoped<FunnyActivities.Application.Interfaces.IAIService, FunnyActivities.Application.Services.OllamaService>();
-        services.AddSingleton<FunnyActivities.Application.Services.OllamaSettings>(sp =>
-        {
-            var configuration = sp.GetRequiredService<IConfiguration>();
-            return new FunnyActivities.Application.Services.OllamaSettings
-            {
-                BaseUrl = configuration["Ollama:BaseUrl"] ?? "http://localhost:11434"
-            };
-        });
+        // AI services
+        services.AddMemoryCache();
+        services.Configure<LlmOptions>(configuration.GetSection("Llm"));
+        services.AddHttpClient<OllamaLlmProvider>();
+        services.AddHttpClient<OpenAiChatProvider>();
+        services.AddTransient<ILlmProvider>(sp => sp.GetRequiredService<OllamaLlmProvider>());
+        services.AddTransient<ILlmProvider>(sp => sp.GetRequiredService<OpenAiChatProvider>());
+        services.AddScoped<IAIService, MultiProviderAiService>();
+        services.AddScoped<ILlmSettingsRepository, LlmSettingsRepository>();
+        services.AddScoped<ILlmSettingsService, LlmSettingsService>();
+        services.AddScoped<ILlmSettingsInitializer, LlmSettingsInitializer>();
+        services.AddScoped<IPromptTemplateService, PromptTemplateService>();
 
         return services;
     }

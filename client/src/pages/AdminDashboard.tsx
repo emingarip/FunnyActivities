@@ -170,6 +170,24 @@ const AdminDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card>
+          <CardContent>
+              <Button component={Link} to="/admin/ai-settings" variant="contained" color="primary">
+                {t('admin_manage_ai_settings')}
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card>
+            <CardContent>
+              <Button component={Link} to="/admin/prompts" variant="contained" color="primary">
+                {t('prompt_templates_title')}
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
 
       {/* System Settings */}

@@ -1,16 +1,18 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using FunnyActivities.Application.AI;
 
 namespace FunnyActivities.Application.Interfaces
 {
     public interface IAIService
     {
-        Task<string> GenerateContentAsync(string prompt, string model = "llama2");
-        Task<string> GeneratePersonaContentAsync(string personaDescription, string activityDescription, string model = "llama2");
-        Task<string> GenerateStoryAsync(string personaDescription, string activityDescription, string model = "llama2");
-        Task<string> GenerateNarrativeAsync(string personaDescription, string activityDescription, string model = "llama2");
-        Task<string> GenerateTipsAsync(string personaDescription, string activityDescription, string model = "llama2");
-        Task<bool> ValidateConnectionAsync();
-        Task<IEnumerable<string>> ListAvailableModelsAsync();
+        Task<string> GenerateContentAsync(string prompt, LlmSelection selection, CancellationToken cancellationToken = default);
+        Task<string> GeneratePersonaContentAsync(string personaDescription, string activityDescription, LlmSelection selection, CancellationToken cancellationToken = default);
+        Task<string> GenerateStoryAsync(string personaDescription, string activityDescription, LlmSelection selection, CancellationToken cancellationToken = default);
+        Task<string> GenerateNarrativeAsync(string personaDescription, string activityDescription, LlmSelection selection, CancellationToken cancellationToken = default);
+        Task<string> GenerateTipsAsync(string personaDescription, string activityDescription, LlmSelection selection, CancellationToken cancellationToken = default);
+        Task<bool> ValidateConnectionAsync(LlmProvider provider, CancellationToken cancellationToken = default);
+        Task<IEnumerable<LlmModelInfo>> ListAvailableModelsAsync(LlmProvider provider, bool forceRefresh = false, CancellationToken cancellationToken = default);
     }
 }

@@ -2,6 +2,7 @@
 using FunnyActivities.CrossCuttingConcerns.APIDocumentation;
 using FunnyActivities.CrossCuttingConcerns.Logging;
 using FunnyActivities.Infrastructure;
+using FunnyActivities.Application.Interfaces;
 using FunnyActivities.WebAPI.Extensions;
 using FunnyActivities.WebAPI.Middleware;
 using MediatR;
@@ -94,7 +95,7 @@ builder.Services.AddNotificationServices(builder.Configuration);
 builder.Services.AddComplianceServices();
 
 // Domain servislerini ekle
-builder.Services.AddDomainServices();
+builder.Services.AddDomainServices(builder.Configuration);
 
 // Loglama servislerini ekle
 builder.Services.AddLoggingServices();
@@ -112,6 +113,12 @@ builder.Services.AddRedis(builder.Configuration);
 // --- 2. UYGULAMA VE MIDDLEWARE YAPILANDIRMASI ---
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var initializer = scope.ServiceProvider.GetRequiredService<ILlmSettingsInitializer>();
+    await initializer.InitializeAsync();
+}
 
 var localizationOptions = new RequestLocalizationOptions
 {

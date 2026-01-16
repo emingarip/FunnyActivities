@@ -134,6 +134,98 @@ export interface RoleResponse {
   };
 }
 
+export interface LlmSettings {
+  defaultProvider: string;
+  defaultModel: string;
+  ollamaBaseUrl: string;
+  ollamaHealthCheckModel: string;
+  ollamaPreferredModels: string[];
+  openAiBaseUrl: string;
+  openAiDefaultModel: string;
+  openAiAllowedModels: string[];
+  openAiOrganizationId: string;
+  hasOpenAiApiKey: boolean;
+  modelCacheSeconds: number;
+}
+
+export interface UpdateLlmSettingsPayload {
+  defaultProvider: string;
+  defaultModel: string;
+  ollamaBaseUrl: string;
+  ollamaHealthCheckModel: string;
+  ollamaPreferredModels: string[];
+  openAiBaseUrl: string;
+  openAiDefaultModel: string;
+  openAiAllowedModels: string[];
+  openAiOrganizationId: string;
+  openAiApiKey?: string;
+  modelCacheSeconds: number;
+}
+
+export interface LlmModelInfo {
+  name: string;
+  displayName: string;
+  provider: string;
+  isDefault: boolean;
+  isAvailable: boolean;
+}
+
+export interface ProviderModelsResponse {
+  provider: string;
+  models: LlmModelInfo[];
+}
+
+// Prompt templates
+export interface PromptTemplateDto {
+  id: string;
+  key: string;
+  title: string;
+  locale: string;
+  providerHint?: string;
+  content: string;
+  outputFormatHint?: string;
+  description?: string;
+  isActive: boolean;
+  updatedAt: string;
+  updatedBy?: string;
+}
+
+export interface PromptTemplatePayload {
+  key: string;
+  title: string;
+  locale: string;
+  providerHint?: string;
+  content: string;
+  outputFormatHint?: string;
+  description?: string;
+  isActive: boolean;
+}
+
+export interface PromptCallLog {
+  id: string;
+  templateId?: string;
+  templateKey: string;
+  locale?: string;
+  provider: string;
+  model: string;
+  duration: number;
+  tokenUsage?: number;
+  success: boolean;
+  resultSummary?: string;
+  errorMessage?: string;
+  isTest: boolean;
+  createdAt: string;
+}
+
+export interface PromptTemplateTestResult {
+  template?: PromptTemplateDto;
+  prompt: string;
+  response: string;
+  duration: number;
+  provider: string;
+  model: string;
+}
+
 // Upload types
 export interface UploadImageResponse {
   success: boolean;

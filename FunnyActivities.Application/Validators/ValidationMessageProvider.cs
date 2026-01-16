@@ -113,6 +113,9 @@ public static class ValidationMessageProvider
         ["CustomPromptMax1000"] = ("Ozel istem 1000 karakteri asamaz.", "Custom prompt must not exceed 1000 characters."),
         ["ModelRequired"] = ("Model zorunludur.", "Model is required."),
         ["ModelInvalid"] = ("Gecersiz model belirtildi.", "Invalid model specified."),
+        ["ProviderInvalid"] = ("Gecersiz LLM saglayicisi secildi.", "Invalid LLM provider selected."),
+        ["TemperatureRange"] = ("Sicaklik 0 ile 2 arasinda olmalidir.", "Temperature must be between 0 and 2."),
+        ["MaxTokensRange"] = ("Maksimum token degeri 0'dan buyuk olmalidir.", "Max tokens must be greater than zero."),
     };
 
     public static string Get(string key)
