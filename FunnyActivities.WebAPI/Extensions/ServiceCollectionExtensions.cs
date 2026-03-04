@@ -221,15 +221,14 @@ public static class ServiceCollectionExtensions
                            context.User.IsInRole("User");
                 }));
 
-            // Add a default policy that allows anonymous access
+            // Require authenticated users by default for [Authorize] endpoints.
             options.DefaultPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
-                .RequireAssertion(context => true) // Allow all requests to pass through
+                .RequireAuthenticatedUser()
                 .Build();
 
-            // Fallback policy for when no policy is specified
-            options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
-                .RequireAssertion(context => true) // Allow all requests to pass through
-                .Build();
+            // Keep fallback open so only endpoints explicitly decorated with
+            // authorization metadata are protected.
+            options.FallbackPolicy = null;
         });
         return services;
     }
