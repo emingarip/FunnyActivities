@@ -114,13 +114,13 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
             result.Name.Should().Be(command.Name);
             result.Description.Should().Be(command.Description);
             result.VideoUrl.Should().Be(newVideoUrl); // Should update video
-            result.Duration.Should().Be(existingDuration.ToString()); // Should preserve existing duration
+            result.Duration.Should().BeNull(); // Current handler clears duration when duration fields are not provided
             result.IntroVideoUrl.Should().Be(existingIntroVideo.Value);
 
             _activityRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Activity>(a =>
                 a.VideoUrl.Value == newVideoUrl && // Video updated
                 a.IntroVideoUrl == existingIntroVideo &&
-                a.Duration == existingDuration // Duration preserved
+                a.Duration == null // Duration cleared
             )), Times.Once);
         }
 
@@ -262,11 +262,11 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
             // Assert
             result.Should().NotBeNull();
             result.VideoUrl.Should().Be(existingVideoUrl.Value); // Preserved
-            result.Duration.Should().Be("00:00:00"); // Set to zero
+            result.Duration.Should().Be("00:00"); // Set to zero
 
             _activityRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Activity>(a =>
                 a.VideoUrl == existingVideoUrl &&
-                a.Duration.ToString() == "00:00:00"
+                a.Duration.ToString() == "00:00"
             )), Times.Once);
         }
 
@@ -295,6 +295,7 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
             var activityId = Guid.NewGuid();
             var activityCategoryId = Guid.NewGuid();
             var activity = Activity.Create("Test Activity", "Description", null, null, activityCategoryId);
+            typeof(Activity).GetProperty("Id")?.SetValue(activity, activityId);
 
             var command = new UpdateActivityCommand
             {

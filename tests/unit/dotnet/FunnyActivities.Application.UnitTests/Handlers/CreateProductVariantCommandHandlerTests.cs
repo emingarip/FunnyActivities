@@ -92,7 +92,16 @@ namespace FunnyActivities.Application.UnitTests.Handlers
         public async Task Handle_BaseProductNotFound_ShouldThrowException()
         {
             // Arrange
-            var command = _fixture.Create<CreateProductVariantCommand>();
+            var command = new CreateProductVariantCommand
+            {
+                BaseProductId = Guid.NewGuid(),
+                Name = "Variant A",
+                StockQuantity = 10,
+                UnitOfMeasureId = Guid.NewGuid(),
+                UnitValue = 1.0m,
+                UsageNotes = "Notes",
+                UserId = Guid.NewGuid()
+            };
             _baseProductRepositoryMock.Setup(x => x.GetByIdAsync(command.BaseProductId)).ReturnsAsync((BaseProduct)null);
 
             // Act & Assert
@@ -104,8 +113,19 @@ namespace FunnyActivities.Application.UnitTests.Handlers
         public async Task Handle_UnitOfMeasureNotFound_ShouldThrowException()
         {
             // Arrange
-            var command = _fixture.Create<CreateProductVariantCommand>();
+            var baseProductId = Guid.NewGuid();
+            var command = new CreateProductVariantCommand
+            {
+                BaseProductId = baseProductId,
+                Name = "Variant A",
+                StockQuantity = 10,
+                UnitOfMeasureId = Guid.NewGuid(),
+                UnitValue = 1.0m,
+                UsageNotes = "Notes",
+                UserId = Guid.NewGuid()
+            };
             var baseProduct = BaseProduct.Create("Test", null, null);
+            typeof(BaseProduct).GetProperty("Id")?.SetValue(baseProduct, baseProductId);
 
             _baseProductRepositoryMock.Setup(x => x.GetByIdAsync(command.BaseProductId)).ReturnsAsync(baseProduct);
             _unitOfMeasureRepositoryMock.Setup(x => x.GetByIdAsync(command.UnitOfMeasureId)).ReturnsAsync((UnitOfMeasure)null);
@@ -119,10 +139,26 @@ namespace FunnyActivities.Application.UnitTests.Handlers
         public async Task Handle_DuplicateName_ShouldThrowException()
         {
             // Arrange
-            var command = _fixture.Create<CreateProductVariantCommand>();
+            var baseProductId = Guid.NewGuid();
+            var unitOfMeasureId = Guid.NewGuid();
+            var command = new CreateProductVariantCommand
+            {
+                BaseProductId = baseProductId,
+                Name = "Duplicate Name",
+                StockQuantity = 10,
+                UnitOfMeasureId = unitOfMeasureId,
+                UnitValue = 1.0m,
+                UsageNotes = "Notes",
+                UserId = Guid.NewGuid()
+            };
+
             var baseProduct = BaseProduct.Create("Test", null, null);
-            var unitOfMeasure = UnitOfMeasure.Create("Test", "T", "Test");
-            var existingVariant = ProductVariant.Create(baseProduct.Id, command.Name, 5, unitOfMeasure.Id, 1, null);
+            typeof(BaseProduct).GetProperty("Id")?.SetValue(baseProduct, baseProductId);
+
+            var unitOfMeasure = UnitOfMeasure.Create("Test Unit", "TU", "Test");
+            typeof(UnitOfMeasure).GetProperty("Id")?.SetValue(unitOfMeasure, unitOfMeasureId);
+
+            var existingVariant = ProductVariant.Create(baseProductId, command.Name, 5, unitOfMeasureId, 1, null);
 
             _baseProductRepositoryMock.Setup(x => x.GetByIdAsync(command.BaseProductId)).ReturnsAsync(baseProduct);
             _unitOfMeasureRepositoryMock.Setup(x => x.GetByIdAsync(command.UnitOfMeasureId)).ReturnsAsync(unitOfMeasure);

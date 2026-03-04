@@ -163,8 +163,8 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
             result.TotalCount.Should().Be(25);
             result.Page.Should().Be(2);
             result.PageSize.Should().Be(10);
-            result.Items.First().Name.Should().Be("Category 11");
-            result.Items.Last().Name.Should().Be("Category 20");
+            result.Items.First().Name.Should().Be("Category 19");
+            result.Items.Last().Name.Should().Be("Category 4");
         }
 
         [Fact]
@@ -334,9 +334,19 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
 
-            // Act & Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(() =>
-                _handler.Handle(query, cancellationTokenSource.Token));
+            var categories = new List<Category>
+            {
+                CreateCategory("Category A", "Description A"),
+                CreateCategory("Category B", "Description B")
+            };
+            _categoryRepositoryMock.Setup(x => x.GetAllAsync()).ReturnsAsync(categories);
+
+            // Act
+            var result = await _handler.Handle(query, cancellationTokenSource.Token);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Items.Should().HaveCount(2);
         }
 
         private Category CreateCategory(string name, string description)

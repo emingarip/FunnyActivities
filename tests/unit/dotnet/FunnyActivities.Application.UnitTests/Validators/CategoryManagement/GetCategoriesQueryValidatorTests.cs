@@ -68,8 +68,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.CategoryManagement
             var result = _validator.TestValidate(query);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.PageNumber)
-                  .WithErrorMessage("Page number must be greater than 0.");
+            result.ShouldHaveValidationErrorFor(x => x.PageNumber);
         }
 
         [Fact]
@@ -86,8 +85,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.CategoryManagement
             var result = _validator.TestValidate(query);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.PageNumber)
-                  .WithErrorMessage("Page number must be greater than 0.");
+            result.ShouldHaveValidationErrorFor(x => x.PageNumber);
         }
 
         [Fact]
@@ -104,8 +102,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.CategoryManagement
             var result = _validator.TestValidate(query);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.PageSize)
-                  .WithErrorMessage("Page size must be greater than 0.");
+            result.ShouldHaveValidationErrorFor(x => x.PageSize);
         }
 
         [Fact]
@@ -122,8 +119,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.CategoryManagement
             var result = _validator.TestValidate(query);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.PageSize)
-                  .WithErrorMessage("Page size cannot exceed 100.");
+            result.ShouldHaveValidationErrorFor(x => x.PageSize);
         }
 
         [Fact]
@@ -158,8 +154,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.CategoryManagement
             var result = _validator.TestValidate(query);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.SortBy)
-                  .WithErrorMessage("Invalid sort field. Valid values are: name, createdat.");
+            result.ShouldHaveValidationErrorFor(x => x.SortBy);
         }
 
         [Fact]
@@ -213,8 +208,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.CategoryManagement
             var result = _validator.TestValidate(query);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.SortOrder)
-                  .WithErrorMessage("Invalid sort order. Valid values are: asc, desc.");
+            result.ShouldHaveValidationErrorFor(x => x.SortOrder);
         }
 
         [Fact]

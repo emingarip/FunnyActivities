@@ -5,6 +5,7 @@ using FunnyActivities.Application.Handlers.UserManagement;
 using FunnyActivities.Domain.Entities;
 using FunnyActivities.Domain.Interfaces;
 using FunnyActivities.Domain.Services;
+using FunnyActivities.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
@@ -39,8 +40,10 @@ namespace FunnyActivities.Application.UnitTests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var user = new User(userId, "test@example.com", "hashedpassword", "John", "Doe");
-            var command = new LoginUserCommand { Email = "test@example.com", Password = "hashedpassword" };
+            var plainPassword = "Password123";
+            var passwordHash = _userService.HashPassword(new Password(plainPassword));
+            var user = new User(userId, "test@example.com", passwordHash, "John", "Doe");
+            var command = new LoginUserCommand { Email = "test@example.com", Password = plainPassword };
 
             _userRepositoryMock.Setup(x => x.GetByEmailAsync(command.Email))
                 .ReturnsAsync(user);
@@ -81,8 +84,9 @@ namespace FunnyActivities.Application.UnitTests
         public async Task Handle_ShouldThrowUnauthorizedAccessException_WhenPasswordIsInvalid()
         {
             // Arrange
-            var user = new User(Guid.NewGuid(), "test@example.com", "hashedpassword", "John", "Doe");
-            var command = new LoginUserCommand { Email = "test@example.com", Password = "wrongpassword" };
+            var passwordHash = _userService.HashPassword(new Password("Password123"));
+            var user = new User(Guid.NewGuid(), "test@example.com", passwordHash, "John", "Doe");
+            var command = new LoginUserCommand { Email = "test@example.com", Password = "WrongPassword999" };
 
             _userRepositoryMock.Setup(x => x.GetByEmailAsync(command.Email))
                 .ReturnsAsync(user);
@@ -97,8 +101,10 @@ namespace FunnyActivities.Application.UnitTests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var user = new User(userId, "test@example.com", "hashedpassword", "John", "Doe");
-            var command = new LoginUserCommand { Email = "test@example.com", Password = "hashedpassword" };
+            var plainPassword = "Password123";
+            var passwordHash = _userService.HashPassword(new Password(plainPassword));
+            var user = new User(userId, "test@example.com", passwordHash, "John", "Doe");
+            var command = new LoginUserCommand { Email = "test@example.com", Password = plainPassword };
 
             _userRepositoryMock.Setup(x => x.GetByEmailAsync(command.Email))
                 .ReturnsAsync(user);

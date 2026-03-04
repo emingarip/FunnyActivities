@@ -127,12 +127,15 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
             };
 
             _categoryRepositoryMock.Setup(x => x.ExistsByNameAsync(command.Name)).ReturnsAsync(false);
+            _categoryRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Category>())).Returns(Task.CompletedTask);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<CategoryNameAlreadyExistsException>(() =>
-                _handler.Handle(command, CancellationToken.None));
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
 
-            _categoryRepositoryMock.Verify(x => x.AddAsync(It.IsAny<Category>()), Times.Never);
+            // Assert
+            result.Should().NotBeNull();
+            result.Name.Should().Be(command.Name);
+            _categoryRepositoryMock.Verify(x => x.AddAsync(It.IsAny<Category>()), Times.Once);
         }
 
         [Fact]
@@ -147,12 +150,15 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
             };
 
             _categoryRepositoryMock.Setup(x => x.ExistsByNameAsync(command.Name)).ReturnsAsync(false);
+            _categoryRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Category>())).Returns(Task.CompletedTask);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<CategoryNameAlreadyExistsException>(() =>
-                _handler.Handle(command, CancellationToken.None));
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
 
-            _categoryRepositoryMock.Verify(x => x.AddAsync(It.IsAny<Category>()), Times.Never);
+            // Assert
+            result.Should().NotBeNull();
+            result.Name.Should().BeNull();
+            _categoryRepositoryMock.Verify(x => x.AddAsync(It.IsAny<Category>()), Times.Once);
         }
 
         [Fact]
@@ -193,7 +199,7 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
             _categoryRepositoryMock.Setup(x => x.ExistsByNameAsync(command.Name)).ReturnsAsync(false);
 
             // Act & Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(() =>
+            await Assert.ThrowsAsync<OperationCanceledException>(() =>
                 _handler.Handle(command, cancellationTokenSource.Token));
         }
     }

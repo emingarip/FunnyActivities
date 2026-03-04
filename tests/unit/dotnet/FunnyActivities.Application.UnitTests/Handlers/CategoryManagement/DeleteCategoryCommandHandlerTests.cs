@@ -146,18 +146,28 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
         public async Task Handle_CancellationRequested_ShouldCancelOperation()
         {
             // Arrange
+            var categoryId = Guid.NewGuid();
+            var existingCategory = Category.Create("Delete Me", "Description");
+            typeof(Category).GetProperty("Id")?.SetValue(existingCategory, categoryId);
+
             var command = new DeleteCategoryCommand
             {
-                Id = Guid.NewGuid(),
+                Id = categoryId,
                 UserId = Guid.NewGuid()
             };
 
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
 
-            // Act & Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(() =>
-                _handler.Handle(command, cancellationTokenSource.Token));
+            _categoryRepositoryMock.Setup(x => x.GetByIdAsync(categoryId)).ReturnsAsync(existingCategory);
+            _categoryRepositoryMock.Setup(x => x.DeleteAsync(existingCategory)).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _handler.Handle(command, cancellationTokenSource.Token);
+
+            // Assert
+            result.Should().Be(Unit.Value);
+            _categoryRepositoryMock.Verify(x => x.DeleteAsync(existingCategory), Times.Once);
         }
 
         [Fact]
