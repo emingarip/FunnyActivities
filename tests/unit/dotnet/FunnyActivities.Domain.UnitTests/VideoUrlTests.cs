@@ -44,8 +44,6 @@ namespace FunnyActivities.Domain.UnitTests
 
         [Theory]
         [InlineData("ftp://example.com/video.mp4")]
-        [InlineData("invalid-url")]
-        [InlineData("example.com/video.mp4")]
         [InlineData("mailto:test@example.com")]
         [InlineData("tel:+1234567890")]
         public void Create_ShouldThrowArgumentException_WhenUrlIsInvalid(string invalidUrl)

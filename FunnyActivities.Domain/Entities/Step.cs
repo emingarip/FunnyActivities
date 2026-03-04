@@ -67,10 +67,15 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="timestampSeconds">The timestamp in seconds.</param>
         public Step(Guid id, Guid activityId, int order, string description, int? timestampSeconds = null)
         {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                throw new ArgumentException("Step description cannot be null or empty.", nameof(description));
+            }
+
             Id = id;
             ActivityId = activityId;
             Order = order;
-            Description = description;
+            Description = description.Trim();
             TimestampSeconds = timestampSeconds ?? 0;
             DomainEvents = new List<IDomainEvent>();
             CreatedAt = DateTime.UtcNow;
@@ -111,13 +116,17 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="timestampSeconds">The new timestamp in seconds.</param>
         public void UpdateDetails(int order, string description, int? timestampSeconds = null)
         {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                throw new ArgumentException("Step description cannot be null or empty.", nameof(description));
+            }
             if (timestampSeconds.HasValue && timestampSeconds.Value < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(timestampSeconds), "Timestamp must be non-negative.");
             }
 
             Order = order;
-            Description = description;
+            Description = description.Trim();
             TimestampSeconds = timestampSeconds ?? TimestampSeconds;
             UpdatedAt = DateTime.UtcNow;
             AddDomainEvent(new StepUpdatedEvent(Id, description));
