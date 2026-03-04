@@ -5,9 +5,9 @@ services:
     container_name: funnyactivities_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: funnyactivities
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: ${POSTGRES_DB:-funnyactivities}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD_required}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -45,20 +45,23 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: Host=postgres;Database=funnyactivities;Username=postgres;Password=postgres123
+      ConnectionStrings__DefaultConnection: Host=postgres;Database=${POSTGRES_DB:-funnyactivities};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD_required}
       ConnectionStrings__Redis: redis:6379,abortConnect=false
       MinIO__Endpoint: minio:9000
-      MinIO__ExternalEndpoint: http://localhost:9000
-      MinIO__AccessKey: minioadmin
-      MinIO__SecretKey: minioadmin123
+      MinIO__ExternalEndpoint: ${MINIO_EXTERNAL_ENDPOINT:?MINIO_EXTERNAL_ENDPOINT_required}
+      MinIO__AccessKey: ${MINIO_ROOT_USER:?MINIO_ROOT_USER_required}
+      MinIO__SecretKey: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD_required}
       MinIO__UseSSL: false
       # JWT Settings
-      JwtSettings__SecretKey: your-super-secret-jwt-key-that-is-at-least-32-characters-long
-      JwtSettings__Issuer: FunnyActivities
-      JwtSettings__Audience: FunnyActivitiesUsers
-      JwtSettings__ExpiryMinutes: 60
-      JwtSettings__RefreshTokenExpiryDays: 7
-      # Add other environment variables as needed (e.g., SendGrid, Twilio)
+      JwtSettings__SecretKey: ${JWT_SECRET_KEY:?JWT_SECRET_KEY_required}
+      JwtSettings__Issuer: ${JWT_ISSUER:-FunnyActivities}
+      JwtSettings__Audience: ${JWT_AUDIENCE:-FunnyActivitiesUsers}
+      JwtSettings__ExpiryMinutes: ${JWT_EXPIRY_MINUTES:-60}
+      JwtSettings__RefreshTokenExpiryDays: ${JWT_REFRESH_DAYS:-7}
+      SendGrid__ApiKey: ${SENDGRID_API_KEY:-}
+      Twilio__AccountSid: ${TWILIO_ACCOUNT_SID:-}
+      Twilio__AuthToken: ${TWILIO_AUTH_TOKEN:-}
+      Twilio__FromNumber: ${TWILIO_FROM_NUMBER:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -112,7 +115,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD_required}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
@@ -142,8 +145,8 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER_required}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD_required}
       # CORS configuration to allow HEAD requests from frontend
       MINIO_API_REQUESTS_MAX: 1600
       MINIO_API_REQUESTS_DEADLINE: 10s

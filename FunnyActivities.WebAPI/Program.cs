@@ -5,8 +5,10 @@ using FunnyActivities.Infrastructure;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.WebAPI.Extensions;
 using FunnyActivities.WebAPI.Middleware;
+using AspNetCoreRateLimit;
 using MediatR;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Minio;
@@ -54,6 +56,7 @@ FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddHealthChecks(bu
 
 // JWT ile kimlik dogrulamayi (Authentication) ekle
 FunnyActivities.CrossCuttingConcerns.ServiceCollectionExtensions.AddJwtAuthentication(builder.Services, builder.Configuration);
+FunnyActivities.CrossCuttingConcerns.ServiceCollectionExtensions.AddRateLimiting(builder.Services, builder.Configuration);
 
 // Yetkilendirme (Authorization) politikalarini ekle
 FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddAuthorizationPolicies(builder.Services);
@@ -68,7 +71,7 @@ FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddApiVersioning(b
 builder.Services.AddSwagger();
 
 // CORS (Cross-Origin Resource Sharing) politikasini ekle
-FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddCors(builder.Services);
+FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddCors(builder.Services, builder.Configuration);
 
 // Veritabani DbContext'ini ekle
 builder.Services.AddDatabase(builder.Configuration);
@@ -165,6 +168,14 @@ app.UseCustomExceptionHandling();
 // Gelen istekleri HTTP'den HTTPS'e yonlendir
 app.UseHttpsRedirection();
 
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
+
 // Yonlendirme (Routing) middleware'ini ekle. Bu, istegin hangi endpoint'e gidecegini belirler.
 app.UseRouting();
 
@@ -173,7 +184,8 @@ app.UseHttpMetrics();
 
 // CORS middleware'ini ekle. Tarayicilarin farkli domain'lerden API'ye erisimine izin verir.
 // Guvenlik middleware'larindan (Authentication/Authorization) once gelmelidir.
-app.UseCors("AllowAllOrigins"); // Development icin tum origin'lere izin ver
+app.UseCors(app.Environment.IsDevelopment() ? "AllowAllOrigins" : "AllowSpecificOrigins");
+app.UseIpRateLimiting();
 
 // Kimlik dogrulama (Authentication) middleware'ini ekle. Gelen JWT'yi dogrular.
 app.UseAuthentication();
