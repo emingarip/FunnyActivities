@@ -53,45 +53,19 @@ public static class ServiceCollectionExtensions
             options.Challenge = "Bearer";
             options.Authority = null;
 
-            // Add event handlers for debugging
+            // Keep custom behavior for anonymous requests without emitting
+            // token/claim details to console logs in production.
             options.Events = new JwtBearerEvents
             {
-                OnAuthenticationFailed = context =>
-                {
-                    Console.WriteLine($"[JWT] Authentication failed: {context.Exception.Message}");
-                    return Task.CompletedTask;
-                },
-                OnTokenValidated = context =>
-                {
-                    var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
-                    Console.WriteLine($"[JWT] Token validated successfully. Claims: {string.Join(", ", claims ?? new List<string>())}");
-
-                    // Check for role claims specifically
-                    var roleClaims = context.Principal?.Claims.Where(c => c.Type.Contains("role") || c.Type == ClaimTypes.Role).ToList();
-                    if (roleClaims?.Any() == true)
-                    {
-                        Console.WriteLine($"[JWT] Role claims: {string.Join(", ", roleClaims.Select(c => $"{c.Type}={c.Value}"))}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[JWT] No role claims found in validated token");
-                    }
-
-                    return Task.CompletedTask;
-                },
-                OnChallenge = context =>
-                {
-                    Console.WriteLine($"[JWT] Challenge triggered: {context.AuthenticateFailure?.Message ?? "No failure details"}");
-                    return Task.CompletedTask;
-                },
+                OnAuthenticationFailed = _ => Task.CompletedTask,
+                OnTokenValidated = _ => Task.CompletedTask,
+                OnChallenge = _ => Task.CompletedTask,
                 OnMessageReceived = context =>
                 {
                     // Don't challenge anonymous requests
                     if (string.IsNullOrEmpty(context.Request.Headers.Authorization))
                     {
-                        Console.WriteLine($"[JWT] No authorization header found, skipping authentication");
                         context.NoResult();
-                        return Task.CompletedTask;
                     }
                     return Task.CompletedTask;
                 }
