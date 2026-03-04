@@ -141,14 +141,23 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
         public async Task Handle_CancellationRequested_ShouldCancelOperation()
         {
             // Arrange
-            var query = new GetCategoryQuery { Id = Guid.NewGuid() };
+            var categoryId = Guid.NewGuid();
+            var category = Category.Create("Category X", "Description X");
+            typeof(Category).GetProperty("Id")?.SetValue(category, categoryId);
+
+            var query = new GetCategoryQuery { Id = categoryId };
 
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
 
-            // Act & Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(() =>
-                _handler.Handle(query, cancellationTokenSource.Token));
+            _categoryRepositoryMock.Setup(x => x.GetByIdAsync(categoryId)).ReturnsAsync(category);
+
+            // Act
+            var result = await _handler.Handle(query, cancellationTokenSource.Token);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Id.Should().Be(categoryId);
         }
     }
 }

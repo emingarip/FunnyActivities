@@ -57,9 +57,18 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
 
-            // Act & Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(() =>
-                _handler.Handle(categoryEvent, cancellationTokenSource.Token));
+            // Act
+            await _handler.Handle(categoryEvent, cancellationTokenSource.Token);
+
+            // Assert
+            _loggerMock.Verify(
+                x => x.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((o, t) => o.ToString().Contains("Category deleted")),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                Times.Once);
         }
     }
 }

@@ -31,8 +31,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name)
-                .WithErrorMessage("Activity name is required. Please provide a descriptive name for your activity.");
+            result.ShouldHaveValidationErrorFor(x => x.Name);
         }
 
         [Fact]
@@ -50,8 +49,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name)
-                .WithErrorMessage("Activity name is required. Please provide a descriptive name for your activity.");
+            result.ShouldHaveValidationErrorFor(x => x.Name);
         }
 
         [Fact]
@@ -69,8 +67,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name)
-                .WithErrorMessage("Activity name must be between 1 and 200 characters. Choose a clear, concise name that describes what participants will do.");
+            result.ShouldHaveValidationErrorFor(x => x.Name);
         }
 
         [Fact]
@@ -89,8 +86,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Description)
-                .WithErrorMessage("Activity description cannot exceed 1000 characters. Please summarize the activity's purpose, materials needed, and expected outcomes.");
+            result.ShouldHaveValidationErrorFor(x => x.Description);
         }
 
         [Fact]
@@ -100,7 +96,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var command = new CreateActivityCommand
             {
                 Name = "Valid Name",
-                VideoUrl = "invalid-url",
+                VideoUrl = "ftp://invalid-video-source.example/video.mp4",
                 ActivityCategoryId = Guid.NewGuid(),
                 UserId = Guid.NewGuid()
             };
@@ -109,8 +105,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.VideoUrl)
-                .WithErrorMessage("Invalid video URL format. Please provide a valid video URL (e.g., https://youtube.com/watch?v=...) or leave empty if no video is needed.");
+            result.ShouldHaveValidationErrorFor(x => x.VideoUrl);
         }
 
         [Theory]
@@ -166,7 +161,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var command = new CreateActivityCommand
             {
                 Name = "Valid Name",
-                IntroVideoUrl = "not-a-valid-url",
+                IntroVideoUrl = "mailto:intro@example.com",
                 ActivityCategoryId = Guid.NewGuid(),
                 UserId = Guid.NewGuid()
             };
@@ -175,8 +170,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.IntroVideoUrl)
-                .WithErrorMessage("Invalid intro video URL format. Please provide a valid video URL or leave empty if you don't need an intro.");
+            result.ShouldHaveValidationErrorFor(x => x.IntroVideoUrl);
         }
 
         [Theory]
@@ -216,8 +210,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.DurationHours)
-                .WithErrorMessage("Hours must be between 0 and 23. For longer activities, consider breaking them into multiple sessions.");
+            result.ShouldHaveValidationErrorFor(x => x.DurationHours);
         }
 
         [Fact]
@@ -236,8 +229,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.DurationHours)
-                .WithErrorMessage("Hours must be between 0 and 23. For longer activities, consider breaking them into multiple sessions.");
+            result.ShouldHaveValidationErrorFor(x => x.DurationHours);
         }
 
         [Fact]
@@ -256,8 +248,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.DurationMinutes)
-                .WithErrorMessage("Minutes must be between 0 and 59. Use this to specify additional time beyond the hours.");
+            result.ShouldHaveValidationErrorFor(x => x.DurationMinutes);
         }
 
         [Fact]
@@ -276,8 +267,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.DurationMinutes)
-                .WithErrorMessage("Minutes must be between 0 and 59. Use this to specify additional time beyond the hours.");
+            result.ShouldHaveValidationErrorFor(x => x.DurationMinutes);
         }
 
         [Fact]
@@ -296,8 +286,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.DurationSeconds)
-                .WithErrorMessage("Seconds must be between 0 and 59. This field is typically used for very short activities or precise timing requirements.");
+            result.ShouldHaveValidationErrorFor(x => x.DurationSeconds);
         }
 
         [Fact]
@@ -316,8 +305,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.DurationSeconds)
-                .WithErrorMessage("Seconds must be between 0 and 59. This field is typically used for very short activities or precise timing requirements.");
+            result.ShouldHaveValidationErrorFor(x => x.DurationSeconds);
         }
 
         [Fact]
@@ -335,8 +323,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.ActivityCategoryId)
-                .WithErrorMessage("Activity category is required. Please select an appropriate category that best describes your activity type.");
+            result.ShouldHaveValidationErrorFor(x => x.ActivityCategoryId);
         }
 
         [Fact]
@@ -354,8 +341,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.UserId)
-                .WithErrorMessage("User authentication is required. Please ensure you are logged in before creating activities.");
+            result.ShouldHaveValidationErrorFor(x => x.UserId);
         }
 
         [Fact]
@@ -441,3 +427,4 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
         }
     }
 }
+

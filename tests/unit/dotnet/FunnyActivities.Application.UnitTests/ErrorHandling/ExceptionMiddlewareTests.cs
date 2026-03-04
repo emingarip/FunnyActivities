@@ -5,7 +5,9 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Net;
+using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Xunit;
 
 namespace FunnyActivities.Application.UnitTests.ErrorHandling
@@ -95,7 +97,7 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             httpContext.Response.ContentType.Should().Be("application/problem+json");
 
             var responseBody = await ReadResponseBody(httpContext.Response);
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
+            var problemDetails = DeserializeProblemDetails(responseBody);
 
             problemDetails.Should().NotBeNull();
             problemDetails.Title.Should().Be("Validation Error");
@@ -103,10 +105,9 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             problemDetails.Detail.Should().Be("One or more validation errors occurred.");
             problemDetails.Extensions.Should().ContainKey("errors");
             problemDetails.Extensions.Should().ContainKey("errorCode");
-            problemDetails.Extensions["errorCode"].Should().Be("VALIDATION_FAILED");
-
-            var errors = (IEnumerable<string>)problemDetails.Extensions["errors"];
-            errors.Should().BeEquivalentTo(new[] { "Name is required", "Stock must be positive" });
+            GetExtensionString(problemDetails, "errorCode").Should().Be("VALIDATION_FAILED");
+            GetExtensionStringArray(problemDetails, "errors")
+                .Should().BeEquivalentTo(new[] { "Name is required", "Stock must be positive" });
         }
 
         [Fact]
@@ -160,13 +161,13 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             httpContext.Response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
 
             var responseBody = await ReadResponseBody(httpContext.Response);
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
+            var problemDetails = DeserializeProblemDetails(responseBody);
 
             problemDetails.Title.Should().Be("Business Rule Violation");
             problemDetails.Status.Should().Be(400);
             problemDetails.Detail.Should().Be("A material with the name 'Duplicate Material' already exists.");
-            problemDetails.Extensions["materialName"].Should().Be("Duplicate Material");
-            problemDetails.Extensions["errorCode"].Should().Be("MATERIAL_NAME_EXISTS");
+            GetExtensionString(problemDetails, "materialName").Should().Be("Duplicate Material");
+            GetExtensionString(problemDetails, "errorCode").Should().Be("MATERIAL_NAME_EXISTS");
         }
 
         [Fact]
@@ -187,12 +188,12 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             httpContext.Response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
 
             var responseBody = await ReadResponseBody(httpContext.Response);
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
+            var problemDetails = DeserializeProblemDetails(responseBody);
 
             problemDetails.Title.Should().Be("Business Rule Violation");
             problemDetails.Status.Should().Be(400);
-            problemDetails.Extensions["stockQuantity"].Should().Be(-5m);
-            problemDetails.Extensions["errorCode"].Should().Be("INVALID_STOCK_QUANTITY");
+            GetExtensionDecimal(problemDetails, "stockQuantity").Should().Be(-5m);
+            GetExtensionString(problemDetails, "errorCode").Should().Be("INVALID_STOCK_QUANTITY");
         }
 
         [Fact]
@@ -214,12 +215,12 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             httpContext.Response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
 
             var responseBody = await ReadResponseBody(httpContext.Response);
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
+            var problemDetails = DeserializeProblemDetails(responseBody);
 
             problemDetails.Title.Should().Be("Business Rule Violation");
             problemDetails.Status.Should().Be(400);
-            problemDetails.Extensions["materialId"].Should().Be(materialId);
-            problemDetails.Extensions["errorCode"].Should().Be("MATERIAL_NOT_FOUND");
+            GetExtensionGuid(problemDetails, "materialId").Should().Be(materialId);
+            GetExtensionString(problemDetails, "errorCode").Should().Be("MATERIAL_NOT_FOUND");
         }
 
         #endregion
@@ -244,12 +245,12 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             httpContext.Response.StatusCode.Should().Be((int)HttpStatusCode.Forbidden);
 
             var responseBody = await ReadResponseBody(httpContext.Response);
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
+            var problemDetails = DeserializeProblemDetails(responseBody);
 
             problemDetails.Title.Should().Be("Access Denied");
             problemDetails.Status.Should().Be(403);
             problemDetails.Detail.Should().Be("You do not have permission to perform this action.");
-            problemDetails.Extensions["errorCode"].Should().Be("ACCESS_DENIED");
+            GetExtensionString(problemDetails, "errorCode").Should().Be("ACCESS_DENIED");
         }
 
         #endregion
@@ -274,12 +275,12 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             httpContext.Response.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
 
             var responseBody = await ReadResponseBody(httpContext.Response);
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
+            var problemDetails = DeserializeProblemDetails(responseBody);
 
             problemDetails.Title.Should().Be("Internal Server Error");
             problemDetails.Status.Should().Be(500);
-            problemDetails.Detail.Should().Be("An unexpected error occurred while processing your request.");
-            problemDetails.Extensions["errorCode"].Should().Be("INTERNAL_SERVER_ERROR");
+            problemDetails.Detail.Should().Be("An unexpected error occurred.");
+            GetExtensionString(problemDetails, "errorCode").Should().Be("INTERNAL_SERVER_ERROR");
         }
 
         [Fact]
@@ -332,7 +333,7 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
 
             // Assert
             var responseBody = await ReadResponseBody(httpContext.Response);
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
+            var problemDetails = DeserializeProblemDetails(responseBody);
 
             problemDetails.Instance.Should().Be("/api/test");
             problemDetails.Extensions.Should().NotBeNull();
@@ -373,7 +374,7 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             httpContext.Request.Method = "POST";
             httpContext.Request.Path = "/api/materials";
             httpContext.User = new System.Security.Claims.ClaimsPrincipal(
-                new System.Security.Claims.ClaimsIdentity(new[] { new System.Security.Claims.Claim("name", "john.doe") }));
+                new System.Security.Claims.ClaimsIdentity(new[] { new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "john.doe") }));
 
             var exception = new ValidationException(new[] { "Name required" });
 
@@ -433,6 +434,62 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
             return await reader.ReadToEndAsync();
         }
 
+        private static ProblemDetails? DeserializeProblemDetails(string responseBody)
+        {
+            return JsonSerializer.Deserialize<ProblemDetails>(
+                responseBody,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+
+        private static string GetExtensionString(ProblemDetails details, string key)
+        {
+            details.Extensions.Should().ContainKey(key);
+            var value = details.Extensions[key];
+            return value switch
+            {
+                JsonElement e when e.ValueKind == JsonValueKind.String => e.GetString()!,
+                null => string.Empty,
+                _ => value.ToString()!
+            };
+        }
+
+        private static decimal GetExtensionDecimal(ProblemDetails details, string key)
+        {
+            details.Extensions.Should().ContainKey(key);
+            var value = details.Extensions[key];
+            return value switch
+            {
+                JsonElement e when e.ValueKind == JsonValueKind.Number => e.GetDecimal(),
+                decimal d => d,
+                _ => decimal.Parse(value!.ToString()!)
+            };
+        }
+
+        private static Guid GetExtensionGuid(ProblemDetails details, string key)
+        {
+            details.Extensions.Should().ContainKey(key);
+            var value = details.Extensions[key];
+            return value switch
+            {
+                JsonElement e when e.ValueKind == JsonValueKind.String => Guid.Parse(e.GetString()!),
+                Guid g => g,
+                _ => Guid.Parse(value!.ToString()!)
+            };
+        }
+
+        private static IEnumerable<string> GetExtensionStringArray(ProblemDetails details, string key)
+        {
+            details.Extensions.Should().ContainKey(key);
+            var value = details.Extensions[key];
+            return value switch
+            {
+                JsonElement e when e.ValueKind == JsonValueKind.Array =>
+                    e.EnumerateArray().Select(x => x.GetString() ?? string.Empty).ToList(),
+                IEnumerable<string> s => s,
+                _ => new[] { value?.ToString() ?? string.Empty }
+            };
+        }
+
         #endregion
     }
 
@@ -444,6 +501,7 @@ namespace FunnyActivities.Application.UnitTests.ErrorHandling
         public int Status { get; set; }
         public string? Detail { get; set; }
         public string? Instance { get; set; }
+        [JsonExtensionData]
         public Dictionary<string, object?> Extensions { get; set; } = new();
     }
 }

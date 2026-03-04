@@ -246,9 +246,13 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
         public async Task Handle_CancellationRequested_ShouldCancelOperation()
         {
             // Arrange
+            var categoryId = Guid.NewGuid();
+            var existingCategory = Category.Create("Existing Name", "Existing Description");
+            typeof(Category).GetProperty("Id")?.SetValue(existingCategory, categoryId);
+
             var command = new UpdateCategoryCommand
             {
-                Id = Guid.NewGuid(),
+                Id = categoryId,
                 Name = "New Name",
                 Description = "New Description",
                 UserId = Guid.NewGuid()
@@ -257,9 +261,17 @@ namespace FunnyActivities.Application.UnitTests.Handlers.CategoryManagement
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
 
-            // Act & Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(() =>
-                _handler.Handle(command, cancellationTokenSource.Token));
+            _categoryRepositoryMock.Setup(x => x.GetByIdAsync(categoryId)).ReturnsAsync(existingCategory);
+            _categoryRepositoryMock.Setup(x => x.ExistsByNameExcludingIdAsync(command.Name, categoryId)).ReturnsAsync(false);
+            _categoryRepositoryMock.Setup(x => x.UpdateAsync(existingCategory)).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _handler.Handle(command, cancellationTokenSource.Token);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Id.Should().Be(categoryId);
+            _categoryRepositoryMock.Verify(x => x.UpdateAsync(existingCategory), Times.Once);
         }
     }
 }

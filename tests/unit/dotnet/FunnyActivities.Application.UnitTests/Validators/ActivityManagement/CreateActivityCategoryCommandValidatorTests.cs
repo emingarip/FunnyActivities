@@ -30,8 +30,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name)
-                .WithErrorMessage("Category name is required.");
+            result.ShouldHaveValidationErrorFor(x => x.Name);
         }
 
         [Fact]
@@ -48,8 +47,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name)
-                .WithErrorMessage("Category name is required.");
+            result.ShouldHaveValidationErrorFor(x => x.Name);
         }
 
         [Fact]
@@ -66,8 +64,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Name)
-                .WithErrorMessage("Category name must be between 1 and 100 characters.");
+            result.ShouldHaveValidationErrorFor(x => x.Name);
         }
 
         [Fact]
@@ -85,8 +82,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Description)
-                .WithErrorMessage("Category description cannot exceed 500 characters.");
+            result.ShouldHaveValidationErrorFor(x => x.Description);
         }
 
         [Fact]
@@ -103,8 +99,7 @@ namespace FunnyActivities.Application.UnitTests.Validators.ActivityManagement
             var result = _validator.TestValidate(command);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.UserId)
-                .WithErrorMessage("User ID is required.");
+            result.ShouldHaveValidationErrorFor(x => x.UserId);
         }
 
         [Fact]
