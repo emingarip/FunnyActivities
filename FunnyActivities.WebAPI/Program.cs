@@ -165,9 +165,6 @@ if (app.Environment.IsDevelopment())
 // Hatalari merkezi olarak yakalamak icin custom exception middleware'ini kullan
 app.UseCustomExceptionHandling();
 
-// Gelen istekleri HTTP'den HTTPS'e yonlendir
-app.UseHttpsRedirection();
-
 var forwardedHeadersOptions = new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -175,6 +172,9 @@ var forwardedHeadersOptions = new ForwardedHeadersOptions
 forwardedHeadersOptions.KnownNetworks.Clear();
 forwardedHeadersOptions.KnownProxies.Clear();
 app.UseForwardedHeaders(forwardedHeadersOptions);
+
+// Gelen istekleri HTTP'den HTTPS'e yonlendir
+app.UseHttpsRedirection();
 
 // Yonlendirme (Routing) middleware'ini ekle. Bu, istegin hangi endpoint'e gidecegini belirler.
 app.UseRouting();
