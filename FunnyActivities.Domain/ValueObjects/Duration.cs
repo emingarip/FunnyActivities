@@ -50,6 +50,9 @@ namespace FunnyActivities.Domain.ValueObjects
         /// <exception cref="ArgumentException">Thrown when the TimeSpan is invalid.</exception>
         public static Duration Create(TimeSpan timeSpan)
         {
+            if (timeSpan < TimeSpan.Zero)
+                throw new ArgumentException("Duration cannot be negative.", nameof(timeSpan));
+
             return new Duration(timeSpan);
         }
 

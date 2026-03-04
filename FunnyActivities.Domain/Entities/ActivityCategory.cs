@@ -55,8 +55,13 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="description">The description of the category.</param>
         public ActivityCategory(Guid id, string name, string? description)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Category name cannot be null or empty.", nameof(name));
+            }
+
             Id = id;
-            Name = name;
+            Name = name.Trim();
             Description = description;
             Activities = new List<Activity>();
             DomainEvents = new List<IDomainEvent>();
@@ -89,7 +94,12 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="description">The new description.</param>
         public void UpdateDetails(string name, string? description)
         {
-            Name = name;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Category name cannot be null or empty.", nameof(name));
+            }
+
+            Name = name.Trim();
             Description = description;
             UpdatedAt = DateTime.UtcNow;
             AddDomainEvent(new ActivityCategoryUpdatedEvent(Id, name));

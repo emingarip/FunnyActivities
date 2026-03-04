@@ -103,8 +103,17 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="isPublic">Whether the activity is public.</param>
         public Activity(Guid id, string name, string? description, VideoUrl? videoUrl, Duration? duration, Guid activityCategoryId, bool isPublic = false, VideoUrl? introVideoUrl = null)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Activity name cannot be null or empty.", nameof(name));
+            }
+            if (activityCategoryId == Guid.Empty)
+            {
+                throw new ArgumentException("Activity category id cannot be empty.", nameof(activityCategoryId));
+            }
+
             Id = id;
-            Name = name;
+            Name = name.Trim();
             Description = description;
             VideoUrl = videoUrl;
             Duration = duration;
@@ -160,7 +169,12 @@ namespace FunnyActivities.Domain.Entities
         /// <param name="isPublic">The new public status.</param>
         public void UpdateDetails(string name, string? description, VideoUrl? videoUrl, Duration? duration, bool? isPublic = null)
         {
-            Name = name;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Activity name cannot be null or empty.", nameof(name));
+            }
+
+            Name = name.Trim();
             Description = description;
             VideoUrl = videoUrl;
             Duration = duration;

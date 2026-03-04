@@ -55,7 +55,7 @@ namespace FunnyActivities.Domain.UnitTests
         }
 
         [Fact]
-        public void HashPassword_ShouldReturnConsistentHashForSamePassword()
+        public void HashPassword_ShouldReturnDifferentHashesForSamePassword()
         {
             // Arrange
             var password1 = new Password("testpassword123");
@@ -66,7 +66,9 @@ namespace FunnyActivities.Domain.UnitTests
             var hash2 = _userService.HashPassword(password2);
 
             // Assert
-            hash1.Should().Be(hash2);
+            hash1.Should().NotBe(hash2);
+            _userService.VerifyPassword(hash1, password1.Value).Should().BeTrue();
+            _userService.VerifyPassword(hash2, password2.Value).Should().BeTrue();
         }
 
         [Fact]

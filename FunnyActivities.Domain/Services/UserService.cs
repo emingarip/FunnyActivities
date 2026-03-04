@@ -39,6 +39,12 @@ namespace FunnyActivities.Domain.Services
 
         public bool VerifyPassword(string hashedPassword, string plainPassword)
         {
+            if (string.IsNullOrWhiteSpace(hashedPassword) || string.IsNullOrEmpty(plainPassword))
+            {
+                _logger.LogWarning("[USER-SERVICE] Password verification skipped because hash or plaintext is empty.");
+                return false;
+            }
+
             _logger.LogDebug("[USER-SERVICE] Starting password verification. Hash format check: {IsOldFormat}",
                 IsOldHashFormat(hashedPassword));
 
@@ -91,9 +97,9 @@ namespace FunnyActivities.Domain.Services
             catch (Exception ex)
             {
                 var totalDuration = DateTime.UtcNow - startTime;
-                _logger.LogError(ex, "[USER-SERVICE] Password verification failed with exception after {TotalDuration}ms. Error: {ErrorMessage}",
+                _logger.LogWarning(ex, "[USER-SERVICE] Password verification failed with exception after {TotalDuration}ms. Error: {ErrorMessage}",
                     totalDuration.TotalMilliseconds, ex.Message);
-                throw;
+                return false;
             }
         }
 
