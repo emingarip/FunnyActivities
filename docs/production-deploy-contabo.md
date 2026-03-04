@@ -26,6 +26,12 @@ Asagidaki iki A kaydini VPS public IP'sine yonlendirin:
 - `APP_DOMAIN` (ornek: `api.example.com`)
 - `FILES_DOMAIN` (ornek: `files.example.com`)
 
+Ek olarak `.env.production` icinde:
+
+- `FRONTEND_URL` (ornek: `https://app.example.com`, sonuna `/` koymayin)
+
+Not: Frontend farkli bir platformda host ediliyorsa `FRONTEND_URL` o canli frontend adresi olmalidir.
+
 ## 4) Production stack'i kaldirma
 
 Asagidaki komutla sistemi ayaga kaldirin:
@@ -57,7 +63,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production up -d --bui
 ## Notlar
 
 - Bu stack production icin gereksiz monitoring container'larini (prometheus/grafana/jaeger/alertmanager) dahil etmez.
-- Canliya cikmadan once güvenlik PR'larinin merge edilmesi gerekir:
+- Canliya cikmadan once guvenlik PR'larinin merge edilmesi gerekir:
   - auth policy
   - CORS allowlist
   - secret management
