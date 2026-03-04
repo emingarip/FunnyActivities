@@ -1,0 +1,126 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: fa_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-funnyactivities}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD_required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fa_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: fa_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - fa_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: fa_minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER_required}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD_required}
+    volumes:
+      - minio_data:/data
+    command: server /data
+    networks:
+      - fa_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  webapi:
+    build:
+      context: .
+      dockerfile: FunnyActivities.WebAPI/Dockerfile
+    container_name: fa_webapi
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB:-funnyactivities};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD_required}
+      ConnectionStrings__Redis: redis:6379,abortConnect=false
+      MinIO__Endpoint: minio:9000
+      MinIO__ExternalEndpoint: https://${FILES_DOMAIN:?FILES_DOMAIN_required}
+      MinIO__AccessKey: ${MINIO_ROOT_USER:?MINIO_ROOT_USER_required}
+      MinIO__SecretKey: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD_required}
+      MinIO__UseSSL: false
+      JwtSettings__SecretKey: ${JWT_SECRET_KEY:?JWT_SECRET_KEY_required}
+      JwtSettings__Issuer: ${JWT_ISSUER:-FunnyActivities}
+      JwtSettings__Audience: ${JWT_AUDIENCE:-FunnyActivitiesUsers}
+      JwtSettings__ExpiryMinutes: ${JWT_EXPIRY_MINUTES:-60}
+      JwtSettings__RefreshTokenExpiryDays: ${JWT_REFRESH_DAYS:-7}
+      FrontendUrl: https://${APP_DOMAIN:?APP_DOMAIN_required}
+      SendGrid__ApiKey: ${SENDGRID_API_KEY:-}
+      Twilio__AccountSid: ${TWILIO_ACCOUNT_SID:-}
+      Twilio__AuthToken: ${TWILIO_AUTH_TOKEN:-}
+      Twilio__FromNumber: ${TWILIO_FROM_NUMBER:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fa_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: fa_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?APP_DOMAIN_required}
+      FILES_DOMAIN: ${FILES_DOMAIN:?FILES_DOMAIN_required}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL_required}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      webapi:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fa_network
+
+networks:
+  fa_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  caddy_data:
+  caddy_config:
