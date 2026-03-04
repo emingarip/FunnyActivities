@@ -51,10 +51,7 @@ namespace FunnyActivities.Api.IntegrationTests
 
                 // Mock authentication for testing
                 services.AddAuthentication("TestAuth")
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestAuth", options =>
-                    {
-                        options.DisplayName = "Test Auth";
-                    });
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestAuth", _ => { });
 
                 // Configure test-specific services here if needed
                 // For example, mock external services
