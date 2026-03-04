@@ -66,12 +66,16 @@ services:
       MinIO__AccessKey: ${MINIO_ROOT_USER:?MINIO_ROOT_USER_required}
       MinIO__SecretKey: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD_required}
       MinIO__UseSSL: false
+      MinIO__CorsOrigins__0: ${FRONTEND_URL:?FRONTEND_URL_required}
+      MinIO__CorsOrigins__1: https://${APP_DOMAIN:?APP_DOMAIN_required}
       JwtSettings__SecretKey: ${JWT_SECRET_KEY:?JWT_SECRET_KEY_required}
       JwtSettings__Issuer: ${JWT_ISSUER:-FunnyActivities}
       JwtSettings__Audience: ${JWT_AUDIENCE:-FunnyActivitiesUsers}
       JwtSettings__ExpiryMinutes: ${JWT_EXPIRY_MINUTES:-60}
       JwtSettings__RefreshTokenExpiryDays: ${JWT_REFRESH_DAYS:-7}
-      FrontendUrl: https://${APP_DOMAIN:?APP_DOMAIN_required}
+      FrontendUrl: ${FRONTEND_URL:?FRONTEND_URL_required}
+      Cors__AllowedOrigins__0: ${FRONTEND_URL:?FRONTEND_URL_required}
+      Cors__AllowedOrigins__1: https://${APP_DOMAIN:?APP_DOMAIN_required}
       SendGrid__ApiKey: ${SENDGRID_API_KEY:-}
       Twilio__AccountSid: ${TWILIO_ACCOUNT_SID:-}
       Twilio__AuthToken: ${TWILIO_AUTH_TOKEN:-}
