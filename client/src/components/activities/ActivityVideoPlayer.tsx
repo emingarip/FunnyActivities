@@ -271,7 +271,7 @@ useEffect(() => {
           <Box sx={{
             position: 'relative',
             width: '100%',
-            height: isMobile ? '200px' : '320px',
+            aspectRatio: '16 / 9',
             overflow: 'hidden',
             bgcolor: 'black',
             borderRadius: 1,
@@ -286,9 +286,8 @@ useEffect(() => {
               style={{
                 width: '100%',
                 height: '100%',
-                aspectRatio: '16/9',
                 borderRadius: theme.shape.borderRadius,
-                objectFit: 'contain',
+                objectFit: 'cover',
               }}
               onEnded={() => handleIntroComplete(true)}
               onPlay={handleIntroPlay}
@@ -393,7 +392,8 @@ useEffect(() => {
         <Box sx={{
           position: 'relative',
           width: '100%',
-          height: isFullscreen ? '100vh' : (isMobile ? '200px' : '320px'),
+          height: isFullscreen ? '100vh' : 'auto',
+          aspectRatio: isFullscreen ? undefined : '16 / 9',
           overflow: 'hidden',
           bgcolor: 'black',
           borderRadius: isFullscreen ? 0 : 1,
@@ -434,9 +434,8 @@ useEffect(() => {
             style={{
               width: '100%',
               height: '100%',
-              aspectRatio: '16/9',
               borderRadius: isFullscreen ? 0 : theme.shape.borderRadius,
-              objectFit: 'contain',
+              objectFit: 'cover',
             }}
             onLoadedMetadata={() => {
               if (videoRef.current) {

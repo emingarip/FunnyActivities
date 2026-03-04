@@ -48,6 +48,11 @@ namespace FunnyActivities.Application.DTOs.ActivityManagement
         public string ActivityCategoryName { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the activity is public (accessible without authentication).
+        /// </summary>
+        public bool IsPublic { get; set; }
+
+        /// <summary>
         /// Gets or sets the date and time when the activity was created.
         /// </summary>
         public DateTime CreatedAt { get; set; }

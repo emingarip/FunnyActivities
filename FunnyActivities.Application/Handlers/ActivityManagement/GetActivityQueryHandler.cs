@@ -62,6 +62,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 Duration = activity.Duration?.ToString(),
                 ActivityCategoryId = activity.ActivityCategoryId,
                 ActivityCategoryName = "Unknown", // Temporarily disable navigation property loading
+                IsPublic = activity.IsPublic,
                 CreatedAt = activity.CreatedAt,
                 UpdatedAt = activity.UpdatedAt,
                 StepCount = 0, // Temporarily disable navigation property loading
