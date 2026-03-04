@@ -87,6 +87,7 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
                 Duration = activity.Duration?.ToString(),
                 ActivityCategoryId = activity.ActivityCategoryId,
                 ActivityCategoryName = activity.ActivityCategory?.Name ?? "Unknown",
+                IsPublic = activity.IsPublic,
                 CreatedAt = activity.CreatedAt,
                 UpdatedAt = activity.UpdatedAt,
                 StepCount = activity.Steps?.Count ?? 0,

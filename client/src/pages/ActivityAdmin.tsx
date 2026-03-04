@@ -21,6 +21,7 @@ import {
   IconButton,
   Chip,
   TextField,
+  Switch,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -28,8 +29,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  PlayArrow as PlayIcon,
-  VideoLibrary as VideoIcon,
 } from '@mui/icons-material';
 import { activitiesAPI, activityCategoriesAPI } from '../services/api';
 import ActivityForm from '../components/activities/ActivityForm';
@@ -41,6 +40,7 @@ interface Activity {
   description?: string;
   videoUrl?: string;
   introVideoUrl?: string;
+  duration?: string;
   durationHours?: number;
   durationMinutes?: number;
   durationSeconds?: number;
@@ -123,6 +123,28 @@ const ActivityAdmin: React.FC = () => {
       if (activitiesResponse.data.success) {
         const list = activitiesResponse.data.data?.items || [];
         const enhancedActivities = list.map((activity: any) => {
+          if (activity.duration && !activity.durationHours && !activity.durationMinutes && !activity.durationSeconds) {
+            const durationParts = activity.duration.split(':');
+            const [first, second, third] = durationParts;
+            if (durationParts.length === 2) {
+              const minutes = parseInt(first, 10);
+              const seconds = parseInt(second, 10);
+              if (!Number.isNaN(minutes) && !Number.isNaN(seconds)) {
+                activity.durationHours = 0;
+                activity.durationMinutes = minutes;
+                activity.durationSeconds = seconds;
+              }
+            } else if (durationParts.length === 3) {
+              const hours = parseInt(first, 10);
+              const minutes = parseInt(second, 10);
+              const seconds = parseInt(third, 10);
+              if (!Number.isNaN(hours) && !Number.isNaN(minutes) && !Number.isNaN(seconds)) {
+                activity.durationHours = hours;
+                activity.durationMinutes = minutes;
+                activity.durationSeconds = seconds;
+              }
+            }
+          }
           if (activity.activityCategoryId && !activity.activityCategory) {
             const found = fetchedCategories.find(
               (c: ActivityCategory) => c.id === activity.activityCategoryId
@@ -147,13 +169,39 @@ const ActivityAdmin: React.FC = () => {
     try {
       setUpdatingPublicId(activity.id);
       setError(null);
+      let durationPayload: { durationHours: number; durationMinutes: number; durationSeconds: number } | null = null;
+      const hasDurationParts =
+        activity.durationHours != null || activity.durationMinutes != null || activity.durationSeconds != null;
+
+      if (hasDurationParts) {
+        durationPayload = {
+          durationHours: activity.durationHours ?? 0,
+          durationMinutes: activity.durationMinutes ?? 0,
+          durationSeconds: activity.durationSeconds ?? 0,
+        };
+      } else if (activity.duration) {
+        const durationParts = activity.duration.split(':');
+        if (durationParts.length === 2) {
+          const minutes = parseInt(durationParts[0], 10);
+          const seconds = parseInt(durationParts[1], 10);
+          if (!Number.isNaN(minutes) && !Number.isNaN(seconds)) {
+            durationPayload = { durationHours: 0, durationMinutes: minutes, durationSeconds: seconds };
+          }
+        } else if (durationParts.length === 3) {
+          const hours = parseInt(durationParts[0], 10);
+          const minutes = parseInt(durationParts[1], 10);
+          const seconds = parseInt(durationParts[2], 10);
+          if (!Number.isNaN(hours) && !Number.isNaN(minutes) && !Number.isNaN(seconds)) {
+            durationPayload = { durationHours: hours, durationMinutes: minutes, durationSeconds: seconds };
+          }
+        }
+      }
+
       const payload = {
         name: activity.name,
-        description: activity.description || '',
-        durationHours: activity.durationHours ?? 0,
-        durationMinutes: activity.durationMinutes ?? 0,
-        durationSeconds: activity.durationSeconds ?? 0,
+        description: activity.description ?? undefined,
         isPublic: !activity.isPublic,
+        ...(durationPayload ?? {}),
       };
       await activitiesAPI.updateActivity(activity.id, payload);
       setActivities((prev) =>
@@ -233,10 +281,11 @@ const ActivityAdmin: React.FC = () => {
   };
 
   const formatDuration = (activity: Activity) => {
-    const h = activity.durationHours || 0;
-    const m = activity.durationMinutes || 0;
-    const s = activity.durationSeconds || 0;
-    if (h === 0 && m === 0 && s === 0) return '-';
+    const h = activity.durationHours ?? 0;
+    const m = activity.durationMinutes ?? 0;
+    const s = activity.durationSeconds ?? 0;
+    if (h === 0 && m === 0 && s === 0) return activity.duration || '-';
+    if (h === 0) return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s
       .toString()
       .padStart(2, '0')}`;
@@ -297,93 +346,161 @@ const ActivityAdmin: React.FC = () => {
             </Button>
           </Box>
 
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('activity_admin_tab_activities')}</TableCell>
-                  <TableCell>{t('activity_admin_category_label')}</TableCell>
-                  <TableCell>{t('activity_admin_duration_label')}</TableCell>
-                  <TableCell>{t('activity_admin_public_status')}</TableCell>
-                  <TableCell>{t('activity_admin_created_at')}</TableCell>
-                  <TableCell align="right">{t('activity_admin_actions')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {activities.map((activity) => (
-                  <TableRow key={activity.id} hover>
-                    <TableCell>
-                      <Typography variant="body1" fontWeight="medium">
+          {isMobile ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {activities.map((activity) => (
+                <Paper key={activity.id} sx={{ p: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle1" fontWeight="medium">
                         {activity.name}
                       </Typography>
                       {activity.description && (
                         <Typography variant="body2" color="text.secondary">
-                          {activity.description.length > 50
-                            ? `${activity.description.substring(0, 50)}...`
+                          {activity.description.length > 80
+                            ? `${activity.description.substring(0, 80)}...`
                             : activity.description}
                         </Typography>
                       )}
-                    </TableCell>
-                    <TableCell>
-                      {activity.activityCategory ? (
-                        <Chip label={activity.activityCategory.name} size="small" variant="outlined" />
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          {getCategoryName(activity)}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>{formatDuration(activity)}</TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Chip
-                          label={
-                            activity.isPublic
-                              ? t('activity_admin_public_label_public')
-                              : t('activity_admin_public_label_private')
-                          }
-                          color={activity.isPublic ? 'success' : 'default'}
-                          size="small"
-                        />
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => handleTogglePublicStatus(activity)}
-                          disabled={updatingPublicId === activity.id}
-                        >
-                          {activity.isPublic
-                            ? t('activity_admin_make_private')
-                            : t('activity_admin_make_public')}
-                        </Button>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{new Date(activity.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell align="right">
-                      <IconButton size="small" sx={{ mr: 1 }}>
-                        <PlayIcon fontSize="small" /> {t('activity_admin_play_intro')}
-                      </IconButton>
-                      <IconButton size="small" sx={{ mr: 1 }}>
-                        <VideoIcon fontSize="small" /> {t('activity_admin_play_main')}
-                      </IconButton>
-                      <IconButton size="small" onClick={() => handleEditActivity(activity)} sx={{ mr: 1 }} title={t('activity_admin_edit')}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton size="small" color="error" onClick={() => handleDeleteActivity(activity)} title={t('activity_admin_delete')}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {activities.length === 0 && (
+                    </Box>
+                    <Switch
+                      checked={Boolean(activity.isPublic)}
+                      onChange={() => handleTogglePublicStatus(activity)}
+                      disabled={updatingPublicId === activity.id}
+                      size="small"
+                      color="success"
+                      inputProps={{
+                        'aria-label': activity.isPublic
+                          ? t('activity_admin_public_label_public')
+                          : t('activity_admin_public_label_private'),
+                      }}
+                    />
+                  </Box>
+
+                  <Box sx={{ mt: 1.5, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 1 }}>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('activity_admin_category_label')}
+                      </Typography>
+                      <Typography variant="body2">
+                        {getCategoryName(activity)}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('activity_admin_duration_label')}
+                      </Typography>
+                      <Typography variant="body2">{formatDuration(activity)}</Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('activity_admin_created_at')}
+                      </Typography>
+                      <Typography variant="body2">{new Date(activity.createdAt).toLocaleDateString()}</Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ mt: 1.5, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleEditActivity(activity)}
+                    >
+                      {t('activity_admin_edit')}
+                    </Button>
+                    <Button
+                      size="small"
+                      color="error"
+                      variant="outlined"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => handleDeleteActivity(activity)}
+                    >
+                      {t('activity_admin_delete')}
+                    </Button>
+                  </Box>
+                </Paper>
+              ))}
+              {activities.length === 0 && (
+                <Paper sx={{ p: 2 }}>
+                  <Typography align="center">{t('activity_admin_no_activities')}</Typography>
+                </Paper>
+              )}
+            </Box>
+          ) : (
+            <TableContainer>
+              <Table>
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      {t('activity_admin_no_activities')}
-                    </TableCell>
+                    <TableCell>{t('activity_admin_tab_activities')}</TableCell>
+                    <TableCell>{t('activity_admin_category_label')}</TableCell>
+                    <TableCell>{t('activity_admin_duration_label')}</TableCell>
+                    <TableCell>{t('activity_admin_public_status')}</TableCell>
+                    <TableCell>{t('activity_admin_created_at')}</TableCell>
+                    <TableCell align="right">{t('activity_admin_actions')}</TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {activities.map((activity) => (
+                    <TableRow key={activity.id} hover>
+                      <TableCell>
+                        <Typography variant="body1" fontWeight="medium">
+                          {activity.name}
+                        </Typography>
+                        {activity.description && (
+                          <Typography variant="body2" color="text.secondary">
+                            {activity.description.length > 50
+                              ? `${activity.description.substring(0, 50)}...`
+                              : activity.description}
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {activity.activityCategory ? (
+                          <Chip label={activity.activityCategory.name} size="small" variant="outlined" />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            {getCategoryName(activity)}
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>{formatDuration(activity)}</TableCell>
+                      <TableCell>
+                        <Switch
+                          checked={Boolean(activity.isPublic)}
+                          onChange={() => handleTogglePublicStatus(activity)}
+                          disabled={updatingPublicId === activity.id}
+                          size="small"
+                          color="success"
+                          inputProps={{
+                            'aria-label': activity.isPublic
+                              ? t('activity_admin_public_label_public')
+                              : t('activity_admin_public_label_private'),
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>{new Date(activity.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell align="right">
+                        <IconButton size="small" onClick={() => handleEditActivity(activity)} sx={{ mr: 1 }} title={t('activity_admin_edit')}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton size="small" color="error" onClick={() => handleDeleteActivity(activity)} title={t('activity_admin_delete')}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {activities.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">
+                        {t('activity_admin_no_activities')}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </TabPanel>
 
         <TabPanel value={activeTab} index={1}>
@@ -394,42 +511,72 @@ const ActivityAdmin: React.FC = () => {
             </Button>
           </Box>
 
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('activity_admin_category_name')}</TableCell>
-                  <TableCell>{t('activity_admin_category_description')}</TableCell>
-                  <TableCell>{t('activity_admin_actions')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {categories.map((category) => (
-                  <TableRow key={category.id} hover>
-                    <TableCell>{category.name}</TableCell>
-                    <TableCell>{category.description || '-'}</TableCell>
-                    <TableCell align="right">
-                      <IconButton size="small" title={t('activity_admin_edit')}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton size="small" color="error" title={t('activity_admin_delete')}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {categories.length === 0 && (
+          {isMobile ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {categories.map((category) => (
+                <Paper key={category.id} sx={{ p: 2 }}>
+                  <Typography variant="subtitle1" fontWeight="medium">
+                    {category.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {category.description || '-'}
+                  </Typography>
+                  <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <IconButton size="small" title={t('activity_admin_edit')}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton size="small" color="error" title={t('activity_admin_delete')}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Paper>
+              ))}
+              {categories.length === 0 && (
+                <Paper sx={{ p: 2 }}>
+                  <Typography align="center" color="text.secondary">
+                    {t('activity_admin_no_activities')}
+                  </Typography>
+                </Paper>
+              )}
+            </Box>
+          ) : (
+            <TableContainer>
+              <Table>
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                      <Typography variant="body1" color="text.secondary">
-                        {t('activity_admin_no_activities')}
-                      </Typography>
-                    </TableCell>
+                    <TableCell>{t('activity_admin_category_name')}</TableCell>
+                    <TableCell>{t('activity_admin_category_description')}</TableCell>
+                    <TableCell>{t('activity_admin_actions')}</TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {categories.map((category) => (
+                    <TableRow key={category.id} hover>
+                      <TableCell>{category.name}</TableCell>
+                      <TableCell>{category.description || '-'}</TableCell>
+                      <TableCell align="right">
+                        <IconButton size="small" title={t('activity_admin_edit')}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton size="small" color="error" title={t('activity_admin_delete')}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {categories.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          {t('activity_admin_no_activities')}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </TabPanel>
       </Paper>
 
