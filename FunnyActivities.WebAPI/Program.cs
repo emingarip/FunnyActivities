@@ -68,7 +68,7 @@ FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddApiVersioning(b
 builder.Services.AddSwagger();
 
 // CORS (Cross-Origin Resource Sharing) politikasini ekle
-FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddCors(builder.Services);
+FunnyActivities.WebAPI.Extensions.ServiceCollectionExtensions.AddCors(builder.Services, builder.Configuration);
 
 // Veritabani DbContext'ini ekle
 builder.Services.AddDatabase(builder.Configuration);
@@ -173,7 +173,7 @@ app.UseHttpMetrics();
 
 // CORS middleware'ini ekle. Tarayicilarin farkli domain'lerden API'ye erisimine izin verir.
 // Guvenlik middleware'larindan (Authentication/Authorization) once gelmelidir.
-app.UseCors("AllowAllOrigins"); // Development icin tum origin'lere izin ver
+app.UseCors(app.Environment.IsDevelopment() ? "AllowAllOrigins" : "AllowSpecificOrigins");
 
 // Kimlik dogrulama (Authentication) middleware'ini ekle. Gelen JWT'yi dogrular.
 app.UseAuthentication();
