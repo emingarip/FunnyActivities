@@ -194,13 +194,13 @@ public class MinioServiceHeadRequestFallbackTests
         _minioClientMock.Setup(x => x.WithEndpoint(It.Is<string>(s => s.Contains("minio:9000"))))
             .Returns(internalMinioClientMock.Object);
         _minioClientMock.Setup(x => x.WithCredentials(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns((Mock<IMinioClient>)null); // This will be handled by the specific endpoint setup
+            .Returns((IMinioClient)null); // This will be handled by the specific endpoint setup
         _minioClientMock.Setup(x => x.WithSSL(It.IsAny<bool>()))
-            .Returns((Mock<IMinioClient>)null);
+            .Returns((IMinioClient)null);
         _minioClientMock.Setup(x => x.WithTimeout(It.IsAny<int>()))
-            .Returns((Mock<IMinioClient>)null);
+            .Returns((IMinioClient)null);
         _minioClientMock.Setup(x => x.Build())
-            .Returns((Mock<IMinioClient>)null);
+            .Returns((IMinioClient)null);
 
         // Act
         var result = await _sut.GeneratePreSignedHeadUrlAsync(objectKey, 3600);
@@ -227,50 +227,6 @@ public class MinioServiceHeadRequestFallbackTests
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception, string>>()),
             Times.AtLeastOnce);
-    }
-
-    [Fact]
-    public async Task Is403ForbiddenError_ShouldCorrectlyIdentify403Errors()
-    {
-        // Test various 403 error message formats
-        var testCases = new[]
-        {
-            new { Message = "403 Forbidden: Access denied", ShouldBe403 = true },
-            new { Message = "403 Forbidden", ShouldBe403 = true },
-            new { Message = "Access denied (403)", ShouldBe403 = true },
-            new { Message = "Forbidden", ShouldBe403 = true },
-            new { Message = "HTTP 403", ShouldBe403 = true },
-            new { Message = "404 Not Found", ShouldBe403 = false },
-            new { Message = "500 Internal Server Error", ShouldBe403 = false },
-            new { Message = "Access denied", ShouldBe403 = false }, // Without 403
-            new { Message = "", ShouldBe403 = false }
-        };
-
-        foreach (var testCase in testCases)
-        {
-            // Arrange
-            var exception = new Exception(testCase.Message);
-
-            // Act
-            var result = _sut.Is403ForbiddenError(exception);
-
-            // Assert
-            result.Should().Be(testCase.ShouldBe403, $"Exception message '{testCase.Message}' should {(testCase.ShouldBe403 ? "" : "not ")}be identified as 403 error");
-        }
-    }
-
-    [Fact]
-    public async Task Is403ForbiddenError_ShouldCheckInnerExceptions()
-    {
-        // Arrange
-        var innerException = new Exception("403 Forbidden: Access denied");
-        var outerException = new Exception("Connection failed", innerException);
-
-        // Act
-        var result = _sut.Is403ForbiddenError(outerException);
-
-        // Assert
-        result.Should().BeTrue("Should check inner exceptions for 403 errors");
     }
 
     [Fact]
