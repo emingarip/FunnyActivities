@@ -256,8 +256,15 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddCors(this IServiceCollection services)
+    public static IServiceCollection AddCors(this IServiceCollection services, IConfiguration configuration)
     {
+        var configuredOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (configuredOrigins is { Length: > 0 })
+        {
+            services.AddCustomCors(configuredOrigins);
+            return services;
+        }
+
         services.AddCustomCors(new[] {
             "http://localhost:3000",
             "https://localhost:3000",
