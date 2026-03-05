@@ -265,6 +265,23 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .login-wrapper {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .mascot-figure {
+    display: none;
+  }
+
+  .login-card {
+    margin-right: 0;
+    width: min(540px, 100%);
+    padding: 40px 32px;
+  }
+}
+
 @media (min-width: 768px) {
   .main-content.login-page {
     height: calc(100vh - 160px); /* Adjusted for desktop navigation */
