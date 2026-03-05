@@ -5,6 +5,7 @@ using FunnyActivities.Application.Commands.UserManagement;
 using FunnyActivities.Domain.Interfaces;
 using FunnyActivities.Application.Commands.NotificationSystem;
 using FunnyActivities.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace FunnyActivities.Application.Handlers
 {
@@ -12,11 +13,13 @@ namespace FunnyActivities.Application.Handlers
     {
         private readonly FunnyActivities.Domain.Interfaces.IUserRepository _userRepository;
         private readonly IMediator _mediator;
+        private readonly ILogger<RequestPasswordResetCommandHandler> _logger;
 
-        public RequestPasswordResetCommandHandler(FunnyActivities.Domain.Interfaces.IUserRepository userRepository, IMediator mediator)
+        public RequestPasswordResetCommandHandler(FunnyActivities.Domain.Interfaces.IUserRepository userRepository, IMediator mediator, ILogger<RequestPasswordResetCommandHandler> logger)
         {
             _userRepository = userRepository;
             _mediator = mediator;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
@@ -41,12 +44,20 @@ namespace FunnyActivities.Application.Handlers
             await _userRepository.UpdateAsync(user);
 
             // Send password reset email
-            await _mediator.Send(new SendPasswordResetEmailCommand
+            try
             {
-                Email = user.Email,
-                ResetToken = token,
-                ResetLink = resetLink
-            });
+                await _mediator.Send(new SendPasswordResetEmailCommand
+                {
+                    Email = user.Email,
+                    ResetToken = token,
+                    ResetLink = resetLink
+                }, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send password reset email to {Email}", user.Email);
+                // Do not fail the request to avoid leaking user existence; token is still stored.
+            }
 
             return Unit.Value;
         }
