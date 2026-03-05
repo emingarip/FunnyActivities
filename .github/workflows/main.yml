@@ -67,6 +67,7 @@ jobs:
         path: ./TestResults/**/*.xml
 
   sonar:
+    if: ${{ secrets.SONAR_TOKEN != '' }}
     runs-on: ubuntu-latest
     needs: test
     steps:
@@ -98,7 +99,7 @@ jobs:
 
   deploy-dev:
     runs-on: ubuntu-latest
-    needs: [build, test, sonar]
+    needs: [build, test]
     environment: dev
     steps:
     - name: Download build artifacts
@@ -116,7 +117,7 @@ jobs:
 
   deploy-staging:
     runs-on: ubuntu-latest
-    needs: [build, test, sonar]
+    needs: [build, test]
     environment: staging
     steps:
     - name: Download build artifacts
@@ -134,7 +135,7 @@ jobs:
 
   deploy-prod:
     runs-on: ubuntu-latest
-    needs: [build, test, sonar]
+    needs: [build, test]
     environment:
       name: prod
       url: https://funnyactivities-prod.azurewebsites.net
