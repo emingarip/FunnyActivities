@@ -12,12 +12,12 @@ using Newtonsoft.Json;
 
 namespace FunnyActivities.Api.IntegrationTests
 {
-    public class ProductManagementIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
+    public class ProductManagementIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory _factory;
         private readonly HttpClient _client;
 
-        public ProductManagementIntegrationTests(WebApplicationFactory<Startup> factory)
+        public ProductManagementIntegrationTests(CustomWebApplicationFactory factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();

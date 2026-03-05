@@ -11,11 +11,11 @@ using Xunit;
 
 namespace FunnyActivities.Api.IntegrationTests
 {
-    public class ActivityControllerTests : IClassFixture<WebApplicationFactory<Program>>
+    public class ActivityControllerTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient _client;
 
-        public ActivityControllerTests(WebApplicationFactory<Program> factory)
+        public ActivityControllerTests(CustomWebApplicationFactory factory)
         {
             _client = factory.CreateClient();
         }
