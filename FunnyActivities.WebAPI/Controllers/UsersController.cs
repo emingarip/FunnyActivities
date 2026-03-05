@@ -39,8 +39,7 @@ namespace FunnyActivities.WebAPI.Controllers
                 Email = request.Email,
                 Password = request.Password,
                 FirstName = request.FirstName,
-                LastName = request.LastName,
-                Role = request.Role
+                LastName = request.LastName
             };
 
             await _mediator.Send(command);

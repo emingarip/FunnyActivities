@@ -28,7 +28,6 @@ export interface RegisterRequest {
   password: string;
   firstName: string;
   lastName: string;
-  role?: string;
 }
 
 export interface RefreshTokenRequest {

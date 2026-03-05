@@ -44,8 +44,7 @@ namespace FunnyActivities.WebAPI.Controllers
                     Email = request.Email,
                     Password = request.Password,
                     FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    Role = request.Role
+                    LastName = request.LastName
                 };
 
                 _logger.LogInformation("[AUTH-REG] Before user registration", new { Email = MaskEmail(request.Email), IP = MaskIP(ip), Method = method, Path = path, CorrelationId = correlationId });

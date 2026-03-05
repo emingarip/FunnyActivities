@@ -37,7 +37,7 @@ namespace FunnyActivities.Application.Handlers.UserManagement
 
             var hashedPassword = _userService.HashPassword(password);
 
-            var user = new User(Guid.NewGuid(), request.Email, hashedPassword, request.FirstName, request.LastName, request.Role);
+            var user = new User(Guid.NewGuid(), request.Email, hashedPassword, request.FirstName, request.LastName, UserRole.User);
 
             await _userRepository.AddAsync(user);
 

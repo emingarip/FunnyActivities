@@ -351,7 +351,7 @@ api.interceptors.response.use(
 
 // API methods - Updated for .NET WebAPI endpoints
 export const authAPI = {
-  register: (data: { email: string; password: string; firstName: string; lastName: string; role?: string }) =>
+  register: (data: { email: string; password: string; firstName: string; lastName: string }) =>
     api.post('/auth/register', data),
 
   login: (data: { email: string; password: string }) =>
