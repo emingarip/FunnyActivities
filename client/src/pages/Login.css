@@ -28,14 +28,14 @@
 
 .mascot-figure {
   position: absolute;
-  right: -160px;
+  left: clamp(360px, 41vw, 480px);
   bottom: -40px;
-  width: 540px;
-  max-width: 55vw;
+  width: 520px;
+  max-width: 52vw;
   height: 520px;
   background-repeat: no-repeat;
   background-size: contain;
-  background-position: right bottom;
+  background-position: left bottom;
   pointer-events: none;
   filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.18));
 }
@@ -45,9 +45,10 @@
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   width: 520px;
-  padding: 44px;
+  padding: 44px 48px;
   position: relative;
   z-index: 2;
+  margin-right: 120px;
 }
 
 .login-header {
