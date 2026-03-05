@@ -248,14 +248,14 @@ jobs:
       if: steps.sshcred.outputs.method == 'key'
       run: |
         ssh -o StrictHostKeyChecking=accept-new -i key.pem ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-          "rm -rf /var/www/funnyactivities/publish && mkdir -p /var/www/funnyactivities/publish && tar xzf /tmp/publish.tar.gz -C /var/www/funnyactivities/publish && systemctl restart funnyactivities"
+          "rm -rf /var/www/funnyactivities/publish && mkdir -p /var/www/funnyactivities/publish && tar xzf /tmp/publish.tar.gz -C /var/www/funnyactivities/publish && if [ -f /etc/funnyactivities/appsettings.Production.json ]; then cp /etc/funnyactivities/appsettings.Production.json /var/www/funnyactivities/publish/; fi && systemctl restart funnyactivities"
 
     - name: Deploy on VPS (password auth)
       if: steps.sshcred.outputs.method == 'password'
       run: |
         sudo apt-get update && sudo apt-get install -y sshpass
         sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=accept-new ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-          "rm -rf /var/www/funnyactivities/publish && mkdir -p /var/www/funnyactivities/publish && tar xzf /tmp/publish.tar.gz -C /var/www/funnyactivities/publish && systemctl restart funnyactivities"
+          "rm -rf /var/www/funnyactivities/publish && mkdir -p /var/www/funnyactivities/publish && tar xzf /tmp/publish.tar.gz -C /var/www/funnyactivities/publish && if [ -f /etc/funnyactivities/appsettings.Production.json ]; then cp /etc/funnyactivities/appsettings.Production.json /var/www/funnyactivities/publish/; fi && systemctl restart funnyactivities"
 
   deploy-frontend-vps:
     runs-on: ubuntu-latest
