@@ -164,6 +164,10 @@ dist
 .cache/
 public
 
+# Allow CRA client public assets
+!client/public
+!client/public/**
+
 # Storybook build outputs
 .out
 .storybook-out
