@@ -38,7 +38,7 @@
   background-position: left top;
   pointer-events: none;
   filter: drop-shadow(0 26px 52px rgba(0, 0, 0, 0.20));
-  z-index: 3; /* arm sits above card edge */
+  z-index: 1; /* place behind card */
 }
 
 .login-card {
@@ -48,7 +48,7 @@
   width: 520px;
   padding: 44px 56px;
   position: relative;
-  z-index: 2;
+  z-index: 3;
   margin-right: 70px;
 }
 
