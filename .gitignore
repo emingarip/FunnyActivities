@@ -168,6 +168,10 @@ public
 !client/public
 !client/public/**
 
+# Allow surveys public components
+!client/src/components/surveys/public
+!client/src/components/surveys/public/**
+
 # Storybook build outputs
 .out
 .storybook-out
