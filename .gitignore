@@ -172,6 +172,9 @@ public
 !client/src/components/surveys/public
 !client/src/components/surveys/public/**
 
+# Allow CRA env for production build
+!client/.env.production
+
 # Storybook build outputs
 .out
 .storybook-out
@@ -243,4 +246,3 @@ pscp.exe
 askpass.bat
 funnyactivities.service
 nginx_funny.conf
-client/.env.production

@@ -291,6 +291,8 @@ jobs:
 
     - name: Build frontend
       if: steps.gate-frontend.outputs.run == 'true'
+      env:
+        REACT_APP_API_URL: https://makethen.com/api
       run: CI=false npm run build
       working-directory: client
 
