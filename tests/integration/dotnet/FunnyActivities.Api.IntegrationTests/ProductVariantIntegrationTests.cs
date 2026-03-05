@@ -13,12 +13,12 @@ using FunnyActivities.Application.DTOs.ProductVariantManagement;
 
 namespace FunnyActivities.Api.IntegrationTests
 {
-    public class ProductVariantIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+    public class ProductVariantIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly CustomWebApplicationFactory _factory;
         private readonly HttpClient _client;
 
-        public ProductVariantIntegrationTests(WebApplicationFactory<Program> factory)
+        public ProductVariantIntegrationTests(CustomWebApplicationFactory factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();

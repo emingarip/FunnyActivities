@@ -2,6 +2,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using FunnyActivities.Application.Interfaces;
+using FunnyActivities.CrossCuttingConcerns.Caching;
 using FunnyActivities.Domain.Entities;
 using FunnyActivities.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
@@ -9,11 +11,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 namespace FunnyActivities.Api.IntegrationTests
 {
@@ -21,6 +26,8 @@ namespace FunnyActivities.Api.IntegrationTests
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment("Development");
+
             builder.ConfigureServices(services =>
             {
                 // Remove all existing DbContext registrations
@@ -49,9 +56,23 @@ namespace FunnyActivities.Api.IntegrationTests
                     options.UseInMemoryDatabase("TestDatabase");
                 });
 
-                // Mock authentication for testing
-                services.AddAuthentication("TestAuth")
+                // Mock authentication for testing and set as default
+                services.AddAuthentication(options =>
+                    {
+                        options.DefaultAuthenticateScheme = "TestAuth";
+                        options.DefaultChallengeScheme = "TestAuth";
+                    })
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestAuth", _ => { });
+
+                // Replace external dependencies with in-memory/no-op implementations
+                services.RemoveAll<ILlmSettingsInitializer>();
+                services.AddSingleton<ILlmSettingsInitializer, NoOpLlmSettingsInitializer>();
+
+                services.RemoveAll<IConnectionMultiplexer>();
+                services.RemoveAll<IDistributedCache>();
+                services.RemoveAll<ICacheService>();
+                services.AddDistributedMemoryCache();
+                services.AddSingleton<ICacheService, InMemoryCacheService>();
 
                 // Configure test-specific services here if needed
                 // For example, mock external services
@@ -78,8 +99,9 @@ namespace FunnyActivities.Api.IntegrationTests
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                new Claim(ClaimTypes.NameIdentifier, "11111111-1111-1111-1111-111111111111"),
                 new Claim(ClaimTypes.Email, "test@test.com"),
+                new Claim(ClaimTypes.Name, "test-user"),
                 new Claim(ClaimTypes.Role, "Admin")
             };
 
@@ -88,6 +110,51 @@ namespace FunnyActivities.Api.IntegrationTests
             var ticket = new AuthenticationTicket(principal, "TestAuth");
 
             return Task.FromResult(AuthenticateResult.Success(ticket));
+        }
+    }
+
+    internal class NoOpLlmSettingsInitializer : ILlmSettingsInitializer
+    {
+        public Task InitializeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
+
+    internal class InMemoryCacheService : ICacheService
+    {
+        private readonly Dictionary<string, object?> _store = new();
+        private readonly object _lock = new();
+
+        public Task<T?> GetAsync<T>(string key)
+        {
+            lock (_lock)
+            {
+                return Task.FromResult(_store.TryGetValue(key, out var value) ? (T?)value : default);
+            }
+        }
+
+        public Task SetAsync<T>(string key, T value, TimeSpan? expiry = null)
+        {
+            lock (_lock)
+            {
+                _store[key] = value;
+                return Task.CompletedTask;
+            }
+        }
+
+        public Task RemoveAsync(string key)
+        {
+            lock (_lock)
+            {
+                _store.Remove(key);
+                return Task.CompletedTask;
+            }
+        }
+
+        public Task<bool> ExistsAsync(string key)
+        {
+            lock (_lock)
+            {
+                return Task.FromResult(_store.ContainsKey(key));
+            }
         }
     }
 }
