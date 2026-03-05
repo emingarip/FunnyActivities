@@ -13,68 +13,41 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 32px;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #e0f2fe 100%);
 }
 
 .login-wrapper {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 24px;
-  width: 100%;
-  max-width: 1050px;
-  align-items: stretch;
-}
-
-.mascot-panel {
-  background: linear-gradient(135deg, #f9fafb 0%, #eef2ff 40%, #e0f2fe 100%);
-  border-radius: 18px;
   position: relative;
-  overflow: hidden;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.08);
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 32px 32px 28px;
-  min-height: 420px;
+  justify-content: flex-start;
+  align-items: stretch;
+  width: min(1100px, 95vw);
+  min-height: 520px;
 }
 
-.mascot-illustration {
-  background-size: contain, cover;
+.mascot-figure {
+  position: absolute;
+  right: -160px;
+  bottom: -40px;
+  width: 540px;
+  max-width: 55vw;
+  height: 520px;
   background-repeat: no-repeat;
-  background-position: center bottom;
-  /* Make white background of non-transparent PNG blend into panel gradient */
-  background-blend-mode: multiply, normal, normal, normal;
-  background-color: #e8f1ff;
-  width: 100%;
-  flex: 1;
-  min-height: 320px;
-  border-radius: 12px;
-}
-
-.mascot-copy {
-  margin-top: 16px;
-  text-align: left;
-  color: #1f2937;
-}
-
-.mascot-copy h3 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 700;
-}
-
-.mascot-copy p {
-  margin: 6px 0 0 0;
-  color: #4b5563;
-  font-size: 15px;
+  background-size: contain;
+  background-position: right bottom;
+  pointer-events: none;
+  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.18));
 }
 
 .login-card {
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  padding: 40px;
+  width: 520px;
+  padding: 44px;
+  position: relative;
+  z-index: 2;
 }
 
 .login-header {
@@ -266,24 +239,17 @@
   }
 
   .login-wrapper {
-    grid-template-columns: 1fr;
+    width: 100%;
+    min-height: auto;
   }
 
-  .mascot-panel {
-    min-height: 240px;
-    padding: 20px;
-  }
-
-  .mascot-illustration {
-    min-height: 200px;
+  .mascot-figure {
+    display: none;
   }
 
   .login-card {
+    width: 100%;
     padding: 30px 20px;
-  }
-
-  .login-card,
-  .mascot-panel {
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
   }
 
@@ -300,9 +266,5 @@
 @media (min-width: 768px) {
   .main-content.login-page {
     height: calc(100vh - 160px); /* Adjusted for desktop navigation */
-  }
-
-  .login-wrapper {
-    grid-template-columns: 1.05fr 0.95fr;
   }
 }

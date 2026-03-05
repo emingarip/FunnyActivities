@@ -79,20 +79,16 @@ const Login: React.FC = () => {
     return <div>{t('login_redirecting')}</div>;
   }
 
-  const mascotBackground = {
-    backgroundImage: `url(${process.env.PUBLIC_URL}/assets/mascot-login.png), radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55), rgba(255,255,255,0)), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.35), rgba(255,255,255,0)), linear-gradient(120deg, #fef3c7 0%, #dbeafe 50%, #e0f2fe 100%)`
-  };
+  const mascotUrl = `${process.env.PUBLIC_URL}/assets/mascot-login.png`;
 
   return (
     <div className="login-container">
       <div className="login-wrapper">
-        <div className="mascot-panel" aria-hidden="true">
-          <div className="mascot-illustration" role="presentation" style={mascotBackground} />
-          <div className="mascot-copy">
-            <h3>{t('login_title_login')}</h3>
-            <p>{t('login_subtitle_login')}</p>
-          </div>
-        </div>
+        <div
+          className="mascot-figure"
+          aria-hidden="true"
+          style={{ backgroundImage: `url(${mascotUrl})` }}
+        />
 
         <div className="login-card">
           <div className="login-header">
