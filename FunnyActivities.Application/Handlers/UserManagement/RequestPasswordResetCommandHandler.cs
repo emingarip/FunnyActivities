@@ -32,6 +32,11 @@ namespace FunnyActivities.Application.Handlers
             var token = Guid.NewGuid().ToString(); // In real app, use secure random
             var expiry = DateTime.UtcNow.AddHours(1);
 
+            var frontendUrl = request.FrontendUrl?.TrimEnd('/')
+                ?? Environment.GetEnvironmentVariable("FRONTEND_URL")?.TrimEnd('/')
+                ?? "https://makethen.com";
+            var resetLink = $"{frontendUrl}/reset-password?token={Uri.EscapeDataString(token)}";
+
             user.SetResetToken(token, expiry);
             await _userRepository.UpdateAsync(user);
 
@@ -39,7 +44,8 @@ namespace FunnyActivities.Application.Handlers
             await _mediator.Send(new SendPasswordResetEmailCommand
             {
                 Email = user.Email,
-                ResetToken = token
+                ResetToken = token,
+                ResetLink = resetLink
             });
 
             return Unit.Value;

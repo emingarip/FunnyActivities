@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -18,7 +19,11 @@ namespace FunnyActivities.Application.Handlers
         public async Task Handle(SendPasswordResetEmailCommand request, CancellationToken cancellationToken)
         {
             var subject = "Password Reset Request";
-            var body = $"Hi,\n\nYou requested a password reset. Use the following token to reset your password: {request.ResetToken}\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nFunnyActivities Team";
+            var resetLink = string.IsNullOrWhiteSpace(request.ResetLink)
+                ? $"https://makethen.com/reset-password?token={Uri.EscapeDataString(request.ResetToken)}"
+                : request.ResetLink;
+
+            var body = $"Hi,\n\nYou requested a password reset. Click the link below or paste it into your browser:\n{resetLink}\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nFunnyActivities Team";
             await _emailService.SendEmailAsync(request.Email, subject, body);
         }
     }

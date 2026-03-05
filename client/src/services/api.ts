@@ -76,6 +76,7 @@ api.interceptors.request.use(
         '/auth/login',
         '/auth/refresh',
         '/users/request-password-reset',
+        '/users/reset-password',
         '/activities/public',
         '/surveys/public',
         '/surveys/activities',
@@ -364,6 +365,9 @@ export const authAPI = {
 
   requestPasswordReset: (data: { email: string }) =>
     api.post('/users/request-password-reset', data),
+
+  resetPassword: (data: { token: string; newPassword: string }) =>
+    api.post('/users/reset-password', data),
 };
 
 export const userAPI = {

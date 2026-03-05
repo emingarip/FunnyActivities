@@ -446,8 +446,25 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddNotificationServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IEmailService>(sp =>
-            new SendGridEmailService(configuration["SendGrid:ApiKey"] ?? throw new InvalidOperationException("SendGrid API key not configured")));
+        var smtpSection = configuration.GetSection("Smtp");
+        var smtpHost = smtpSection["Host"];
+        var smtpUser = smtpSection["Username"] ?? smtpSection["User"];
+
+        if (!string.IsNullOrWhiteSpace(smtpHost) && !string.IsNullOrWhiteSpace(smtpUser))
+        {
+            services.Configure<SmtpOptions>(smtpSection);
+            services.AddScoped<IEmailService, SmtpEmailService>();
+        }
+        else
+        {
+            var sendGridApiKey = configuration["SendGrid:ApiKey"];
+            if (string.IsNullOrWhiteSpace(sendGridApiKey))
+            {
+                throw new InvalidOperationException("Email provider not configured. Set Smtp or SendGrid settings.");
+            }
+            services.AddScoped<IEmailService>(_ => new SendGridEmailService(sendGridApiKey));
+        }
+
         services.AddScoped<ISmsService>(sp =>
             new TwilioSmsService(
                 configuration["Twilio:AccountSid"] ?? throw new InvalidOperationException("Twilio AccountSid not configured"),

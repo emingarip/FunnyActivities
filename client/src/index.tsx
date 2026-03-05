@@ -6,6 +6,14 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// Silence noisy console output in production; keep warnings/errors.
+if (process.env.NODE_ENV === 'production') {
+  ['log', 'debug', 'info', 'trace', 'table'].forEach(fn => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (console as any)[fn] = () => {};
+  });
+}
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

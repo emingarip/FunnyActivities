@@ -10,6 +10,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import AdminDashboard from './pages/AdminDashboard';
@@ -50,6 +52,8 @@ const theme = createTheme({
 function AppContent() {
   const location = useLocation();
   const { t } = useTranslation();
+  const authPaths = ['/login', '/forgot-password', '/reset-password'];
+  const isAuthPage = authPaths.includes(location.pathname);
   return (
     <div className="App">
       {/* Global loading indicator */}
@@ -62,10 +66,12 @@ function AppContent() {
         <LanguageSelector />
       </div>
 
-      <main className={`main-content ${location.pathname === '/login' ? 'login-page' : ''}`}>
+      <main className={`main-content ${isAuthPage ? 'login-page' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

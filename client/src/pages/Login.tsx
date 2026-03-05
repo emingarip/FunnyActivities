@@ -146,6 +146,16 @@ const Login: React.FC = () => {
                 />
               </div>
 
+              <div className="form-help">
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => navigate('/forgot-password')}
+                >
+                  {t('login_forgot_password')}
+                </button>
+              </div>
+
               <button
                 type="submit"
                 className="login-button"

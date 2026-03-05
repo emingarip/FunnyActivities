@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Configuration;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -20,12 +21,14 @@ namespace FunnyActivities.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IStringLocalizer<UsersController> _localizer;
+        private readonly IConfiguration _configuration;
 
-        public UsersController(IMediator mediator, ILogger<UsersController> logger, IStringLocalizer<UsersController> localizer)
+        public UsersController(IMediator mediator, ILogger<UsersController> logger, IStringLocalizer<UsersController> localizer, IConfiguration configuration)
             : base(logger)
         {
             _mediator = mediator;
             _localizer = localizer;
+            _configuration = configuration;
         }
 
         [HttpPost("register")]
@@ -156,7 +159,8 @@ namespace FunnyActivities.WebAPI.Controllers
         {
             var command = new RequestPasswordResetCommand
             {
-                Email = request.Email
+                Email = request.Email,
+                FrontendUrl = _configuration["FrontendUrl"] ?? $"{Request.Scheme}://{Request.Host.Value}"
             };
 
             await _mediator.Send(command);
