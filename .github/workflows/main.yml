@@ -156,9 +156,10 @@ jobs:
     steps:
     - name: Send Slack notification
       uses: slackapi/slack-github-action@v1.26.0
-      if: ${{ secrets.SLACK_BOT_TOKEN != '' && secrets.SLACK_CHANNEL_ID != '' }}
+      if: ${{ env.SLACK_BOT_TOKEN != '' && env.SLACK_CHANNEL_ID != '' }}
       with:
-        channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+        channel-id: ${{ env.SLACK_CHANNEL_ID }}
         slack-message: "CI/CD Pipeline failed: ${{ github.workflow }} - ${{ github.run_id }} - ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
