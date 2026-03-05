@@ -16,25 +16,62 @@
   padding: 20px;
 }
 
-.login-card {
-  background: none;
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+.login-wrapper {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 24px;
   width: 100%;
-  max-width: 450px;
-  padding: 40px;
-  animation: slideUp 0.3s ease-out;
+  max-width: 1050px;
+  align-items: stretch;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.mascot-panel {
+  background: linear-gradient(135deg, #f9fafb 0%, #eef2ff 40%, #e0f2fe 100%);
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px 32px 28px;
+  min-height: 420px;
+}
+
+.mascot-illustration {
+  background-size: contain, cover;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  width: 100%;
+  flex: 1;
+  min-height: 320px;
+  border-radius: 12px;
+}
+
+.mascot-copy {
+  margin-top: 16px;
+  text-align: left;
+  color: #1f2937;
+}
+
+.mascot-copy h3 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.mascot-copy p {
+  margin: 6px 0 0 0;
+  color: #4b5563;
+  font-size: 15px;
+}
+
+.login-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  padding: 40px;
 }
 
 .login-header {
@@ -225,8 +262,26 @@
     padding: 10px;
   }
 
+  .login-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .mascot-panel {
+    min-height: 240px;
+    padding: 20px;
+  }
+
+  .mascot-illustration {
+    min-height: 200px;
+  }
+
   .login-card {
     padding: 30px 20px;
+  }
+
+  .login-card,
+  .mascot-panel {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
   }
 
   .form-row {
@@ -242,5 +297,9 @@
 @media (min-width: 768px) {
   .main-content.login-page {
     height: calc(100vh - 160px); /* Adjusted for desktop navigation */
+  }
+
+  .login-wrapper {
+    grid-template-columns: 1.05fr 0.95fr;
   }
 }

@@ -257,6 +257,87 @@ jobs:
         sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=accept-new ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
           "rm -rf /var/www/funnyactivities/publish && mkdir -p /var/www/funnyactivities/publish && tar xzf /tmp/publish.tar.gz -C /var/www/funnyactivities/publish && systemctl restart funnyactivities"
 
+  deploy-frontend-vps:
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+    - name: Check VPS secrets
+      id: gate-frontend
+      shell: bash
+      run: |
+        if [ -z "${{ secrets.VPS_HOST }}" ] || [ -z "${{ secrets.VPS_USER }}" ]; then
+          echo "run=false" >> $GITHUB_OUTPUT
+          echo "VPS_HOST or VPS_USER not set, skipping frontend VPS deploy."
+        else
+          echo "run=true" >> $GITHUB_OUTPUT
+        fi
+
+    - uses: actions/checkout@v4
+      if: steps.gate-frontend.outputs.run == 'true'
+
+    - name: Setup Node
+      if: steps.gate-frontend.outputs.run == 'true'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+
+    - name: Install frontend dependencies
+      if: steps.gate-frontend.outputs.run == 'true'
+      run: npm ci
+      working-directory: client
+
+    - name: Build frontend
+      if: steps.gate-frontend.outputs.run == 'true'
+      run: npm run build
+      working-directory: client
+
+    - name: Create frontend package
+      if: steps.gate-frontend.outputs.run == 'true'
+      run: tar czf frontend.tar.gz -C client/build .
+
+    - name: Prepare SSH credentials
+      id: sshcred-frontend
+      shell: bash
+      if: steps.gate-frontend.outputs.run == 'true'
+      run: |
+        if [ -n "${{ secrets.VPS_PASSWORD }}" ]; then
+          echo "method=password" >> $GITHUB_OUTPUT
+        elif [ -n "${{ secrets.VPS_SSH_KEY }}" ]; then
+          echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          echo "method=key" >> $GITHUB_OUTPUT
+        else
+          echo "No VPS_SSH_KEY or VPS_PASSWORD provided." >&2
+          exit 1
+        fi
+
+    - name: Upload frontend package (key auth)
+      if: steps.sshcred-frontend.outputs.method == 'key'
+      run: |
+        scp -o StrictHostKeyChecking=accept-new -i key.pem frontend.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/frontend.tar.gz
+
+    - name: Upload frontend package (password auth)
+      if: steps.sshcred-frontend.outputs.method == 'password'
+      run: |
+        sudo apt-get update && sudo apt-get install -y sshpass
+        sshpass -p "${{ secrets.VPS_PASSWORD }}" scp -o StrictHostKeyChecking=accept-new frontend.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/frontend.tar.gz
+
+    - name: Deploy frontend on VPS (key auth)
+      if: steps.sshcred-frontend.outputs.method == 'key'
+      run: |
+        ssh -o StrictHostKeyChecking=accept-new -i key.pem ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+          "rm -rf /var/www/funnyactivities/frontend && mkdir -p /var/www/funnyactivities/frontend && tar xzf /tmp/frontend.tar.gz -C /var/www/funnyactivities/frontend && chown -R www-data:www-data /var/www/funnyactivities/frontend"
+
+    - name: Deploy frontend on VPS (password auth)
+      if: steps.sshcred-frontend.outputs.method == 'password'
+      run: |
+        sudo apt-get update && sudo apt-get install -y sshpass
+        sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=accept-new ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+          "rm -rf /var/www/funnyactivities/frontend && mkdir -p /var/www/funnyactivities/frontend && tar xzf /tmp/frontend.tar.gz -C /var/www/funnyactivities/frontend && chown -R www-data:www-data /var/www/funnyactivities/frontend"
+
   notify:
     runs-on: ubuntu-latest
     needs: [deploy-dev, deploy-staging, deploy-prod]

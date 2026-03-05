@@ -79,179 +79,193 @@ const Login: React.FC = () => {
     return <div>{t('login_redirecting')}</div>;
   }
 
+  const mascotBackground = {
+    backgroundImage: `url(${process.env.PUBLIC_URL}/assets/mascot-login.png), radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55), rgba(255,255,255,0)), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.35), rgba(255,255,255,0)), linear-gradient(120deg, #fef3c7 0%, #dbeafe 50%, #e0f2fe 100%)`
+  };
+
   return (
     <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h2>{isLogin ? t('login_title_login') : t('login_title_register')}</h2>
-          <p>{isLogin ? t('login_subtitle_login') : t('login_subtitle_register')}</p>
-        </div>
-
-        <div className="auth-tabs">
-          <button
-            className={`tab-button ${isLogin ? 'active' : ''}`}
-            onClick={() => setIsLogin(true)}
-          >
-            {t('login_tab_login')}
-          </button>
-          <button
-            className={`tab-button ${!isLogin ? 'active' : ''}`}
-            onClick={() => setIsLogin(false)}
-          >
-            {t('login_tab_register')}
-          </button>
-        </div>
-
-        {error && (
-          <div className="error-message">
-            {error}
+      <div className="login-wrapper">
+        <div className="mascot-panel" aria-hidden="true">
+          <div className="mascot-illustration" role="presentation" style={mascotBackground} />
+          <div className="mascot-copy">
+            <h3>{t('login_title_login')}</h3>
+            <p>{t('login_subtitle_login')}</p>
           </div>
-        )}
+        </div>
 
-        {isLogin ? (
-          <form onSubmit={handleLogin} className="login-form">
-            <div className="form-group">
-              <label htmlFor="email">{t('login_label_email')}</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={email}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              />
-            </div>
+        <div className="login-card">
+          <div className="login-header">
+            <h2>{isLogin ? t('login_title_login') : t('login_title_register')}</h2>
+            <p>{isLogin ? t('login_subtitle_login') : t('login_subtitle_register')}</p>
+          </div>
 
-            <div className="form-group">
-              <label htmlFor="password">{t('login_label_password')}</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={password}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              />
-            </div>
-
+          <div className="auth-tabs">
             <button
-              type="submit"
-              className="login-button"
-              disabled={isLoading}
+              className={`tab-button ${isLogin ? 'active' : ''}`}
+              onClick={() => setIsLogin(true)}
             >
-              {isLoading ? t('login_signing_in') : t('login_sign_in')}
+              {t('login_tab_login')}
             </button>
-          </form>
-        ) : (
-          <form onSubmit={handleRegister} className="register-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="firstName">{t('login_label_first_name')}</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="lastName">{t('login_label_last_name')}</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="registerEmail">{t('login_label_email')}</label>
-              <input
-                type="email"
-                id="registerEmail"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="registerPassword">{t('login_label_password')}</label>
-              <input
-                type="password"
-                id="registerPassword"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-                minLength={6}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="confirmPassword">{t('login_label_confirm_password')}</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-                minLength={6}
-              />
-              {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                <span className="password-mismatch">{t('login_passwords_not_match')}</span>
-              )}
-            </div>
-
             <button
-              type="submit"
-              className="register-button"
-              disabled={isLoading || formData.password !== formData.confirmPassword}
+              className={`tab-button ${!isLogin ? 'active' : ''}`}
+              onClick={() => setIsLogin(false)}
             >
-              {isLoading ? t('login_creating_account') : t('login_create_account')}
+              {t('login_tab_register')}
             </button>
-          </form>
-        )}
+          </div>
 
-        <div className="auth-links">
-          {isLogin ? (
-            <p>
-              {t('login_no_account')}{' '}
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => setIsLogin(false)}
-              >
-                {t('login_sign_up')}
-              </button>
-            </p>
-          ) : (
-            <p>
-              {t('login_have_account')}{' '}
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => setIsLogin(true)}
-              >
-                {t('login_sign_in_cta')}
-              </button>
-            </p>
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
           )}
+
+          {isLogin ? (
+            <form onSubmit={handleLogin} className="login-form">
+              <div className="form-group">
+                <label htmlFor="email">{t('login_label_email')}</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={handleInputChange}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">{t('login_label_password')}</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={handleInputChange}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="login-button"
+                disabled={isLoading}
+              >
+                {isLoading ? t('login_signing_in') : t('login_sign_in')}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleRegister} className="register-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="firstName">{t('login_label_first_name')}</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="lastName">{t('login_label_last_name')}</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="registerEmail">{t('login_label_email')}</label>
+                <input
+                  type="email"
+                  id="registerEmail"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="registerPassword">{t('login_label_password')}</label>
+                <input
+                  type="password"
+                  id="registerPassword"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  disabled={isLoading}
+                  minLength={6}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="confirmPassword">{t('login_label_confirm_password')}</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  required
+                  disabled={isLoading}
+                  minLength={6}
+                />
+                {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <span className="password-mismatch">{t('login_passwords_not_match')}</span>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="register-button"
+                disabled={isLoading || formData.password !== formData.confirmPassword}
+              >
+                {isLoading ? t('login_creating_account') : t('login_create_account')}
+              </button>
+            </form>
+          )}
+
+          <div className="auth-links">
+            {isLogin ? (
+              <p>
+                {t('login_no_account')}{' '}
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => setIsLogin(false)}
+                >
+                  {t('login_sign_up')}
+                </button>
+              </p>
+            ) : (
+              <p>
+                {t('login_have_account')}{' '}
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => setIsLogin(true)}
+                >
+                  {t('login_sign_in_cta')}
+                </button>
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
