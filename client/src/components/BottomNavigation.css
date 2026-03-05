@@ -228,21 +228,7 @@
   }
 }
 
-/* Smooth reveal animation */
-@keyframes slideUp {
-  from {
-    transform: translateX(-50%) translateY(100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-}
-
-.modern-bottom-nav {
-  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* Remove entrance animation to render in-place, centered */
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
