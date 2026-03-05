@@ -223,12 +223,12 @@ jobs:
       shell: bash
       if: steps.gate-vps.outputs.run == 'true'
       run: |
-        if [ -n "${{ secrets.VPS_SSH_KEY }}" ]; then
+        if [ -n "${{ secrets.VPS_PASSWORD }}" ]; then
+          echo "method=password" >> $GITHUB_OUTPUT
+        elif [ -n "${{ secrets.VPS_SSH_KEY }}" ]; then
           echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
           chmod 600 key.pem
           echo "method=key" >> $GITHUB_OUTPUT
-        elif [ -n "${{ secrets.VPS_PASSWORD }}" ]; then
-          echo "method=password" >> $GITHUB_OUTPUT
         else
           echo "No VPS_SSH_KEY or VPS_PASSWORD provided." >&2
           exit 1
