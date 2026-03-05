@@ -79,7 +79,8 @@ const Login: React.FC = () => {
     return <div>{t('login_redirecting')}</div>;
   }
 
-  const mascotUrl = `${process.env.PUBLIC_URL}/assets/mascot-login.png`;
+  const mascotWebp = `${process.env.PUBLIC_URL}/assets/mascot-login.webp`;
+  const mascotPng = `${process.env.PUBLIC_URL}/assets/mascot-login.png`;
 
   return (
     <div className="login-container">
@@ -87,7 +88,7 @@ const Login: React.FC = () => {
         <div
           className="mascot-figure"
           aria-hidden="true"
-          style={{ backgroundImage: `url(${mascotUrl})` }}
+          style={{ backgroundImage: `url(${mascotWebp}), url(${mascotPng})` }}
         />
 
         <div className="login-card">
