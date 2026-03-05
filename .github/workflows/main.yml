@@ -67,9 +67,11 @@ jobs:
         path: ./TestResults/**/*.xml
 
   sonar:
-    if: ${{ secrets.SONAR_TOKEN != '' }}
     runs-on: ubuntu-latest
     needs: test
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    if: ${{ env.SONAR_TOKEN != '' }}
     steps:
     - uses: actions/checkout@v4
       with:
