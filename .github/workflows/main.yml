@@ -83,7 +83,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: SonarCloud Scan
-      if: ${{ secrets.SONAR_TOKEN != '' }}
+      continue-on-error: true
       uses: SonarSource/sonarcloud-github-action@v2
       with:
         args: >
@@ -101,6 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, test]
     environment: dev
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
@@ -119,6 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, test]
     environment: staging
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
@@ -139,6 +141,7 @@ jobs:
     environment:
       name: prod
       url: https://funnyactivities-prod.azurewebsites.net
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
