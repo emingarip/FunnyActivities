@@ -224,3 +224,15 @@ TestResults/
 # Secrets
 secrets.json
 appsettings.*.json
+
+# Deployment artifacts (local)
+publish/
+publish.zip
+frontend-build.zip
+deploy_vps_key*
+plink.exe
+pscp.exe
+askpass.bat
+funnyactivities.service
+nginx_funny.conf
+client/.env.production

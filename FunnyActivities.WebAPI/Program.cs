@@ -174,7 +174,8 @@ forwardedHeadersOptions.KnownProxies.Clear();
 app.UseForwardedHeaders(forwardedHeadersOptions);
 
 // Gelen istekleri HTTP'den HTTPS'e yonlendir
-app.UseHttpsRedirection();
+// HTTPS sertifikasi hazir olmadigi icin su an kapali; Nginx uzerinden TLS eklenince acilacak
+// app.UseHttpsRedirection();
 
 // Yonlendirme (Routing) middleware'ini ekle. Bu, istegin hangi endpoint'e gidecegini belirler.
 app.UseRouting();
