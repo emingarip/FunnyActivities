@@ -29,7 +29,7 @@
 .mascot-figure {
   position: absolute;
   left: clamp(250px, 34vw, 380px);
-  bottom: -160px;
+  bottom: -61px;
   width: 720px;
   max-width: 64vw;
   height: 760px;
