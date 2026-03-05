@@ -42,6 +42,9 @@
   background-size: contain, cover;
   background-repeat: no-repeat;
   background-position: center bottom;
+  /* Make white background of non-transparent PNG blend into panel gradient */
+  background-blend-mode: multiply, normal, normal, normal;
+  background-color: #e8f1ff;
   width: 100%;
   flex: 1;
   min-height: 320px;
