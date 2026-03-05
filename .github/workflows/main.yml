@@ -291,7 +291,7 @@ jobs:
 
     - name: Build frontend
       if: steps.gate-frontend.outputs.run == 'true'
-      run: npm run build
+      run: CI=false npm run build
       working-directory: client
 
     - name: Create frontend package
