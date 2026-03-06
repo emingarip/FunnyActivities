@@ -23,10 +23,34 @@ require_command docker
 require_command nginx
 require_command python3
 require_command openssl
+require_command apt-get
 
-if ! ${SUDO} docker compose version >/dev/null 2>&1; then
-  echo "docker compose plugin is required on the VPS." >&2
-  exit 1
+DOCKER_COMPOSE_CMD=()
+if ${SUDO} docker compose version >/dev/null 2>&1; then
+  if [[ -n "${SUDO}" ]]; then
+    DOCKER_COMPOSE_CMD=(sudo docker compose)
+  else
+    DOCKER_COMPOSE_CMD=(docker compose)
+  fi
+elif command -v docker-compose >/dev/null 2>&1; then
+  if [[ -n "${SUDO}" ]]; then
+    DOCKER_COMPOSE_CMD=(sudo docker-compose)
+  else
+    DOCKER_COMPOSE_CMD=(docker-compose)
+  fi
+else
+  ${SUDO} apt-get update
+  ${SUDO} apt-get install -y docker-compose-plugin
+  if ${SUDO} docker compose version >/dev/null 2>&1; then
+    if [[ -n "${SUDO}" ]]; then
+      DOCKER_COMPOSE_CMD=(sudo docker compose)
+    else
+      DOCKER_COMPOSE_CMD=(docker compose)
+    fi
+  else
+    echo "Neither docker compose nor docker-compose is available on the VPS." >&2
+    exit 1
+  fi
 fi
 
 ${SUDO} mkdir -p "${APP_LOG_DIR}"
@@ -77,7 +101,7 @@ PY
 
 ${SUDO} nginx -t
 ${SUDO} systemctl reload nginx
-${SUDO} docker compose --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" pull
-${SUDO} docker compose --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" up -d --remove-orphans
+"${DOCKER_COMPOSE_CMD[@]}" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" pull
+"${DOCKER_COMPOSE_CMD[@]}" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" up -d --remove-orphans
 
 echo "Monitoring stack deployed. Grafana should be reachable at https://makethen.com/grafana/"
