@@ -4,7 +4,6 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.Interfaces;
-using FunnyActivities.CrossCuttingConcerns.Caching;
 using FunnyActivities.Domain.Exceptions;
 
 namespace FunnyActivities.Application.Handlers.ActivityManagement
@@ -15,22 +14,18 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
     public class DeleteActivityCategoryCommandHandler : IRequestHandler<DeleteActivityCategoryCommand, Unit>
     {
         private readonly IActivityCategoryRepository _activityCategoryRepository;
-        private readonly ICacheService _cache;
         private readonly ILogger<DeleteActivityCategoryCommandHandler> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteActivityCategoryCommandHandler"/> class.
         /// </summary>
         /// <param name="activityCategoryRepository">The activity category repository.</param>
-        /// <param name="cache">The cache service.</param>
         /// <param name="logger">The logger.</param>
         public DeleteActivityCategoryCommandHandler(
             IActivityCategoryRepository activityCategoryRepository,
-            ICacheService cache,
             ILogger<DeleteActivityCategoryCommandHandler> logger)
         {
             _activityCategoryRepository = activityCategoryRepository;
-            _cache = cache;
             _logger = logger;
         }
 
@@ -65,9 +60,6 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
 
             // Delete the activity category
             await _activityCategoryRepository.DeleteAsync(category).ConfigureAwait(false);
-
-            // Invalidate activity categories cache
-            await _cache.RemoveAsync("activity_categories");
 
             _logger.LogInformation("Activity category deleted successfully with ID: {CategoryId}", request.Id);
 

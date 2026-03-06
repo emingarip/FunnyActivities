@@ -1,19 +1,16 @@
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using FunnyActivities.CrossCuttingConcerns.Caching;
 
 namespace FunnyActivities.Infrastructure
 {
     public class ActivityCategoryRepository : IActivityCategoryRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICacheService _cache;
 
-        public ActivityCategoryRepository(ApplicationDbContext context, ICacheService cache)
+        public ActivityCategoryRepository(ApplicationDbContext context)
         {
             _context = context;
-            _cache = cache;
         }
 
         public async Task<ActivityCategory?> GetByIdAsync(Guid id)
@@ -23,21 +20,9 @@ namespace FunnyActivities.Infrastructure
 
         public async Task<List<ActivityCategory>> GetAllAsync()
         {
-            const string cacheKey = "activity_categories";
-            var cachedCategories = await _cache.GetAsync<List<ActivityCategory>>(cacheKey);
-
-            if (cachedCategories != null)
-            {
-                return cachedCategories;
-            }
-
-            var categories = await _context.ActivityCategories
+            return await _context.ActivityCategories
                 .OrderBy(ac => ac.Name)
                 .ToListAsync();
-
-            // Cache for 30 minutes
-            await _cache.SetAsync(cacheKey, categories, TimeSpan.FromMinutes(30));
-            return categories;
         }
 
         public async Task<bool> ExistsByNameAsync(string name)

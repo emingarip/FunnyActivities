@@ -67,7 +67,7 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <returns>A paginated list of activity categories.</returns>
         [HttpGet]
         [Authorize(Policy = "CanViewActivityCategory")]
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         [ProducesResponseType(typeof(PagedResult<ActivityCategoryDto>), 200)]
         public async Task<IActionResult> GetActivityCategories(
             [FromQuery] int pageNumber = 1,
@@ -104,7 +104,7 @@ namespace FunnyActivities.WebAPI.Controllers
         /// <returns>The activity category information.</returns>
         [HttpGet("{id}")]
         [Authorize(Policy = "CanViewActivityCategory")]
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         [ProducesResponseType(typeof(ActivityCategoryDto), 200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetActivityCategory(Guid id)

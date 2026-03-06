@@ -8,7 +8,6 @@ using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Domain.Events;
 using FunnyActivities.Domain.Exceptions;
-using FunnyActivities.CrossCuttingConcerns.Caching;
 
 namespace FunnyActivities.Application.Handlers.ActivityManagement
 {
@@ -18,7 +17,6 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
     public class UpdateActivityCategoryCommandHandler : IRequestHandler<UpdateActivityCategoryCommand, ActivityCategoryDto>
     {
         private readonly IActivityCategoryRepository _activityCategoryRepository;
-        private readonly ICacheService _cache;
         private readonly IMediator _mediator;
         private readonly ILogger<UpdateActivityCategoryCommandHandler> _logger;
 
@@ -26,17 +24,14 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
         /// Initializes a new instance of the <see cref="UpdateActivityCategoryCommandHandler"/> class.
         /// </summary>
         /// <param name="activityCategoryRepository">The activity category repository.</param>
-        /// <param name="cache">The cache service.</param>
         /// <param name="mediator">The mediator for publishing events.</param>
         /// <param name="logger">The logger.</param>
         public UpdateActivityCategoryCommandHandler(
             IActivityCategoryRepository activityCategoryRepository,
-            ICacheService cache,
             IMediator mediator,
             ILogger<UpdateActivityCategoryCommandHandler> logger)
         {
             _activityCategoryRepository = activityCategoryRepository;
-            _cache = cache;
             _mediator = mediator;
             _logger = logger;
         }
@@ -80,9 +75,6 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
 
             // Save to repository
             await _activityCategoryRepository.UpdateAsync(category).ConfigureAwait(false);
-
-            // Invalidate activity categories cache
-            await _cache.RemoveAsync("activity_categories");
 
             _logger.LogInformation("Activity category updated successfully with ID: {CategoryId}", category.Id);
 
