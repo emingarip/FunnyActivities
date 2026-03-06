@@ -256,6 +256,11 @@ namespace FunnyActivities.WebAPI.Controllers
                 _logger.LogInformation("Activity category deleted successfully with ID: {CategoryId}", id);
                 return this.ApiSuccess<object>(_localizer["ActivityCategoryDeleted"], 204);
             }
+            catch (ActivityCategoryHasActivitiesException ex)
+            {
+                _logger.LogWarning("Activity category deletion failed: {Message}", ex.Message);
+                return this.ApiError(_localizer["ActivityCategoryDeleteHasActivities"], "Conflict", 409);
+            }
             catch (KeyNotFoundException ex)
             {
                 _logger.LogWarning("Activity category deletion failed: {Message}", ex.Message);

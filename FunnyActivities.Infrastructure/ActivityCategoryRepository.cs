@@ -58,6 +58,11 @@ namespace FunnyActivities.Infrastructure
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> HasActivitiesAsync(Guid id)
+        {
+            return await _context.Activities.AnyAsync(activity => activity.ActivityCategoryId == id);
+        }
+
         public async Task UpdateAsync(ActivityCategory category)
         {
             _context.ActivityCategories.Update(category);

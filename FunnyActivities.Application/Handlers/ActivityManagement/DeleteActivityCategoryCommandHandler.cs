@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.CrossCuttingConcerns.Caching;
+using FunnyActivities.Domain.Exceptions;
 
 namespace FunnyActivities.Application.Handlers.ActivityManagement
 {
@@ -54,8 +55,11 @@ namespace FunnyActivities.Application.Handlers.ActivityManagement
             // Business rule validations
             _logger.LogInformation("Performing business rule validations for activity category deletion");
 
-            // Check if category has activities (you might want to prevent deletion if it has activities)
-            // For now, we'll allow deletion even if it has activities - they will become uncategorized
+            if (await _activityCategoryRepository.HasActivitiesAsync(request.Id).ConfigureAwait(false))
+            {
+                _logger.LogWarning("Activity category delete failed: Category with ID '{CategoryId}' still has activities", request.Id);
+                throw new ActivityCategoryHasActivitiesException(request.Id);
+            }
 
             cancellationToken.ThrowIfCancellationRequested();
 

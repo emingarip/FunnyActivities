@@ -269,9 +269,12 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     activity_admin_category_name: 'Name',
     activity_admin_category_description: 'Description',
     activity_admin_category_create: 'Create Category',
+    activity_admin_category_edit: 'Edit Category',
     activity_admin_category_save: 'Save',
     activity_admin_category_cancel: 'Cancel',
     activity_admin_category_validation: 'Name is required.',
+    activity_admin_category_confirm_delete: 'Are you sure you want to delete category "{0}"?',
+    activity_admin_no_categories: 'No categories found.',
     activity_admin_actions: 'Actions',
     activity_admin_public_status: 'Visibility',
     activity_admin_public_label_public: 'Public',
@@ -279,6 +282,7 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     activity_admin_make_public: 'Make Public',
     activity_admin_make_private: 'Make Private',
     activity_admin_public_update_error: 'Failed to update activity visibility.',
+
 
     // Activity form modal
     activity_form_create_title: 'Create New Activity',
@@ -673,6 +677,9 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     activity_admin_make_public: 'Public Yap',
     activity_admin_make_private: 'Özele Çevir',
     activity_admin_public_update_error: 'Aktivite görünürlüğü güncellenemedi.',
+    activity_admin_category_edit: 'Kategoriyi Düzenle',
+    activity_admin_category_confirm_delete: '"{0}" kategorisini silmek istediğinize emin misiniz?',
+    activity_admin_no_categories: 'Kategori bulunamadı.',
 
     // Activity form modal
     activity_form_create_title: 'Yeni Aktivite Oluştur',

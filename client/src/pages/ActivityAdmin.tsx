@@ -94,6 +94,7 @@ const ActivityAdmin: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [categoryFormOpen, setCategoryFormOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<ActivityCategory | null>(null);
   const [categoryFormData, setCategoryFormData] = useState({
     name: '',
     description: '',
@@ -246,13 +247,27 @@ const ActivityAdmin: React.FC = () => {
   };
 
   const handleCreateCategory = () => {
+    setEditingCategory(null);
+    setError(null);
     setCategoryFormData({ name: '', description: '' });
+    setCategoryFormErrors({});
+    setCategoryFormOpen(true);
+  };
+
+  const handleEditCategory = (category: ActivityCategory) => {
+    setEditingCategory(category);
+    setError(null);
+    setCategoryFormData({
+      name: category.name,
+      description: category.description || '',
+    });
     setCategoryFormErrors({});
     setCategoryFormOpen(true);
   };
 
   const handleCategoryFormClose = () => {
     setCategoryFormOpen(false);
+    setEditingCategory(null);
     setCategoryFormData({ name: '', description: '' });
     setCategoryFormErrors({});
   };
@@ -268,15 +283,34 @@ const ActivityAdmin: React.FC = () => {
     }
 
     try {
-      await activityCategoriesAPI.createActivityCategory({
+      const payload = {
         name: categoryFormData.name.trim(),
         description: categoryFormData.description.trim() || undefined,
-      });
-      setCategoryFormOpen(false);
-      setCategoryFormData({ name: '', description: '' });
+      };
+
+      if (editingCategory) {
+        await activityCategoriesAPI.updateActivityCategory(editingCategory.id, payload);
+      } else {
+        await activityCategoriesAPI.createActivityCategory(payload);
+      }
+
+      handleCategoryFormClose();
       await loadData();
-    } catch {
-      setError(t('activity_admin_error'));
+    } catch (err: any) {
+      setError(err?.message || t('activity_admin_error'));
+    }
+  };
+
+  const handleDeleteCategory = async (category: ActivityCategory) => {
+    const confirmText = t('activity_admin_category_confirm_delete').replace('{0}', category.name);
+    if (!window.confirm(confirmText)) return;
+
+    try {
+      setError(null);
+      await activityCategoriesAPI.deleteActivityCategory(category.id);
+      await loadData();
+    } catch (err: any) {
+      setError(err?.message || t('activity_admin_error'));
     }
   };
 
@@ -522,10 +556,10 @@ const ActivityAdmin: React.FC = () => {
                     {category.description || '-'}
                   </Typography>
                   <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                    <IconButton size="small" title={t('activity_admin_edit')}>
+                    <IconButton size="small" title={t('activity_admin_edit')} onClick={() => handleEditCategory(category)}>
                       <EditIcon />
                     </IconButton>
-                    <IconButton size="small" color="error" title={t('activity_admin_delete')}>
+                    <IconButton size="small" color="error" title={t('activity_admin_delete')} onClick={() => handleDeleteCategory(category)}>
                       <DeleteIcon />
                     </IconButton>
                   </Box>
@@ -534,7 +568,7 @@ const ActivityAdmin: React.FC = () => {
               {categories.length === 0 && (
                 <Paper sx={{ p: 2 }}>
                   <Typography align="center" color="text.secondary">
-                    {t('activity_admin_no_activities')}
+                    {t('activity_admin_no_categories')}
                   </Typography>
                 </Paper>
               )}
@@ -555,10 +589,10 @@ const ActivityAdmin: React.FC = () => {
                       <TableCell>{category.name}</TableCell>
                       <TableCell>{category.description || '-'}</TableCell>
                       <TableCell align="right">
-                        <IconButton size="small" title={t('activity_admin_edit')}>
+                        <IconButton size="small" title={t('activity_admin_edit')} onClick={() => handleEditCategory(category)}>
                           <EditIcon />
                         </IconButton>
-                        <IconButton size="small" color="error" title={t('activity_admin_delete')}>
+                        <IconButton size="small" color="error" title={t('activity_admin_delete')} onClick={() => handleDeleteCategory(category)}>
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
@@ -568,7 +602,7 @@ const ActivityAdmin: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
                         <Typography variant="body1" color="text.secondary">
-                          {t('activity_admin_no_activities')}
+                          {t('activity_admin_no_categories')}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -593,7 +627,7 @@ const ActivityAdmin: React.FC = () => {
       </Dialog>
 
       <Dialog open={categoryFormOpen} onClose={handleCategoryFormClose} maxWidth="sm" fullWidth fullScreen={isMobile}>
-        <DialogTitle>{t('activity_admin_category_create')}</DialogTitle>
+        <DialogTitle>{editingCategory ? t('activity_admin_category_edit') : t('activity_admin_category_create')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 2 }}>
             <TextField

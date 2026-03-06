@@ -17,5 +17,6 @@
   <data name="ActivityCategoryUpdateUnexpected" xml:space="preserve"><value>Aktivite kategorisi güncellenirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
   <data name="ActivityCategoryDeleted" xml:space="preserve"><value>Aktivite kategorisi başarıyla silindi</value></data>
   <data name="ActivityCategoryDeleteNotFound" xml:space="preserve"><value>Silmek istediğiniz aktivite kategorisi bulunamadı. Lütfen kategori ID'sini doğrulayın ve tekrar deneyin.</value></data>
+  <data name="ActivityCategoryDeleteHasActivities" xml:space="preserve"><value>Bu aktivite kategorisi silinemiyor çünkü hâlâ bağlı aktiviteleri var. Önce bu aktiviteleri taşıyın veya kaldırın.</value></data>
   <data name="ActivityCategoryDeleteUnexpected" xml:space="preserve"><value>Aktivite kategorisi silinirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
 </root>

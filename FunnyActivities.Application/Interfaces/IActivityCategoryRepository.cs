@@ -42,6 +42,13 @@ namespace FunnyActivities.Application.Interfaces
         Task AddAsync(ActivityCategory category);
 
         /// <summary>
+        /// Checks whether the activity category has linked activities.
+        /// </summary>
+        /// <param name="id">The activity category ID.</param>
+        /// <returns>True if linked activities exist; otherwise, false.</returns>
+        Task<bool> HasActivitiesAsync(Guid id);
+
+        /// <summary>
         /// Updates an existing activity category.
         /// </summary>
         /// <param name="category">The activity category to update.</param>
