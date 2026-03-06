@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System;
 using Microsoft.Extensions.Localization;
+using FunnyActivities.Application.Services;
 
 namespace FunnyActivities.WebAPI.Controllers
 {
@@ -17,12 +18,18 @@ namespace FunnyActivities.WebAPI.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger<AuthController> _logger;
         private readonly IStringLocalizer<AuthController> _localizer;
+        private readonly GoogleLoginService _googleLoginService;
 
-        public AuthController(IMediator mediator, ILogger<AuthController> logger, IStringLocalizer<AuthController> localizer)
+        public AuthController(
+            IMediator mediator,
+            ILogger<AuthController> logger,
+            IStringLocalizer<AuthController> localizer,
+            GoogleLoginService googleLoginService)
         {
             _mediator = mediator;
             _logger = logger;
             _localizer = localizer;
+            _googleLoginService = googleLoginService;
         }
 
         [HttpPost("register")]
@@ -161,6 +168,110 @@ namespace FunnyActivities.WebAPI.Controllers
                 _logger.LogError(ex, "[AUTH-LOGIN] Login failed unexpectedly", new { Email = MaskEmail(request.Email), Error = ex.Message, IP = MaskIP(ip), Method = method, Path = path, Status = 500, DurationMs = stopwatch.ElapsedMilliseconds, CorrelationId = correlationId });
 
                 _logger.LogDebug("[AUTH-LOGIN] About to return ApiError", new { Email = MaskEmail(request.Email), Error = ex.Message, IP = MaskIP(ip), Method = method, Path = path, CorrelationId = correlationId });
+
+                return this.ApiError(string.Format(_localizer["LoginUnexpectedError"], correlationId), "InternalError", 500);
+            }
+        }
+
+        [HttpPost("google")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request, CancellationToken cancellationToken)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var correlationId = GetCorrelationId();
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var method = Request.Method;
+            var path = Request.Path.ToString();
+
+            _logger.LogInformation("[AUTH-GOOGLE] Google login attempt", new
+            {
+                IP = MaskIP(ip),
+                Method = method,
+                Path = path,
+                CorrelationId = correlationId
+            });
+
+            try
+            {
+                var result = await _googleLoginService
+                    .AuthenticateAsync(request.IdToken, cancellationToken)
+                    .ConfigureAwait(false);
+
+                stopwatch.Stop();
+                _logger.LogInformation("[AUTH-GOOGLE] Google login completed", new
+                {
+                    UserId = result.User.Id,
+                    Email = MaskEmail(result.User.Email),
+                    IP = MaskIP(ip),
+                    Method = method,
+                    Path = path,
+                    Status = 200,
+                    DurationMs = stopwatch.ElapsedMilliseconds,
+                    CorrelationId = correlationId
+                });
+
+                var data = new
+                {
+                    user = result.User,
+                    accessToken = result.Token,
+                    refreshToken = result.RefreshToken
+                };
+
+                return this.ApiSuccess(data, _localizer["LoginSuccessful"]);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                stopwatch.Stop();
+                _logger.LogWarning(ex, "[AUTH-GOOGLE] Google login rejected", new
+                {
+                    Error = ex.Message,
+                    IP = MaskIP(ip),
+                    Method = method,
+                    Path = path,
+                    Status = 401,
+                    DurationMs = stopwatch.ElapsedMilliseconds,
+                    CorrelationId = correlationId
+                });
+
+                var message = ex.Message.Contains("verified", StringComparison.OrdinalIgnoreCase)
+                    ? _localizer["GoogleLoginEmailNotVerified"]
+                    : _localizer["GoogleLoginInvalidToken"];
+
+                return this.ApiError(message, "AuthenticationError", 401);
+            }
+            catch (InvalidOperationException ex)
+            {
+                stopwatch.Stop();
+                _logger.LogError(ex, "[AUTH-GOOGLE] Google login unavailable", new
+                {
+                    Error = ex.Message,
+                    IP = MaskIP(ip),
+                    Method = method,
+                    Path = path,
+                    Status = 503,
+                    DurationMs = stopwatch.ElapsedMilliseconds,
+                    CorrelationId = correlationId
+                });
+
+                var message = ex.Message.Contains("not configured", StringComparison.OrdinalIgnoreCase)
+                    ? _localizer["GoogleLoginNotConfigured"]
+                    : _localizer["GoogleLoginUnavailable"];
+
+                return this.ApiError(message, "ServiceUnavailable", 503);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _logger.LogError(ex, "[AUTH-GOOGLE] Google login failed unexpectedly", new
+                {
+                    Error = ex.Message,
+                    IP = MaskIP(ip),
+                    Method = method,
+                    Path = path,
+                    Status = 500,
+                    DurationMs = stopwatch.ElapsedMilliseconds,
+                    CorrelationId = correlationId
+                });
 
                 return this.ApiError(string.Format(_localizer["LoginUnexpectedError"], correlationId), "InternalError", 500);
             }

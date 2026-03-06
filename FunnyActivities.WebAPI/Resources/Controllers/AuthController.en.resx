@@ -27,4 +27,16 @@
   <data name="LoginUnexpectedError" xml:space="preserve">
     <value>An unexpected error occurred during login. Reference code: {0}</value>
   </data>
+  <data name="GoogleLoginInvalidToken" xml:space="preserve">
+    <value>Google login could not be verified. Please try again.</value>
+  </data>
+  <data name="GoogleLoginEmailNotVerified" xml:space="preserve">
+    <value>Your Google account email must be verified before you can sign in.</value>
+  </data>
+  <data name="GoogleLoginNotConfigured" xml:space="preserve">
+    <value>Google login is not configured for this environment.</value>
+  </data>
+  <data name="GoogleLoginUnavailable" xml:space="preserve">
+    <value>Google login is temporarily unavailable. Please try again later.</value>
+  </data>
 </root>

@@ -53,6 +53,7 @@ export type AuthAction =
 // Auth context interface
 export interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
+  googleLogin: (idToken: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   clearError: () => void;
@@ -196,6 +197,68 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   
       checkAuthStatus();
     }, []);
+
+  const googleLogin = useCallback(async (idToken: string): Promise<void> => {
+    logAuthEvent('log', 'Google login attempt started', { requestId: Date.now() });
+    dispatch({ type: 'AUTH_START' });
+
+    try {
+      const { authAPI } = await import('../services/api');
+      const response = await authAPI.googleLogin({ idToken });
+      const responseData = response.data;
+
+      if (responseData.success && responseData.data) {
+        const { user, accessToken, refreshToken } = responseData.data;
+
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        logAuthEvent('log', 'Tokens stored in localStorage after Google login', { userId: user.id, email: user.email });
+
+        dispatch({ type: 'AUTH_SUCCESS', payload: user });
+        logAuthEvent('log', 'Google login successful', { userId: user.id, email: user.email, role: user.role });
+      } else {
+        throw new Error(responseData.message || 'Google login failed');
+      }
+    } catch (error: any) {
+      let errorMessage = 'Google login failed';
+      let errorDetails = {};
+
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        errorDetails = { responseData: errorData, statusCode: error.response.status };
+
+        if (errorData.success === false) {
+          errorMessage = errorData.message || errorMessage;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+        errorDetails = { errorMessage: error.message };
+      }
+
+      if (error.type) {
+        switch (error.type) {
+          case 'Unauthorized':
+            errorMessage = 'Google account could not be verified';
+            break;
+          case 'ServiceUnavailable':
+            errorMessage = 'Google login is not available right now';
+            break;
+          case 'NetworkError':
+            errorMessage = 'Network error, please check your connection';
+            break;
+          default:
+            break;
+        }
+        errorDetails = { ...errorDetails, errorType: error.type };
+      }
+
+      logAuthEvent('error', 'Google login failed', { errorMessage, errorDetails });
+      dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
+      throw error;
+    }
+  }, []);
 
   // Login function
     const login = useCallback(async (email: string, password: string): Promise<void> => {
@@ -372,6 +435,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     ...state,
     login,
+    googleLogin,
     register,
     logout,
     clearError,

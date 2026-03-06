@@ -26,6 +26,8 @@ public static class ServiceCollectionExtensions
     {
         var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuth"));
+        services.AddScoped<IGoogleTokenVerifier, GoogleTokenVerifier>();
         var signingKey = JwtKeyHelper.CreateSigningKey(jwtSettings?.SecretKey ?? string.Empty);
 
         services.AddAuthentication(options =>

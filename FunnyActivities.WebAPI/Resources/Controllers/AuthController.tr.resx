@@ -27,4 +27,16 @@
   <data name="LoginUnexpectedError" xml:space="preserve">
     <value>Giriş sırasında beklenmeyen bir hata oluştu. Destek için referans kodu: {0}</value>
   </data>
+  <data name="GoogleLoginInvalidToken" xml:space="preserve">
+    <value>Google ile giriş doğrulanamadı. Lütfen tekrar deneyin.</value>
+  </data>
+  <data name="GoogleLoginEmailNotVerified" xml:space="preserve">
+    <value>Google hesabınızdaki e-posta doğrulanmış olmalıdır.</value>
+  </data>
+  <data name="GoogleLoginNotConfigured" xml:space="preserve">
+    <value>Bu ortamda Google ile giriş yapılandırılmamış.</value>
+  </data>
+  <data name="GoogleLoginUnavailable" xml:space="preserve">
+    <value>Google ile giriş geçici olarak kullanılamıyor. Lütfen daha sonra tekrar deneyin.</value>
+  </data>
 </root>

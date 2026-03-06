@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Login.css';
 import { useTranslation } from '../hooks/useTranslation';
 
+const GOOGLE_SCRIPT_ID = 'google-identity-services';
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID?.trim() ?? '';
+
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
+  const [isGoogleReady, setIsGoogleReady] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -15,8 +19,9 @@ const Login: React.FC = () => {
     password: '',
     confirmPassword: '',
   });
+  const googleButtonRef = useRef<HTMLDivElement | null>(null);
 
-  const { login, register, isLoading, error, isAuthenticated, clearError } = useAuth();
+  const { login, googleLogin, register, isLoading, error, isAuthenticated, clearError } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -31,6 +36,71 @@ const Login: React.FC = () => {
   useEffect(() => {
     clearError();
   }, [isLogin, clearError]);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) {
+      return;
+    }
+
+    if (window.google?.accounts?.id) {
+      setIsGoogleReady(true);
+      return;
+    }
+
+    const existingScript = document.getElementById(GOOGLE_SCRIPT_ID) as HTMLScriptElement | null;
+    const handleReady = () => setIsGoogleReady(true);
+
+    if (existingScript) {
+      existingScript.addEventListener('load', handleReady);
+      return () => existingScript.removeEventListener('load', handleReady);
+    }
+
+    const script = document.createElement('script');
+    script.id = GOOGLE_SCRIPT_ID;
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = handleReady;
+    document.head.appendChild(script);
+
+    return () => {
+      script.onload = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !isGoogleReady || !googleButtonRef.current || !window.google?.accounts?.id) {
+      return;
+    }
+
+    const handleGoogleCredential = async (response: GoogleCredentialResponse) => {
+      if (!response.credential) {
+        return;
+      }
+
+      try {
+        await googleLogin(response.credential);
+        navigate('/dashboard');
+      } catch (error) {
+        // Error state is handled by the auth context
+      }
+    };
+
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      ux_mode: 'popup'
+    });
+
+    googleButtonRef.current.innerHTML = '';
+    window.google.accounts.id.renderButton(googleButtonRef.current, {
+      theme: 'outline',
+      size: 'large',
+      shape: 'pill',
+      text: isLogin ? 'continue_with' : 'signup_with',
+      width: 320
+    });
+  }, [googleLogin, isGoogleReady, isLogin, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +185,18 @@ const Login: React.FC = () => {
           {error && (
             <div className="error-message">
               {error}
+            </div>
+          )}
+
+          {GOOGLE_CLIENT_ID && (
+            <div className="social-auth-section">
+              <div ref={googleButtonRef} className="google-button-container" />
+              {!isGoogleReady && (
+                <div className="social-auth-loading">{t('login_google_loading')}</div>
+              )}
+              <div className="auth-divider">
+                <span>{t('login_google_or')}</span>
+              </div>
             </div>
           )}
 

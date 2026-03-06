@@ -20,6 +20,7 @@ const API_TIMEOUT = Number(process.env.REACT_APP_API_TIMEOUT_MS ?? 30000);
 const ANONYMOUS_ENDPOINTS = [
   '/auth/register',
   '/auth/login',
+  '/auth/google',
   '/auth/refresh',
   '/users/request-password-reset',
   '/users/reset-password',
@@ -360,6 +361,9 @@ export const authAPI = {
 
   login: (data: { email: string; password: string }) =>
     api.post('/auth/login', data),
+
+  googleLogin: (data: { idToken: string }) =>
+    api.post('/auth/google', data),
 
   refreshToken: (data: { refreshToken: string }) =>
     api.post('/auth/refresh', data),

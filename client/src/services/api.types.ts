@@ -30,6 +30,10 @@ export interface RegisterRequest {
   lastName: string;
 }
 
+export interface GoogleLoginRequest {
+  idToken: string;
+}
+
 export interface RefreshTokenRequest {
   refreshToken: string;
 }

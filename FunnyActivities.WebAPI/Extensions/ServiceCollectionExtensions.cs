@@ -484,6 +484,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<FunnyActivities.Domain.Services.UserService>();
+        services.AddScoped<FunnyActivities.Application.Services.GoogleLoginService>();
 
         // Survey services
         services.AddScoped<FunnyActivities.Application.Services.ISurveyService, FunnyActivities.Application.Services.SurveyService>();
