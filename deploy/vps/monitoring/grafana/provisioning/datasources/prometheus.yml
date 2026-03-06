@@ -5,6 +5,6 @@ datasources:
     uid: prometheus
     type: prometheus
     access: proxy
-    url: http://funnyactivities_prometheus:9090
+    url: http://172.30.0.11:9090
     isDefault: true
     editable: false

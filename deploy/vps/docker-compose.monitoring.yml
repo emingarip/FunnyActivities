@@ -18,6 +18,7 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       monitoring:
+        ipv4_address: 172.30.0.11
         aliases:
           - prometheus
           - funnyactivities_prometheus
@@ -35,6 +36,7 @@ services:
       - ./monitoring/loki-config.yml:/etc/loki/local-config.yml:ro
     networks:
       monitoring:
+        ipv4_address: 172.30.0.10
         aliases:
           - loki
           - funnyactivities_loki
@@ -53,6 +55,7 @@ services:
       - loki
     networks:
       monitoring:
+        ipv4_address: 172.30.0.12
         aliases:
           - promtail
           - funnyactivities_promtail
@@ -79,6 +82,7 @@ services:
       - loki
     networks:
       monitoring:
+        ipv4_address: 172.30.0.13
         aliases:
           - grafana
           - funnyactivities_grafana
@@ -86,6 +90,9 @@ services:
 networks:
   monitoring:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
 
 volumes:
   prometheus_data:
