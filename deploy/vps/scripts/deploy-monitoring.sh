@@ -26,6 +26,7 @@ require_command openssl
 require_command apt-get
 
 DOCKER_COMPOSE_CMD=()
+USING_LEGACY_DOCKER_COMPOSE="false"
 if ${SUDO} docker compose version >/dev/null 2>&1; then
   if [[ -n "${SUDO}" ]]; then
     DOCKER_COMPOSE_CMD=(sudo docker compose)
@@ -38,6 +39,7 @@ elif command -v docker-compose >/dev/null 2>&1; then
   else
     DOCKER_COMPOSE_CMD=(docker-compose)
   fi
+  USING_LEGACY_DOCKER_COMPOSE="true"
 else
   ${SUDO} apt-get update
   if ${SUDO} apt-get install -y docker-compose-plugin; then
@@ -58,6 +60,7 @@ else
       else
         DOCKER_COMPOSE_CMD=(docker-compose)
       fi
+      USING_LEGACY_DOCKER_COMPOSE="true"
     fi
   fi
 
@@ -133,6 +136,9 @@ PY
 ${SUDO} nginx -t
 ${SUDO} systemctl reload nginx
 "${DOCKER_COMPOSE_CMD[@]}" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" pull
+if [[ "${USING_LEGACY_DOCKER_COMPOSE}" == "true" ]]; then
+  "${DOCKER_COMPOSE_CMD[@]}" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" down --remove-orphans || true
+fi
 "${DOCKER_COMPOSE_CMD[@]}" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" up -d --remove-orphans
 
 echo "Monitoring stack deployed. Grafana should be reachable at https://makethen.com/grafana/"
