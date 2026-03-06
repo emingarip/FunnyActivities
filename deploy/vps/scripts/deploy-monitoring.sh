@@ -102,15 +102,32 @@ site_config = pathlib.Path(os.environ["SITE_CONFIG"])
 snippet_file = pathlib.Path(os.environ["SNIPPET_FILE"])
 content = site_config.read_text(encoding="utf-8")
 snippet = snippet_file.read_text(encoding="utf-8").rstrip() + "\n\n"
+marker_start = "# BEGIN funnyactivities grafana"
+marker_end = "# END funnyactivities grafana"
 
-if "location /grafana/" in content:
-    sys.exit(0)
+marked_block_pattern = re.compile(
+    rf"^[ \t]*{re.escape(marker_start)}.*?^[ \t]*{re.escape(marker_end)}\n?",
+    flags=re.MULTILINE | re.DOTALL,
+)
+legacy_block_pattern = re.compile(
+    r"^[ \t]*location /grafana/api/live/ \{\n.*?^[ \t]*\}\n\s*^[ \t]*location /grafana/ \{\n.*?^[ \t]*\}\n?",
+    flags=re.MULTILINE | re.DOTALL,
+)
 
-match = re.search(r"^\s*location /\s*\{\s*$", content, flags=re.MULTILINE)
-if match is None:
-    raise SystemExit("Could not locate insertion point for Grafana nginx snippet")
+if marker_start in content and marker_end in content:
+    updated = marked_block_pattern.sub(snippet, content, count=1)
+elif "location /grafana/" in content:
+    updated, replacements = legacy_block_pattern.subn(snippet, content, count=1)
+    if replacements == 0:
+        raise SystemExit("Could not replace existing Grafana nginx block")
+else:
+    match = re.search(r"^\s*location /\s*\{\s*$", content, flags=re.MULTILINE)
+    if match is None:
+        raise SystemExit("Could not locate insertion point for Grafana nginx snippet")
+    updated = content[:match.start()] + snippet + content[match.start():]
 
-site_config.write_text(content[:match.start()] + snippet + content[match.start():], encoding="utf-8")
+if updated != content:
+    site_config.write_text(updated, encoding="utf-8")
 PY
 
 ${SUDO} nginx -t
