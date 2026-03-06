@@ -3,9 +3,8 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Filters;
-using Serilog.Sinks.Elasticsearch;
-using Serilog.Sinks.Seq;
 using System.Diagnostics;
+using System.Linq;
 
 namespace FunnyActivities.CrossCuttingConcerns.Logging;
 
@@ -15,7 +14,6 @@ public static class SerilogConfiguration
     {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
         var loggerConfig = new LoggerConfiguration()
-            .ReadFrom.Configuration(configuration)
             .Enrich.FromLogContext()
             .Enrich.With<CorrelationIdEnricher>()
             .Enrich.With<RequestContextEnricher>()
@@ -45,44 +43,32 @@ public static class SerilogConfiguration
             loggerConfig.MinimumLevel.Warning();
         }
 
-        // Conditional sink enabling
-        if (configuration.GetSection("Serilog:WriteTo:Console").Exists())
+        var configuredSinks = configuration.GetSection("Serilog:WriteTo").GetChildren().ToList();
+        if (configuredSinks.Count > 0)
         {
-            loggerConfig.WriteTo.Console();
+            loggerConfig.ReadFrom.Configuration(configuration);
         }
-
-        if (configuration.GetSection("Serilog:WriteTo:File").Exists())
+        else
         {
-            loggerConfig.WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day);
-        }
-
-        if (configuration.GetSection("Serilog:WriteTo:Elasticsearch").Exists())
-        {
-            var esUri = configuration["Serilog:WriteTo:Elasticsearch:Args:nodes"];
-            var esUser = configuration["Elasticsearch:Username"];
-            var esPass = configuration["Elasticsearch:Password"];
-
-            var esOptions = new ElasticsearchSinkOptions(new Uri(esUri))
-            {
-                AutoRegisterTemplate = true,
-                IndexFormat = "funnyactivities-{0:yyyy.MM.dd}",
-                ModifyConnectionSettings = c =>
-                {
-                    if (!string.IsNullOrEmpty(esUser) && !string.IsNullOrEmpty(esPass))
-                    {
-                        c.BasicAuthentication(esUser, esPass);
-                    }
-                    return c;
-                }
-            };
-            loggerConfig.WriteTo.Elasticsearch(esOptions);
-        }
-
-        if (configuration.GetSection("Serilog:WriteTo:Seq").Exists())
-        {
-            var seqUrl = configuration["Serilog:WriteTo:Seq:Args:serverUrl"];
-            var seqApiKey = configuration["Serilog:WriteTo:Seq:Args:apiKey"];
-            loggerConfig.WriteTo.Seq(seqUrl, apiKey: seqApiKey);
+            // Production deployments can run with an external appsettings.Production.json
+            // that omits Serilog configuration entirely. Keep console and rolling files on
+            // by default so journalctl and log shippers always have data to read.
+            loggerConfig
+                .WriteTo.Console(
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}> {CorrelationId}{NewLine}{Exception}")
+                .WriteTo.File(
+                    path: "logs/log-.txt",
+                    rollingInterval: RollingInterval.Day,
+                    retainedFileCountLimit: 30,
+                    fileSizeLimitBytes: 104857600,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+                .WriteTo.File(
+                    path: "logs/error-.txt",
+                    rollingInterval: RollingInterval.Day,
+                    retainedFileCountLimit: 30,
+                    fileSizeLimitBytes: 104857600,
+                    restrictedToMinimumLevel: LogEventLevel.Error,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}");
         }
 
         // Note: Azure Application Insights integration requires Serilog.Sinks.ApplicationInsights package
