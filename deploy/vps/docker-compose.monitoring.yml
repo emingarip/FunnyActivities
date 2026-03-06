@@ -2,6 +2,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: funnyactivities_prometheus
+    hostname: funnyactivities_prometheus
     restart: unless-stopped
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -16,11 +17,15 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - monitoring
+      monitoring:
+        aliases:
+          - prometheus
+          - funnyactivities_prometheus
 
   loki:
     image: grafana/loki:latest
     container_name: funnyactivities_loki
+    hostname: funnyactivities_loki
     restart: unless-stopped
     command: -config.file=/etc/loki/local-config.yml
     ports:
@@ -29,11 +34,15 @@ services:
       - loki_data:/loki
       - ./monitoring/loki-config.yml:/etc/loki/local-config.yml:ro
     networks:
-      - monitoring
+      monitoring:
+        aliases:
+          - loki
+          - funnyactivities_loki
 
   promtail:
     image: grafana/promtail:latest
     container_name: funnyactivities_promtail
+    hostname: funnyactivities_promtail
     restart: unless-stopped
     command: -config.file=/etc/promtail/config.yml
     volumes:
@@ -43,11 +52,15 @@ services:
     depends_on:
       - loki
     networks:
-      - monitoring
+      monitoring:
+        aliases:
+          - promtail
+          - funnyactivities_promtail
 
   grafana:
     image: grafana/grafana:latest
     container_name: funnyactivities_grafana
+    hostname: funnyactivities_grafana
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
@@ -65,7 +78,10 @@ services:
       - prometheus
       - loki
     networks:
-      - monitoring
+      monitoring:
+        aliases:
+          - grafana
+          - funnyactivities_grafana
 
 networks:
   monitoring:
