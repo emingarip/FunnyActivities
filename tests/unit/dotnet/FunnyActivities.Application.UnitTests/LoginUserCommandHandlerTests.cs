@@ -42,10 +42,10 @@ namespace FunnyActivities.Application.UnitTests
             var userId = Guid.NewGuid();
             var plainPassword = "Password123";
             var passwordHash = _userService.HashPassword(new Password(plainPassword));
-            var user = new User(userId, "test@example.com", passwordHash, "John", "Doe");
-            var command = new LoginUserCommand { Email = "test@example.com", Password = plainPassword };
+            var user = new User(userId, "Test@Example.com", passwordHash, "John", "Doe");
+            var command = new LoginUserCommand { Email = " Test@Example.com ", Password = plainPassword };
 
-            _userRepositoryMock.Setup(x => x.GetByEmailAsync(command.Email))
+            _userRepositoryMock.Setup(x => x.GetByEmailAsync("test@example.com"))
                 .ReturnsAsync(user);
             _jwtTokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<IEnumerable<Claim>>()))
                 .Returns("jwt-token");
@@ -61,7 +61,7 @@ namespace FunnyActivities.Application.UnitTests
             result.RefreshToken.Should().Be("refresh-token");
             result.User.Should().NotBeNull();
             result.User.Id.Should().Be(userId);
-            result.User.Email.Should().Be("test@example.com");
+            result.User.Email.Should().Be("Test@Example.com");
             result.User.FirstName.Should().Be("John");
             result.User.LastName.Should().Be("Doe");
         }
@@ -70,9 +70,9 @@ namespace FunnyActivities.Application.UnitTests
         public async Task Handle_ShouldThrowUnauthorizedAccessException_WhenUserNotFound()
         {
             // Arrange
-            var command = new LoginUserCommand { Email = "nonexistent@example.com", Password = "password" };
+            var command = new LoginUserCommand { Email = " Nonexistent@Example.com ", Password = "password" };
 
-            _userRepositoryMock.Setup(x => x.GetByEmailAsync(command.Email))
+            _userRepositoryMock.Setup(x => x.GetByEmailAsync("nonexistent@example.com"))
                 .ReturnsAsync((User)null);
 
             // Act & Assert
@@ -86,9 +86,9 @@ namespace FunnyActivities.Application.UnitTests
             // Arrange
             var passwordHash = _userService.HashPassword(new Password("Password123"));
             var user = new User(Guid.NewGuid(), "test@example.com", passwordHash, "John", "Doe");
-            var command = new LoginUserCommand { Email = "test@example.com", Password = "WrongPassword999" };
+            var command = new LoginUserCommand { Email = " TEST@example.com ", Password = "WrongPassword999" };
 
-            _userRepositoryMock.Setup(x => x.GetByEmailAsync(command.Email))
+            _userRepositoryMock.Setup(x => x.GetByEmailAsync("test@example.com"))
                 .ReturnsAsync(user);
 
             // Act & Assert
@@ -104,9 +104,9 @@ namespace FunnyActivities.Application.UnitTests
             var plainPassword = "Password123";
             var passwordHash = _userService.HashPassword(new Password(plainPassword));
             var user = new User(userId, "test@example.com", passwordHash, "John", "Doe");
-            var command = new LoginUserCommand { Email = "test@example.com", Password = plainPassword };
+            var command = new LoginUserCommand { Email = " TEST@example.com ", Password = plainPassword };
 
-            _userRepositoryMock.Setup(x => x.GetByEmailAsync(command.Email))
+            _userRepositoryMock.Setup(x => x.GetByEmailAsync("test@example.com"))
                 .ReturnsAsync(user);
             _jwtTokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<IEnumerable<Claim>>()))
                 .Returns("jwt-token")

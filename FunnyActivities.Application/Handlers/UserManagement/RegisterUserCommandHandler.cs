@@ -28,23 +28,24 @@ namespace FunnyActivities.Application.Handlers.UserManagement
         {
             var email = new Email(request.Email);
             var password = new Password(request.Password);
+            var normalizedEmail = email.Value;
 
             if (!_userService.IsValidEmail(email))
                 throw new InvalidOperationException("Invalid email");
 
-            if (await _userRepository.ExistsByEmailAsync(request.Email))
+            if (await _userRepository.ExistsByEmailAsync(normalizedEmail))
                 throw new InvalidOperationException("User already exists");
 
             var hashedPassword = _userService.HashPassword(password);
 
-            var user = new User(Guid.NewGuid(), request.Email, hashedPassword, request.FirstName, request.LastName, UserRole.User);
+            var user = new User(Guid.NewGuid(), normalizedEmail, hashedPassword, request.FirstName, request.LastName, UserRole.User);
 
             await _userRepository.AddAsync(user);
 
             // Send registration confirmation email
             await _mediator.Send(new SendRegistrationConfirmationEmailCommand
             {
-                Email = request.Email,
+                Email = normalizedEmail,
                 FirstName = request.FirstName
             });
 

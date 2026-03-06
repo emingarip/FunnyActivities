@@ -36,25 +36,30 @@ namespace FunnyActivities.Application.UnitTests.Handlers.UserManagement
             // Registration must never trust caller-supplied role data.
             var command = new RegisterUserCommand
             {
-                Email = "new-user@example.com",
+                Email = " New-User@Example.com ",
                 Password = "Password123!",
                 FirstName = "New",
                 LastName = "User"
             };
             User? createdUser = null;
+            SendRegistrationConfirmationEmailCommand? emailCommand = null;
 
-            _userRepositoryMock.Setup(x => x.ExistsByEmailAsync(command.Email))
+            _userRepositoryMock.Setup(x => x.ExistsByEmailAsync("new-user@example.com"))
                 .ReturnsAsync(false);
             _userRepositoryMock.Setup(x => x.AddAsync(It.IsAny<User>()))
                 .Callback<User>(user => createdUser = user)
                 .Returns(Task.CompletedTask);
             _mediatorMock.Setup(x => x.Send(It.IsAny<SendRegistrationConfirmationEmailCommand>(), It.IsAny<CancellationToken>()))
+                .Callback<SendRegistrationConfirmationEmailCommand, CancellationToken>((request, _) => emailCommand = request)
                 .Returns(Task.CompletedTask);
 
             await _handler.Handle(command, CancellationToken.None);
 
             createdUser.Should().NotBeNull();
+            createdUser!.Email.Should().Be("new-user@example.com");
             createdUser!.Role.Should().Be(UserRole.User);
+            emailCommand.Should().NotBeNull();
+            emailCommand!.Email.Should().Be("new-user@example.com");
         }
     }
 }

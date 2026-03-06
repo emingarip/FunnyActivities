@@ -73,12 +73,12 @@ namespace FunnyActivities.IntegrationTests
         public async Task ExistsByEmailAsync_ShouldReturnTrue_WhenEmailExists()
         {
             // Arrange
-            var user = new User(Guid.NewGuid(), "test@example.com", "hashedpassword", "John", "Doe");
+            var user = new User(Guid.NewGuid(), "Test@Example.com", "hashedpassword", "John", "Doe");
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _repository.ExistsByEmailAsync("test@example.com");
+            var result = await _repository.ExistsByEmailAsync(" test@example.com ");
 
             // Assert
             result.Should().BeTrue();
@@ -98,16 +98,16 @@ namespace FunnyActivities.IntegrationTests
         public async Task GetByEmailAsync_ShouldReturnUser_WhenEmailExists()
         {
             // Arrange
-            var user = new User(Guid.NewGuid(), "test@example.com", "hashedpassword", "John", "Doe");
+            var user = new User(Guid.NewGuid(), "Test@Example.com", "hashedpassword", "John", "Doe");
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _repository.GetByEmailAsync("test@example.com");
+            var result = await _repository.GetByEmailAsync(" test@example.com ");
 
             // Assert
             result.Should().NotBeNull();
-            result.Email.Should().Be("test@example.com");
+            result.Email.Should().Be("Test@Example.com");
         }
 
         [Fact]

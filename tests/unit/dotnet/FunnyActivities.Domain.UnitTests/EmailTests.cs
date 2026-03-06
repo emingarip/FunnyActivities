@@ -10,13 +10,13 @@ namespace FunnyActivities.Domain.UnitTests
         public void Constructor_ShouldCreateEmailWithValidValue()
         {
             // Arrange
-            var validEmail = "test@example.com";
+            var validEmail = " Test@Example.com ";
 
             // Act
             var email = new Email(validEmail);
 
             // Assert
-            email.Value.Should().Be(validEmail);
+            email.Value.Should().Be("test@example.com");
         }
 
         [Fact]
@@ -53,8 +53,8 @@ namespace FunnyActivities.Domain.UnitTests
         public void Equals_ShouldReturnTrueForSameEmailValues()
         {
             // Arrange
-            var email1 = new Email("test@example.com");
-            var email2 = new Email("test@example.com");
+            var email1 = new Email("Test@Example.com");
+            var email2 = new Email(" test@example.com ");
 
             // Act & Assert
             email1.Equals(email2).Should().BeTrue();

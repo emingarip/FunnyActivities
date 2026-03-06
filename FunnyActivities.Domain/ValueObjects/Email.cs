@@ -8,10 +8,15 @@ namespace FunnyActivities.Domain.ValueObjects
 
         public Email(string value)
         {
+            Value = Normalize(value);
+        }
+
+        public static string Normalize(string value)
+        {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Email cannot be empty");
-            // Add email validation logic here
-            Value = value;
+
+            return value.Trim().ToLowerInvariant();
         }
 
         public bool Equals(Email other) => other != null && Value == other.Value;

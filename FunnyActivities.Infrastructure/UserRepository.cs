@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Entities;
 using FunnyActivities.Domain.Interfaces;
+using FunnyActivities.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -36,24 +37,30 @@ namespace FunnyActivities.Infrastructure
 
         public async Task<bool> ExistsByEmailAsync(string email)
         {
-            return await _context.Users.AnyAsync(u => u.Email == email).ConfigureAwait(false);
+            var normalizedEmail = Email.Normalize(email);
+            return await _context.Users
+                .AnyAsync(u => u.Email.Trim().ToLower() == normalizedEmail)
+                .ConfigureAwait(false);
         }
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            _logger.LogDebug("[USER-REPO] Starting GetByEmailAsync for email: {Email}", MaskEmail(email));
+            var normalizedEmail = Email.Normalize(email);
+            _logger.LogDebug("[USER-REPO] Starting GetByEmailAsync for email: {Email}", MaskEmail(normalizedEmail));
 
             var startTime = DateTime.UtcNow;
 
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email).ConfigureAwait(false);
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail)
+                    .ConfigureAwait(false);
 
                 var endTime = DateTime.UtcNow;
                 var duration = endTime - startTime;
 
                 _logger.LogInformation("[USER-REPO] GetByEmailAsync completed in {Duration}ms. User found: {UserFound} for email: {Email}",
-                    duration.TotalMilliseconds, user != null, MaskEmail(email));
+                    duration.TotalMilliseconds, user != null, MaskEmail(normalizedEmail));
 
                 if (user != null)
                 {
@@ -68,7 +75,7 @@ namespace FunnyActivities.Infrastructure
                 var duration = endTime - startTime;
 
                 _logger.LogError(ex, "[USER-REPO] GetByEmailAsync failed after {Duration}ms for email: {Email}. Error: {ErrorMessage}",
-                    duration.TotalMilliseconds, MaskEmail(email), ex.Message);
+                    duration.TotalMilliseconds, MaskEmail(normalizedEmail), ex.Message);
 
                 throw;
             }

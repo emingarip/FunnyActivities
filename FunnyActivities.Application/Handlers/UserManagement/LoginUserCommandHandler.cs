@@ -47,7 +47,8 @@ namespace FunnyActivities.Application.Handlers.UserManagement
                 var dbQueryStart = DateTime.UtcNow;
                 _logger.LogDebug("[LOGIN-HANDLER] Starting database query for user lookup at {Timestamp}", dbQueryStart);
 
-                var user = await _userRepository.GetByEmailAsync(request.Email).ConfigureAwait(false);
+                var normalizedEmail = Email.Normalize(request.Email);
+                var user = await _userRepository.GetByEmailAsync(normalizedEmail).ConfigureAwait(false);
 
                 var dbQueryEnd = DateTime.UtcNow;
                 var dbQueryDuration = dbQueryEnd - dbQueryStart;

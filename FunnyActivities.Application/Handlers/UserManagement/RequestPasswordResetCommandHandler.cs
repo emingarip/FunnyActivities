@@ -5,6 +5,7 @@ using FunnyActivities.Application.Commands.UserManagement;
 using FunnyActivities.Domain.Interfaces;
 using FunnyActivities.Application.Commands.NotificationSystem;
 using FunnyActivities.Domain.Entities;
+using FunnyActivities.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 
 namespace FunnyActivities.Application.Handlers
@@ -24,7 +25,8 @@ namespace FunnyActivities.Application.Handlers
 
         public async Task<Unit> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            var normalizedEmail = Email.Normalize(request.Email);
+            var user = await _userRepository.GetByEmailAsync(normalizedEmail);
 
             if (user == null)
             {
