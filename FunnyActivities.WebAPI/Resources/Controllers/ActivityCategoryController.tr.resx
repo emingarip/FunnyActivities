@@ -8,6 +8,7 @@
   <data name="ActivityCategoryNotFound" xml:space="preserve"><value>İstenen aktivite kategorisi bulunamadı. Lütfen kategori ID'sini kontrol edip tekrar deneyin.</value></data>
   <data name="ActivityCategoryRetrieved" xml:space="preserve"><value>Aktivite kategorisi başarıyla getirildi</value></data>
   <data name="ActivityCategoryCreated" xml:space="preserve"><value>Aktivite kategorisi başarıyla oluşturuldu</value></data>
+  <data name="ActivityCategoryAlreadyExists" xml:space="preserve"><value>'{0}' adlı bir aktivite kategorisi zaten mevcut. Lütfen farklı bir isim seçin.</value></data>
   <data name="ActivityCategoryCreateValidationError" xml:space="preserve"><value>Aktivite kategorisi oluşturulamadı: {0}. Lütfen girdilerinizi kontrol edin ve tekrar deneyin.</value></data>
   <data name="ActivityCategoryCreateUnexpected" xml:space="preserve"><value>Aktivite kategorisi oluşturulurken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya destekle iletişime geçin.</value></data>
   <data name="ActivityCategoryUpdated" xml:space="preserve"><value>Aktivite kategorisi başarıyla güncellendi</value></data>

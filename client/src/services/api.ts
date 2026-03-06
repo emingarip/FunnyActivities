@@ -307,7 +307,9 @@ api.interceptors.response.use(
           break;
         case 409:
           errorType = 'Conflict';
-          errorMessage = 'Resource conflict';
+          if (errorMessage === 'An unexpected error occurred') {
+            errorMessage = 'Resource conflict';
+          }
           break;
         case 422:
           errorType = 'ValidationError';

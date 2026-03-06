@@ -233,8 +233,8 @@ const ActivityAdmin: React.FC = () => {
     try {
       await activitiesAPI.deleteActivity(activity.id);
       await loadData();
-    } catch {
-      setError(t('activity_admin_error'));
+    } catch (err: any) {
+      setError(err?.message || t('activity_admin_error'));
     }
   };
 

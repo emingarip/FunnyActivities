@@ -8,6 +8,7 @@ using FunnyActivities.Application.Queries.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.DTOs.Shared;
 using FunnyActivities.Application.Interfaces;
+using FunnyActivities.Domain.Exceptions;
 using FunnyActivities.WebAPI.Controllers.Base;
 using Microsoft.Extensions.Localization;
 
@@ -152,6 +153,14 @@ namespace FunnyActivities.WebAPI.Controllers
                 _logger.LogInformation("Activity category created successfully with ID: {Id}", result.Id);
                 return this.ApiCreated(nameof(GetActivityCategory), new { id = result.Id }, result, _localizer["ActivityCategoryCreated"]);
             }
+            catch (ActivityCategoryNameAlreadyExistsException ex)
+            {
+                _logger.LogWarning("Activity category creation failed: {Message}", ex.Message);
+                return this.ApiError(
+                    string.Format(_localizer["ActivityCategoryAlreadyExists"], request.Name),
+                    "Conflict",
+                    409);
+            }
             catch (ArgumentException ex)
             {
                 _logger.LogWarning("Activity category creation failed: {Message}", ex.Message);
@@ -196,6 +205,14 @@ namespace FunnyActivities.WebAPI.Controllers
                 var result = await _mediator.Send(command);
                 _logger.LogInformation("Activity category updated successfully with ID: {CategoryId}", result.Id);
                 return this.ApiSuccess(result, _localizer["ActivityCategoryUpdated"]);
+            }
+            catch (ActivityCategoryNameAlreadyExistsException ex)
+            {
+                _logger.LogWarning("Activity category update failed: {Message}", ex.Message);
+                return this.ApiError(
+                    string.Format(_localizer["ActivityCategoryAlreadyExists"], request.Name),
+                    "Conflict",
+                    409);
             }
             catch (KeyNotFoundException ex)
             {
