@@ -63,7 +63,7 @@ src/
 </ProtectedRoute>
 ```
 **Location**: `src/components/ProtectedRoute.tsx`  
-**Used In**: All authenticated pages (Profile, Settings, UserDashboard, Wallet)
+**Used In**: All authenticated pages (Profile, Settings, UserDashboard)
 
 #### **BottomNavigation.tsx**
 **Purpose**: Mobile-friendly bottom navigation component
@@ -470,8 +470,6 @@ src/
 | **ActivityAdmin** | `ActivityAdmin.tsx` | Activity management | `/admin/activities` |
 | **MaterialsAdmin** | `MaterialsAdmin.tsx` | Material management | `/admin/materials` |
 | **UserDashboard** | `UserDashboard.tsx` | User dashboard | `/dashboard` |
-| **Wallet** | `Wallet.tsx` | User wallet | `/wallet` |
-
 ### **Routing Structure**
 ```tsx
 <Routes>

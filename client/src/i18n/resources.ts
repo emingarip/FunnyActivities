@@ -153,18 +153,6 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     language_en: 'English',
     language_tr: 'Turkish',
 
-    // Wallet
-    wallet_loading: 'Loading wallet data...',
-    wallet_title: 'Wallet',
-    wallet_total_balance: 'Total Balance',
-    wallet_action_add: 'Add Money',
-    wallet_action_send: 'Send',
-    wallet_action_reports: 'Reports',
-    wallet_recent_transactions: 'Recent Transactions',
-    wallet_tx_salary: 'Salary',
-    wallet_tx_groceries: 'Groceries',
-    wallet_tx_coffee: 'Coffee',
-
     // User dashboard
     dashboard_loading: 'Loading dashboard...',
     dashboard_error: 'Failed to load dashboard data',
@@ -525,18 +513,6 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     language_select: 'Dil',
     language_en: 'İngilizce',
     language_tr: 'Türkçe',
-
-    // Wallet
-    wallet_loading: 'Cüzdan bilgileri yükleniyor...',
-    wallet_title: 'Cüzdan',
-    wallet_total_balance: 'Toplam Bakiye',
-    wallet_action_add: 'Para Ekle',
-    wallet_action_send: 'Gönder',
-    wallet_action_reports: 'Raporlar',
-    wallet_recent_transactions: 'Son İşlemler',
-    wallet_tx_salary: 'Maaş',
-    wallet_tx_groceries: 'Market Alışverişi',
-    wallet_tx_coffee: 'Kahve',
 
     // User dashboard
     dashboard_loading: 'Panel yükleniyor...',

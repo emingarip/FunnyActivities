@@ -19,7 +19,6 @@ import ActivityAdmin from './pages/ActivityAdmin';
 import ActivityEditPage from './pages/ActivityEditPage';
 import ActivityPage from './pages/ActivityPage';
 import UserDashboard from './pages/UserDashboard';
-import Wallet from './pages/Wallet';
 import MaterialsAdmin from './pages/MaterialsAdmin';
 import PersonaAdmin from './pages/PersonaAdmin';
 import { ProductsOverview, ProductWizardDemo } from './components/products';
@@ -92,7 +91,6 @@ function AppContent() {
           <Route path="/survey/:surveyId/success" element={<VoteSuccess />} />
           <Route path="/activity/:id" element={<ActivityPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
-          <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
         </Routes>
       </main>
       <BottomNavigation />
