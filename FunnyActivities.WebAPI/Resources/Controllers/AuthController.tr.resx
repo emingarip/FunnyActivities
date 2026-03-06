@@ -24,4 +24,7 @@
   <data name="InvalidCredentials" xml:space="preserve">
     <value>Geçersiz kimlik bilgileri</value>
   </data>
+  <data name="LoginUnexpectedError" xml:space="preserve">
+    <value>Giriş sırasında beklenmeyen bir hata oluştu. Destek için referans kodu: {0}</value>
+  </data>
 </root>

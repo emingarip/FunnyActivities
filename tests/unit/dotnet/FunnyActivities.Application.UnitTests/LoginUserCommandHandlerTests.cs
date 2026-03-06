@@ -128,5 +128,34 @@ namespace FunnyActivities.Application.UnitTests
             _jwtTokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<IEnumerable<Claim>>()), Times.Once);
             _jwtTokenServiceMock.Verify(x => x.GenerateRefreshToken(), Times.Once);
         }
+
+        [Fact]
+        public async Task Handle_ShouldStillReturnLoginResponse_WhenPostLoginUpdateFails()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var plainPassword = "Password123";
+            var passwordHash = _userService.HashPassword(new Password(plainPassword));
+            var user = new User(userId, "test@example.com", passwordHash, "John", "Doe");
+            var command = new LoginUserCommand { Email = "test@example.com", Password = plainPassword };
+
+            _userRepositoryMock.Setup(x => x.GetByEmailAsync("test@example.com"))
+                .ReturnsAsync(user);
+            _userRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<User>()))
+                .ThrowsAsync(new InvalidOperationException("Update failed"));
+            _jwtTokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<IEnumerable<Claim>>()))
+                .Returns("jwt-token");
+            _jwtTokenServiceMock.Setup(x => x.GenerateRefreshToken())
+                .Returns("refresh-token");
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Token.Should().Be("jwt-token");
+            result.RefreshToken.Should().Be("refresh-token");
+            result.User.Id.Should().Be(userId);
+        }
     }
 }

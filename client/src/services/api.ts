@@ -17,6 +17,22 @@ import {
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 const API_TIMEOUT = Number(process.env.REACT_APP_API_TIMEOUT_MS ?? 30000);
 
+const ANONYMOUS_ENDPOINTS = [
+  '/auth/register',
+  '/auth/login',
+  '/auth/refresh',
+  '/users/request-password-reset',
+  '/users/reset-password',
+  '/activities/public',
+  '/surveys/public',
+  '/surveys/activities',
+  '/surveys/status',
+  '/surveys/share'
+];
+
+const isAnonymousEndpoint = (url?: string): boolean =>
+  !!url && ANONYMOUS_ENDPOINTS.some(endpoint => url.includes(endpoint));
+
 // Logout callback - will be set by AuthContext
 let logoutCallback: (() => void) | null = null;
 
@@ -70,25 +86,7 @@ api.interceptors.request.use(
     // Add auth token if available, but skip for anonymous endpoints
     const token = localStorage.getItem('accessToken');
     if (token && config.headers) {
-      // Skip adding Authorization header for anonymous endpoints
-      const anonymousEndpoints = [
-        '/auth/register',
-        '/auth/login',
-        '/auth/refresh',
-        '/users/request-password-reset',
-        '/users/reset-password',
-        '/activities/public',
-        '/surveys/public',
-        '/surveys/activities',
-        '/surveys/status',
-        '/surveys/share'
-      ];
-
-      const isAnonymousEndpoint = anonymousEndpoints.some(endpoint =>
-        config.url?.includes(endpoint)
-      );
-
-      if (!isAnonymousEndpoint) {
+      if (!isAnonymousEndpoint(config.url)) {
         config.headers.Authorization = `Bearer ${token}`;
         console.log('🔐 Auth token added to request');
       } else {
@@ -196,7 +194,7 @@ api.interceptors.response.use(
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
     // Handle 401 Unauthorized
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAnonymousEndpoint(originalRequest?.url)) {
       originalRequest._retry = true;
 
       try {
@@ -290,7 +288,13 @@ api.interceptors.response.use(
           break;
         case 401:
           errorType = 'Unauthorized';
-          errorMessage = 'Authentication required or token expired';
+          if (isAnonymousEndpoint(error.config?.url)) {
+            errorMessage = errorMessage === 'An unexpected error occurred'
+              ? 'Invalid email or password'
+              : errorMessage;
+          } else {
+            errorMessage = 'Authentication required or token expired';
+          }
           break;
         case 403:
           errorType = 'Forbidden';

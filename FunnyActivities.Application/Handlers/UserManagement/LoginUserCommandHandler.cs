@@ -81,29 +81,7 @@ namespace FunnyActivities.Application.Handlers.UserManagement
                 }
 
                 _logger.LogInformation("[LOGIN-HANDLER] User authentication successful for {UserId}", user.Id);
-
-                // Update last login date
-                user.UpdateLastLoginDate();
-                await _userRepository.UpdateAsync(user).ConfigureAwait(false);
-                _logger.LogInformation("[LOGIN-HANDLER] Last login date updated for user {UserId}", user.Id);
-
-                // Password re-hashing check
-                if (_userService.IsOldHashFormat(user.PasswordHash))
-                {
-                    _logger.LogInformation("[LOGIN-HANDLER] Old password format detected for user {UserId}, starting re-hash", user.Id);
-
-                    var rehashStart = DateTime.UtcNow;
-                    var newHash = _userService.HashPassword(new Password(request.Password));
-                    user.SetPasswordHash(newHash);
-
-                    var updateStart = DateTime.UtcNow;
-                    await _userRepository.UpdateAsync(user).ConfigureAwait(false);
-                    var updateEnd = DateTime.UtcNow;
-                    var updateDuration = updateEnd - updateStart;
-
-                    _logger.LogInformation("[LOGIN-HANDLER] Password re-hashed and updated for user {UserId} in {Duration}ms",
-                        user.Id, updateDuration.TotalMilliseconds);
-                }
+                var needsRehash = _userService.IsOldHashFormat(user.PasswordHash);
 
                 cancellationToken.ThrowIfCancellationRequested();
                 _logger.LogDebug("[LOGIN-HANDLER] Third cancellation token check passed");
@@ -120,8 +98,8 @@ namespace FunnyActivities.Application.Handlers.UserManagement
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.GivenName, user.FirstName),
-                    new Claim(ClaimTypes.Surname, user.LastName),
+                    new Claim(ClaimTypes.GivenName, user.FirstName ?? string.Empty),
+                    new Claim(ClaimTypes.Surname, user.LastName ?? string.Empty),
                     new Claim(ClaimTypes.Role, roleString),
                     new Claim("role", roleString) // Add both standard and custom role claim
                 };
@@ -135,6 +113,32 @@ namespace FunnyActivities.Application.Handlers.UserManagement
                 var jwtEnd = DateTime.UtcNow;
                 var jwtDuration = jwtEnd - jwtStart;
                 _logger.LogInformation("[LOGIN-HANDLER] JWT token generation completed in {Duration}ms", jwtDuration.TotalMilliseconds);
+
+                try
+                {
+                    user.UpdateLastLoginDate();
+
+                    if (needsRehash)
+                    {
+                        _logger.LogInformation("[LOGIN-HANDLER] Old password format detected for user {UserId}, starting re-hash", user.Id);
+                        var newHash = _userService.HashPassword(new Password(request.Password));
+                        user.SetPasswordHash(newHash);
+                    }
+
+                    var updateStart = DateTime.UtcNow;
+                    await _userRepository.UpdateAsync(user).ConfigureAwait(false);
+                    var updateEnd = DateTime.UtcNow;
+                    var updateDuration = updateEnd - updateStart;
+
+                    _logger.LogInformation("[LOGIN-HANDLER] Post-login user update completed in {Duration}ms for user {UserId}. Rehashed: {Rehashed}",
+                        updateDuration.TotalMilliseconds, user.Id, needsRehash);
+                }
+                catch (Exception updateEx)
+                {
+                    _logger.LogWarning(updateEx,
+                        "[LOGIN-HANDLER] Post-login user update failed for user {UserId}. Login will still succeed.",
+                        user.Id);
+                }
 
                 _logger.LogInformation("[LOGIN-HANDLER] Login successful for user {UserId}", user.Id);
 

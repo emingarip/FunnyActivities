@@ -148,14 +148,21 @@ namespace FunnyActivities.WebAPI.Controllers
 
                 return this.ApiSuccess(data, _localizer["LoginSuccessful"]);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                stopwatch.Stop();
+                _logger.LogWarning(ex, "[AUTH-LOGIN] Login rejected", new { Email = MaskEmail(request.Email), Error = ex.Message, IP = MaskIP(ip), Method = method, Path = path, Status = 401, DurationMs = stopwatch.ElapsedMilliseconds, CorrelationId = correlationId });
+
+                return this.ApiError(_localizer["InvalidCredentials"], "AuthenticationError", 401);
+            }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger.LogError(ex, "[AUTH-LOGIN] Login failed", new { Email = MaskEmail(request.Email), Error = ex.Message, IP = MaskIP(ip), Method = method, Path = path, Status = 401, DurationMs = stopwatch.ElapsedMilliseconds, CorrelationId = correlationId });
+                _logger.LogError(ex, "[AUTH-LOGIN] Login failed unexpectedly", new { Email = MaskEmail(request.Email), Error = ex.Message, IP = MaskIP(ip), Method = method, Path = path, Status = 500, DurationMs = stopwatch.ElapsedMilliseconds, CorrelationId = correlationId });
 
                 _logger.LogDebug("[AUTH-LOGIN] About to return ApiError", new { Email = MaskEmail(request.Email), Error = ex.Message, IP = MaskIP(ip), Method = method, Path = path, CorrelationId = correlationId });
 
-                return this.ApiError(_localizer["InvalidCredentials"], "AuthenticationError", 401);
+                return this.ApiError(string.Format(_localizer["LoginUnexpectedError"], correlationId), "InternalError", 500);
             }
         }
 

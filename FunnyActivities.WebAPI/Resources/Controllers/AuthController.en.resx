@@ -24,4 +24,7 @@
   <data name="InvalidCredentials" xml:space="preserve">
     <value>Invalid credentials</value>
   </data>
+  <data name="LoginUnexpectedError" xml:space="preserve">
+    <value>An unexpected error occurred during login. Reference code: {0}</value>
+  </data>
 </root>

@@ -19,7 +19,7 @@ public class JwtTokenService : IJwtTokenService
 
     public string GenerateToken(IEnumerable<Claim> claims)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+        var key = JwtKeyHelper.CreateSigningKey(_jwtSettings.SecretKey);
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         // Create a list of claims that includes the standard JWT claims
@@ -59,7 +59,7 @@ public class JwtTokenService : IJwtTokenService
 
     public ClaimsPrincipal? ValidateToken(string token)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+        var key = JwtKeyHelper.CreateSigningKey(_jwtSettings.SecretKey);
         var tokenHandler = new JwtSecurityTokenHandler();
 
         // Debug: Log the settings being used
@@ -76,7 +76,7 @@ public class JwtTokenService : IJwtTokenService
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = _jwtSettings.Issuer,
                 ValidAudience = _jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey))
+                IssuerSigningKey = key
             }, out var validatedToken);
 
             Console.WriteLine($"[DEBUG] JWT Validation successful");

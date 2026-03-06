@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
     {
         var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        var signingKey = JwtKeyHelper.CreateSigningKey(jwtSettings?.SecretKey ?? string.Empty);
 
         services.AddAuthentication(options =>
         {
@@ -43,7 +44,7 @@ public static class ServiceCollectionExtensions
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtSettings?.Issuer,
                 ValidAudience = jwtSettings?.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.SecretKey ?? "")),
+                IssuerSigningKey = signingKey,
                 // Ensure role claims are properly mapped
                 RoleClaimType = ClaimTypes.Role,
                 NameClaimType = ClaimTypes.NameIdentifier
