@@ -1,0 +1,141 @@
+name: VPS Diagnose
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose-vps:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check VPS secrets
+      id: gate
+      shell: bash
+      run: |
+        if [ -z "${{ secrets.VPS_HOST }}" ] || [ -z "${{ secrets.VPS_USER }}" ]; then
+          echo "VPS_HOST or VPS_USER not set." >&2
+          exit 1
+        fi
+
+    - name: Prepare SSH credentials
+      id: sshcred
+      shell: bash
+      run: |
+        if [ -n "${{ secrets.VPS_PASSWORD }}" ]; then
+          echo "method=password" >> "$GITHUB_OUTPUT"
+        elif [ -n "${{ secrets.VPS_SSH_KEY }}" ]; then
+          echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          echo "method=key" >> "$GITHUB_OUTPUT"
+        else
+          echo "No VPS_SSH_KEY or VPS_PASSWORD provided." >&2
+          exit 1
+        fi
+
+    - name: Diagnose VPS (key auth)
+      if: steps.sshcred.outputs.method == 'key'
+      shell: bash
+      run: |
+        ssh -o StrictHostKeyChecking=accept-new -i key.pem ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 'bash -s' <<'EOF'
+        set +e
+        echo "=== HOST ==="
+        hostname
+        whoami
+
+        echo "=== CONFIG FILES ==="
+        for file in /etc/funnyactivities/appsettings.Production.json /var/www/funnyactivities/publish/appsettings.Production.json /var/www/funnyactivities/publish/appsettings.json; do
+          if [ -f "$file" ]; then
+            echo "$file: present"
+          else
+            echo "$file: missing"
+          fi
+        done
+
+        echo "=== JWT SECRET LENGTHS ==="
+        python3 - <<'PY'
+import json
+from pathlib import Path
+
+paths = [
+    Path("/etc/funnyactivities/appsettings.Production.json"),
+    Path("/var/www/funnyactivities/publish/appsettings.Production.json"),
+    Path("/var/www/funnyactivities/publish/appsettings.json"),
+]
+
+for path in paths:
+    if not path.exists():
+        print(f"{path}: missing")
+        continue
+    try:
+        data = json.loads(path.read_text())
+        secret = data.get("JwtSettings", {}).get("SecretKey", "")
+        print(f"{path}: jwt_secret_bits={len(secret.encode('utf-8')) * 8}")
+    except Exception as exc:
+        print(f"{path}: unreadable ({exc})")
+PY
+
+        echo "=== SERVICE STATUS ==="
+        systemctl is-active funnyactivities || true
+        systemctl status funnyactivities --no-pager -l || true
+
+        echo "=== LOCAL HEALTH ==="
+        curl -sS -D - http://localhost:5000/health -o /tmp/funny-health.out || true
+        cat /tmp/funny-health.out 2>/dev/null || true
+
+        echo "=== RECENT JOURNAL MATCHES ==="
+        journalctl -u funnyactivities -n 200 --no-pager | grep -E "JwtSettings|SecretKey|exception|Exception|error|Error|fail|Fail|Unable|InvalidOperation" || true
+        EOF
+
+    - name: Diagnose VPS (password auth)
+      if: steps.sshcred.outputs.method == 'password'
+      shell: bash
+      run: |
+        sudo apt-get update && sudo apt-get install -y sshpass
+        sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=accept-new ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 'bash -s' <<'EOF'
+        set +e
+        echo "=== HOST ==="
+        hostname
+        whoami
+
+        echo "=== CONFIG FILES ==="
+        for file in /etc/funnyactivities/appsettings.Production.json /var/www/funnyactivities/publish/appsettings.Production.json /var/www/funnyactivities/publish/appsettings.json; do
+          if [ -f "$file" ]; then
+            echo "$file: present"
+          else
+            echo "$file: missing"
+          fi
+        done
+
+        echo "=== JWT SECRET LENGTHS ==="
+        python3 - <<'PY'
+import json
+from pathlib import Path
+
+paths = [
+    Path("/etc/funnyactivities/appsettings.Production.json"),
+    Path("/var/www/funnyactivities/publish/appsettings.Production.json"),
+    Path("/var/www/funnyactivities/publish/appsettings.json"),
+]
+
+for path in paths:
+    if not path.exists():
+        print(f"{path}: missing")
+        continue
+    try:
+        data = json.loads(path.read_text())
+        secret = data.get("JwtSettings", {}).get("SecretKey", "")
+        print(f"{path}: jwt_secret_bits={len(secret.encode('utf-8')) * 8}")
+    except Exception as exc:
+        print(f"{path}: unreadable ({exc})")
+PY
+
+        echo "=== SERVICE STATUS ==="
+        systemctl is-active funnyactivities || true
+        systemctl status funnyactivities --no-pager -l || true
+
+        echo "=== LOCAL HEALTH ==="
+        curl -sS -D - http://localhost:5000/health -o /tmp/funny-health.out || true
+        cat /tmp/funny-health.out 2>/dev/null || true
+
+        echo "=== RECENT JOURNAL MATCHES ==="
+        journalctl -u funnyactivities -n 200 --no-pager | grep -E "JwtSettings|SecretKey|exception|Exception|error|Error|fail|Fail|Unable|InvalidOperation" || true
+        EOF
