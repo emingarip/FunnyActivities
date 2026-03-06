@@ -40,14 +40,28 @@ elif command -v docker-compose >/dev/null 2>&1; then
   fi
 else
   ${SUDO} apt-get update
-  ${SUDO} apt-get install -y docker-compose-plugin
-  if ${SUDO} docker compose version >/dev/null 2>&1; then
-    if [[ -n "${SUDO}" ]]; then
-      DOCKER_COMPOSE_CMD=(sudo docker compose)
-    else
-      DOCKER_COMPOSE_CMD=(docker compose)
+  if ${SUDO} apt-get install -y docker-compose-plugin; then
+    if ${SUDO} docker compose version >/dev/null 2>&1; then
+      if [[ -n "${SUDO}" ]]; then
+        DOCKER_COMPOSE_CMD=(sudo docker compose)
+      else
+        DOCKER_COMPOSE_CMD=(docker compose)
+      fi
     fi
-  else
+  fi
+
+  if [[ ${#DOCKER_COMPOSE_CMD[@]} -eq 0 ]]; then
+    ${SUDO} apt-get install -y docker-compose
+    if command -v docker-compose >/dev/null 2>&1; then
+      if [[ -n "${SUDO}" ]]; then
+        DOCKER_COMPOSE_CMD=(sudo docker-compose)
+      else
+        DOCKER_COMPOSE_CMD=(docker-compose)
+      fi
+    fi
+  fi
+
+  if [[ ${#DOCKER_COMPOSE_CMD[@]} -eq 0 ]]; then
     echo "Neither docker compose nor docker-compose is available on the VPS." >&2
     exit 1
   fi
