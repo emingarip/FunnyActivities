@@ -415,6 +415,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Logout function
     const logout = useCallback((): void => {
       logAuthEvent('log', 'Logout initiated', { userId: state.user?.id, email: state.user?.email });
+      window.google?.accounts?.id?.disableAutoSelect();
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       logAuthEvent('log', 'Tokens removed from localStorage');

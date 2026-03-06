@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Login.css';
@@ -20,10 +20,25 @@ const Login: React.FC = () => {
     confirmPassword: '',
   });
   const googleButtonRef = useRef<HTMLDivElement | null>(null);
+  const hasInitializedGoogleRef = useRef(false);
+  const hasPromptedOneTapRef = useRef(false);
 
   const { login, googleLogin, register, isLoading, error, isAuthenticated, clearError } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const handleGoogleCredential = useCallback(async (response: GoogleCredentialResponse) => {
+    if (!response.credential) {
+      return;
+    }
+
+    try {
+      await googleLogin(response.credential);
+      navigate('/dashboard');
+    } catch (error) {
+      // Error state is handled by the auth context
+    }
+  }, [googleLogin, navigate]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -69,28 +84,25 @@ const Login: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !isGoogleReady || !googleButtonRef.current || !window.google?.accounts?.id) {
+    if (!GOOGLE_CLIENT_ID || !isGoogleReady || !window.google?.accounts?.id || hasInitializedGoogleRef.current) {
       return;
     }
-
-    const handleGoogleCredential = async (response: GoogleCredentialResponse) => {
-      if (!response.credential) {
-        return;
-      }
-
-      try {
-        await googleLogin(response.credential);
-        navigate('/dashboard');
-      } catch (error) {
-        // Error state is handled by the auth context
-      }
-    };
 
     window.google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: handleGoogleCredential,
-      ux_mode: 'popup'
+      ux_mode: 'popup',
+      auto_select: false,
+      cancel_on_tap_outside: false,
     });
+
+    hasInitializedGoogleRef.current = true;
+  }, [handleGoogleCredential, isGoogleReady]);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !isGoogleReady || !googleButtonRef.current || !window.google?.accounts?.id) {
+      return;
+    }
 
     googleButtonRef.current.innerHTML = '';
     window.google.accounts.id.renderButton(googleButtonRef.current, {
@@ -100,7 +112,36 @@ const Login: React.FC = () => {
       text: isLogin ? 'continue_with' : 'signup_with',
       width: 320
     });
-  }, [googleLogin, isGoogleReady, isLogin, navigate]);
+  }, [isGoogleReady, isLogin]);
+
+  useEffect(() => {
+    if (
+      !GOOGLE_CLIENT_ID ||
+      !isGoogleReady ||
+      !window.google?.accounts?.id ||
+      !hasInitializedGoogleRef.current ||
+      hasPromptedOneTapRef.current ||
+      isAuthenticated ||
+      isLoading
+    ) {
+      return;
+    }
+
+    hasPromptedOneTapRef.current = true;
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed()) {
+        console.info('Google One Tap was not displayed', notification.getNotDisplayedReason());
+      } else if (notification.isSkippedMoment()) {
+        console.info('Google One Tap was skipped', notification.getSkippedReason());
+      } else if (notification.isDismissedMoment()) {
+        console.info('Google One Tap was dismissed', notification.getDismissedReason());
+      }
+    });
+
+    return () => {
+      window.google?.accounts?.id?.cancel();
+    };
+  }, [isAuthenticated, isGoogleReady, isLoading]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
