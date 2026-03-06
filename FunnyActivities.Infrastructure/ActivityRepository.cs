@@ -1,25 +1,16 @@
 using FunnyActivities.Application.Interfaces;
 using FunnyActivities.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using FunnyActivities.CrossCuttingConcerns.Caching;
 
 namespace FunnyActivities.Infrastructure
 {
     public class ActivityRepository : IActivityRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICacheService _cache;
 
-        public ActivityRepository(ApplicationDbContext context, ICacheService cache)
+        public ActivityRepository(ApplicationDbContext context)
         {
             _context = context;
-            _cache = cache;
-        }
-
-        private class CachedActivityResult
-        {
-            public IEnumerable<Activity> Activities { get; set; }
-            public int TotalCount { get; set; }
         }
 
         public async Task<Activity?> GetByIdAsync(Guid id)
@@ -80,26 +71,6 @@ namespace FunnyActivities.Infrastructure
             int pageNumber,
             int pageSize)
         {
-            // For public activities without search term or category filter, use cache
-            if (isPublic && string.IsNullOrWhiteSpace(searchTerm) && !activityCategoryId.HasValue)
-            {
-                var cacheKey = $"public_activities_{pageNumber}_{pageSize}_{sortBy ?? "name"}_{sortOrder ?? "asc"}";
-                var cachedResult = await _cache.GetAsync<CachedActivityResult>(cacheKey);
-
-                if (cachedResult != null)
-                {
-                    return (cachedResult.Activities, cachedResult.TotalCount);
-                }
-
-                var result = await GetFilteredActivitiesFromDatabase(searchTerm, activityCategoryId, isPublic, sortBy, sortOrder, pageNumber, pageSize);
-
-                // Cache for 15 minutes
-                var cacheData = new CachedActivityResult { Activities = result.Activities, TotalCount = result.TotalCount };
-                await _cache.SetAsync(cacheKey, cacheData, TimeSpan.FromMinutes(15));
-                return result;
-            }
-
-            // For other queries, don't cache (too many variations)
             return await GetFilteredActivitiesFromDatabase(searchTerm, activityCategoryId, isPublic, sortBy, sortOrder, pageNumber, pageSize);
         }
 

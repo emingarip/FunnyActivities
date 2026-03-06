@@ -4,19 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Xunit;
 using FunnyActivities.Domain.Entities;
-using FunnyActivities.Domain.ValueObjects;
 using FunnyActivities.Infrastructure;
-using FunnyActivities.CrossCuttingConcerns.Caching;
 
 namespace FunnyActivities.Infrastructure.UnitTests.Repositories.ActivityManagement
 {
     public class ActivityRepositoryTests : IDisposable
     {
         private readonly ApplicationDbContext _context;
-        private readonly Mock<ICacheService> _cacheMock;
         private readonly ActivityRepository _repository;
 
         public ActivityRepositoryTests()
@@ -26,67 +22,30 @@ namespace FunnyActivities.Infrastructure.UnitTests.Repositories.ActivityManageme
                 .Options;
 
             _context = new ApplicationDbContext(options);
-            _cacheMock = new Mock<ICacheService>();
-            _repository = new ActivityRepository(_context, _cacheMock.Object);
+            _repository = new ActivityRepository(_context);
         }
 
         [Fact]
-        public async Task GetFilteredAsync_ShouldCachePublicActivitiesWithoutFilters()
+        public async Task GetFilteredAsync_ShouldReflectUpdatedPublicStatusImmediately()
         {
             // Arrange
             var category = new ActivityCategory("Test Category", "Description");
             await _context.ActivityCategories.AddAsync(category);
 
-            var activity1 = Activity.Create("Activity 1", "Description 1", null, null, category.Id, true);
-            var activity2 = Activity.Create("Activity 2", "Description 2", null, null, category.Id, true);
-
-            await _context.Activities.AddRangeAsync(activity1, activity2);
+            var activity = Activity.Create("Activity 1", "Description 1", null, null, category.Id, false);
+            await _context.Activities.AddAsync(activity);
             await _context.SaveChangesAsync();
 
-            var cacheKey = "public_activities_1_10_name_asc";
-            _cacheMock.Setup(x => x.GetAsync<ActivityRepository.CachedActivityResult>(cacheKey))
-                .ReturnsAsync((ActivityRepository.CachedActivityResult)null);
+            var initialResult = await _repository.GetFilteredAsync(null, null, true, "name", "asc", 1, 12);
+            initialResult.Activities.Should().BeEmpty();
+            initialResult.TotalCount.Should().Be(0);
 
-            // Act
-            var result = await _repository.GetFilteredAsync(null, null, true, "name", "asc", 1, 10);
+            activity.UpdatePublicStatus(true);
+            await _context.SaveChangesAsync();
 
-            // Assert
-            result.Activities.Should().HaveCount(2);
-            result.TotalCount.Should().Be(2);
-
-            _cacheMock.Verify(x => x.GetAsync<ActivityRepository.CachedActivityResult>(cacheKey), Times.Once);
-            _cacheMock.Verify(x => x.SetAsync(It.Is<string>(k => k == cacheKey),
-                It.IsAny<ActivityRepository.CachedActivityResult>(),
-                It.Is<TimeSpan>(t => t.TotalMinutes == 15)), Times.Once);
-        }
-
-        [Fact]
-        public async Task GetFilteredAsync_ShouldReturnCachedResult_WhenAvailable()
-        {
-            // Arrange
-            var cachedActivities = new List<Activity>
-            {
-                Activity.Create("Cached Activity 1", "Description", null, null, Guid.NewGuid())
-            };
-            var cachedResult = new ActivityRepository.CachedActivityResult
-            {
-                Activities = cachedActivities,
-                TotalCount = 1
-            };
-
-            var cacheKey = "public_activities_1_10_name_asc";
-            _cacheMock.Setup(x => x.GetAsync<ActivityRepository.CachedActivityResult>(cacheKey))
-                .ReturnsAsync(cachedResult);
-
-            // Act
-            var result = await _repository.GetFilteredAsync(null, null, true, "name", "asc", 1, 10);
-
-            // Assert
-            result.Activities.Should().BeEquivalentTo(cachedActivities);
-            result.TotalCount.Should().Be(1);
-
-            _cacheMock.Verify(x => x.GetAsync<ActivityRepository.CachedActivityResult>(cacheKey), Times.Once);
-            _cacheMock.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<ActivityRepository.CachedActivityResult>(), It.IsAny<TimeSpan>()), Times.Never);
+            var updatedResult = await _repository.GetFilteredAsync(null, null, true, "name", "asc", 1, 12);
+            updatedResult.Activities.Should().ContainSingle(a => a.Id == activity.Id);
+            updatedResult.TotalCount.Should().Be(1);
         }
 
         [Fact]
@@ -107,9 +66,6 @@ namespace FunnyActivities.Infrastructure.UnitTests.Repositories.ActivityManageme
             // Assert
             result.Activities.Should().HaveCount(1);
             result.TotalCount.Should().Be(1);
-
-            _cacheMock.Verify(x => x.GetAsync<ActivityRepository.CachedActivityResult>(It.IsAny<string>()), Times.Never);
-            _cacheMock.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<ActivityRepository.CachedActivityResult>(), It.IsAny<TimeSpan>()), Times.Never);
         }
 
         [Fact]
@@ -130,9 +86,6 @@ namespace FunnyActivities.Infrastructure.UnitTests.Repositories.ActivityManageme
             // Assert
             result.Activities.Should().HaveCount(1);
             result.TotalCount.Should().Be(1);
-
-            _cacheMock.Verify(x => x.GetAsync<ActivityRepository.CachedActivityResult>(It.IsAny<string>()), Times.Never);
-            _cacheMock.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<ActivityRepository.CachedActivityResult>(), It.IsAny<TimeSpan>()), Times.Never);
         }
 
         [Fact]
@@ -153,9 +106,6 @@ namespace FunnyActivities.Infrastructure.UnitTests.Repositories.ActivityManageme
             // Assert
             result.Activities.Should().HaveCount(1);
             result.TotalCount.Should().Be(1);
-
-            _cacheMock.Verify(x => x.GetAsync<ActivityRepository.CachedActivityResult>(It.IsAny<string>()), Times.Never);
-            _cacheMock.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<ActivityRepository.CachedActivityResult>(), It.IsAny<TimeSpan>()), Times.Never);
         }
 
         [Fact]
