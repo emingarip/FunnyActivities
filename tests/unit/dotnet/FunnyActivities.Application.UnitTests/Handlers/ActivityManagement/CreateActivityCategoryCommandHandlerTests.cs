@@ -6,7 +6,6 @@ using FunnyActivities.Application.Commands.ActivityManagement;
 using FunnyActivities.Application.DTOs.ActivityManagement;
 using FunnyActivities.Application.Handlers.ActivityManagement;
 using FunnyActivities.Application.Interfaces;
-using FunnyActivities.CrossCuttingConcerns.Caching;
 using FunnyActivities.Domain.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -19,7 +18,6 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
     {
         private readonly Mock<IActivityCategoryRepository> _repositoryMock;
         private readonly Mock<IMediator> _mediatorMock;
-        private readonly Mock<ICacheService> _cacheMock;
         private readonly Mock<ILogger<CreateActivityCategoryCommandHandler>> _loggerMock;
         private readonly CreateActivityCategoryCommandHandler _handler;
 
@@ -27,14 +25,10 @@ namespace FunnyActivities.Application.UnitTests.Handlers.ActivityManagement
         {
             _repositoryMock = new Mock<IActivityCategoryRepository>();
             _mediatorMock = new Mock<IMediator>();
-            _cacheMock = new Mock<ICacheService>();
             _loggerMock = new Mock<ILogger<CreateActivityCategoryCommandHandler>>();
-
-            _cacheMock.Setup(c => c.RemoveAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
 
             _handler = new CreateActivityCategoryCommandHandler(
                 _repositoryMock.Object,
-                _cacheMock.Object,
                 _mediatorMock.Object,
                 _loggerMock.Object);
         }
