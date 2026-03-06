@@ -25,6 +25,36 @@ require_command python3
 require_command openssl
 require_command apt-get
 
+if ! command -v curl >/dev/null 2>&1; then
+  ${SUDO} apt-get update
+  ${SUDO} apt-get install -y curl
+fi
+
+dump_monitoring_logs() {
+  ${SUDO} docker ps -a || true
+  ${SUDO} docker logs --tail 200 funnyactivities_loki || true
+  ${SUDO} docker logs --tail 200 funnyactivities_promtail || true
+  ${SUDO} docker logs --tail 200 funnyactivities_prometheus || true
+  ${SUDO} docker logs --tail 200 funnyactivities_grafana || true
+}
+
+wait_for_url() {
+  local name="$1"
+  local url="$2"
+  local attempts="${3:-30}"
+
+  for ((i=1; i<=attempts; i++)); do
+    if curl -fsS "${url}" >/dev/null 2>&1; then
+      echo "${name} is ready at ${url}"
+      return 0
+    fi
+    sleep 2
+  done
+
+  echo "${name} failed health check at ${url}" >&2
+  return 1
+}
+
 DOCKER_COMPOSE_CMD=()
 USING_LEGACY_DOCKER_COMPOSE="false"
 if ${SUDO} docker compose version >/dev/null 2>&1; then
@@ -140,5 +170,20 @@ if [[ "${USING_LEGACY_DOCKER_COMPOSE}" == "true" ]]; then
   "${DOCKER_COMPOSE_CMD[@]}" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" down --remove-orphans || true
 fi
 "${DOCKER_COMPOSE_CMD[@]}" --env-file "${ENV_FILE}" -f "${ROOT_DIR}/docker-compose.monitoring.yml" up -d --remove-orphans
+
+if ! wait_for_url "Loki" "http://127.0.0.1:3100/ready"; then
+  dump_monitoring_logs
+  exit 1
+fi
+
+if ! wait_for_url "Prometheus" "http://127.0.0.1:9090/-/ready"; then
+  dump_monitoring_logs
+  exit 1
+fi
+
+if ! wait_for_url "Grafana" "http://127.0.0.1:3000/api/health"; then
+  dump_monitoring_logs
+  exit 1
+fi
 
 echo "Monitoring stack deployed. Grafana should be reachable at https://makethen.com/grafana/"
