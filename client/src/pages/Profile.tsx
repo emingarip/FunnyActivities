@@ -11,9 +11,19 @@ import {
   Alert,
   Stack,
   TextField,
-  Divider,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import {
+  LockReset as LockResetIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { userAPI } from '../services/api';
@@ -22,15 +32,32 @@ const Profile: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success' as 'success' | 'error',
   });
+
+  const passwordMismatch = Boolean(confirmPassword) && newPassword !== confirmPassword;
+  const passwordTooShort = Boolean(newPassword) && newPassword.length < 8;
+  const passwordSameAsCurrent = Boolean(currentPassword) && Boolean(newPassword) && currentPassword === newPassword;
+  const canSubmitPassword =
+    Boolean(currentPassword) &&
+    Boolean(newPassword) &&
+    Boolean(confirmPassword) &&
+    !passwordMismatch &&
+    !passwordTooShort &&
+    !passwordSameAsCurrent &&
+    !passwordLoading;
 
   const handleLogout = async () => {
     try {
@@ -56,35 +83,61 @@ const Profile: React.FC = () => {
     setSnackbar(prev => ({ ...prev, open: false }));
   };
 
+  const resetPasswordDialog = () => {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setPasswordError(null);
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+  };
+
+  const handleOpenPasswordDialog = () => {
+    resetPasswordDialog();
+    setPasswordDialogOpen(true);
+  };
+
+  const handleClosePasswordDialog = () => {
+    if (passwordLoading) {
+      return;
+    }
+
+    setPasswordDialogOpen(false);
+    resetPasswordDialog();
+  };
+
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      setSnackbar({
-        open: true,
-        message: t('profile_password_required'),
-        severity: 'error',
-      });
+      setPasswordError(t('profile_password_required'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setSnackbar({
-        open: true,
-        message: t('profile_password_mismatch'),
-        severity: 'error',
-      });
+      setPasswordError(t('profile_password_mismatch'));
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordError(t('profile_password_too_short'));
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setPasswordError(t('profile_password_same'));
       return;
     }
 
     try {
       setPasswordLoading(true);
+      setPasswordError(null);
       await userAPI.changePassword({
         currentPassword,
         newPassword,
       });
 
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      setPasswordDialogOpen(false);
+      resetPasswordDialog();
       setSnackbar({
         open: true,
         message: t('profile_password_success'),
@@ -123,43 +176,6 @@ const Profile: React.FC = () => {
             <Typography variant="body1" sx={{ mb: 3 }}>
               <strong>{t('profile_email_label')}</strong> {user.email}
             </Typography>
-            <Divider sx={{ my: 3 }} />
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              {t('profile_password_title')}
-            </Typography>
-            <Stack spacing={2} sx={{ maxWidth: 420 }}>
-              <TextField
-                label={t('profile_password_current')}
-                type="password"
-                value={currentPassword}
-                onChange={(event) => setCurrentPassword(event.target.value)}
-                fullWidth
-              />
-              <TextField
-                label={t('profile_password_new')}
-                type="password"
-                value={newPassword}
-                onChange={(event) => setNewPassword(event.target.value)}
-                fullWidth
-              />
-              <TextField
-                label={t('profile_password_confirm')}
-                type="password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                fullWidth
-              />
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-                <Button
-                  variant="contained"
-                  onClick={handleChangePassword}
-                  disabled={passwordLoading}
-                >
-                  {passwordLoading ? t('profile_password_submitting') : t('profile_password_submit')}
-                </Button>
-                {passwordLoading && <CircularProgress size={20} />}
-              </Box>
-            </Stack>
             <Button
               variant="outlined"
               color="secondary"
@@ -171,6 +187,137 @@ const Profile: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
+
+      <Card variant="outlined" sx={{ mt: 3 }}>
+        <CardContent
+          sx={{
+            p: 3,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            gap: 2,
+            flexDirection: { xs: 'column', sm: 'row' },
+          }}
+        >
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              {t('profile_security_title')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('profile_password_description')}
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            startIcon={<LockResetIcon />}
+            onClick={handleOpenPasswordDialog}
+          >
+            {t('profile_password_open')}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Dialog
+        open={passwordDialogOpen}
+        onClose={handleClosePasswordDialog}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>{t('profile_password_title')}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('profile_password_hint')}
+            </Typography>
+
+            {passwordError && (
+              <Alert severity="error">{passwordError}</Alert>
+            )}
+
+            <TextField
+              label={t('profile_password_current')}
+              type={showCurrentPassword ? 'text' : 'password'}
+              value={currentPassword}
+              onChange={(event) => setCurrentPassword(event.target.value)}
+              fullWidth
+              autoFocus
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowCurrentPassword((value) => !value)}
+                      edge="end"
+                    >
+                      {showCurrentPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              label={t('profile_password_new')}
+              type={showNewPassword ? 'text' : 'password'}
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              fullWidth
+              error={passwordTooShort || passwordSameAsCurrent}
+              helperText={
+                passwordTooShort
+                  ? t('profile_password_too_short')
+                  : passwordSameAsCurrent
+                    ? t('profile_password_same')
+                    : ' '
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowNewPassword((value) => !value)}
+                      edge="end"
+                    >
+                      {showNewPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              label={t('profile_password_confirm')}
+              type={showConfirmPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              fullWidth
+              error={passwordMismatch}
+              helperText={passwordMismatch ? t('profile_password_mismatch') : ' '}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirmPassword((value) => !value)}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={handleClosePasswordDialog} disabled={passwordLoading}>
+            {t('profile_password_cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleChangePassword}
+            disabled={!canSubmitPassword}
+            startIcon={passwordLoading ? <CircularProgress size={18} color="inherit" /> : undefined}
+          >
+            {passwordLoading ? t('profile_password_submitting') : t('profile_password_submit')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbar.open}
