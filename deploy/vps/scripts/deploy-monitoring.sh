@@ -92,7 +92,7 @@ fi
 
 SNIPPET_FILE="${ROOT_DIR}/nginx/grafana-location.conf"
 
-${SUDO} SITE_CONFIG="${SITE_CONFIG}" SNIPPET_FILE="${SNIPPET_FILE}" python3 - <<'PY'
+${SUDO} env SITE_CONFIG="${SITE_CONFIG}" SNIPPET_FILE="${SNIPPET_FILE}" python3 - <<'PY'
 import os
 import pathlib
 import re
