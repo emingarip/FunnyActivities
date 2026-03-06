@@ -180,6 +180,48 @@ namespace FunnyActivities.WebAPI.Controllers
             return this.ApiSuccess<object>(_localizer["PasswordResetSuccess"]);
         }
 
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var command = new ChangePasswordCommand
+            {
+                UserId = CurrentUserId,
+                CurrentPassword = request.CurrentPassword,
+                NewPassword = request.NewPassword
+            };
+
+            try
+            {
+                await _mediator.Send(command);
+                return this.ApiSuccess<object>(_localizer["PasswordChanged"]);
+            }
+            catch (ArgumentException ex)
+            {
+                if (ex.Message == "Current password is incorrect")
+                {
+                    return this.ApiError(_localizer["CurrentPasswordIncorrect"], "ValidationError", 400);
+                }
+
+                if (ex.Message == "New password must be different from the current password")
+                {
+                    return this.ApiError(_localizer["NewPasswordMustDiffer"], "ValidationError", 400);
+                }
+
+                if (ex.Message.Contains("Password must be at least", StringComparison.OrdinalIgnoreCase))
+                {
+                    return this.ApiError(_localizer["NewPasswordTooShort"], "ValidationError", 400);
+                }
+
+                return this.ApiError(string.Format(_localizer["PasswordChangeValidationError"], ex.Message), "ValidationError", 400);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error changing password for user {UserId}", CurrentUserId);
+                return this.ApiError(_localizer["PasswordChangeUnexpected"], "InternalError", 500);
+            }
+        }
+
         [HttpGet("search")]
         [Authorize(Policy = "CanManageUsers")]
         public async Task<IActionResult> SearchUsers([FromQuery] string searchTerm, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "CreatedAt", [FromQuery] string sortOrder = "desc")

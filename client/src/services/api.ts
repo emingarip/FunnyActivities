@@ -386,6 +386,9 @@ export const userAPI = {
   updateProfile: (data: { firstName: string; lastName: string }) =>
     api.put('/users/profile', data),
 
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    api.post('/users/change-password', data),
+
   // Note: .NET API doesn't have a dedicated dashboard endpoint
   // We'll use profile data for now
   getDashboard: () => api.get('/users/profile'),

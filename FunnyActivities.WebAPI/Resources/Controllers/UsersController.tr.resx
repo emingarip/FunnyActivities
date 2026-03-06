@@ -17,6 +17,12 @@
   <data name="ProfileImageUploadUnexpected" xml:space="preserve"><value>Profil resmi yuklenirken bir hata olustu. Lutfen daha sonra tekrar deneyin.</value></data>
   <data name="PasswordResetRequested" xml:space="preserve"><value>Eger email varsa, sifre sifirlama baglantisi gonderildi.</value></data>
   <data name="PasswordResetSuccess" xml:space="preserve"><value>Sifre basariyla sifirlandi.</value></data>
+  <data name="PasswordChanged" xml:space="preserve"><value>Sifre basariyla degistirildi.</value></data>
+  <data name="PasswordChangeValidationError" xml:space="preserve"><value>Sifre degistirilemedi: {0}. Lutfen formu kontrol edip tekrar deneyin.</value></data>
+  <data name="PasswordChangeUnexpected" xml:space="preserve"><value>Sifre degistirilirken bir hata olustu. Lutfen daha sonra tekrar deneyin.</value></data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve"><value>Mevcut sifreniz yanlis.</value></data>
+  <data name="NewPasswordMustDiffer" xml:space="preserve"><value>Yeni sifreniz mevcut sifreden farkli olmali.</value></data>
+  <data name="NewPasswordTooShort" xml:space="preserve"><value>Yeni sifreniz en az 8 karakter olmali.</value></data>
   <data name="UserCountRetrieved" xml:space="preserve"><value>Kullanici sayisi basariyla getirildi.</value></data>
   <data name="UserCountError" xml:space="preserve"><value>Kullanici sayisi getirilirken bir hata olustu.</value></data>
   <data name="OnlineUserCountRetrieved" xml:space="preserve"><value>Cevirimiçi kullanici sayisi basariyla getirildi.</value></data>

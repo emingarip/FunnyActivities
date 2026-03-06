@@ -57,6 +57,16 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     profile_logout: 'Logout',
     profile_logout_success: 'Successfully logged out',
     profile_logout_error: 'Failed to logout. Please try again.',
+    profile_password_title: 'Change password',
+    profile_password_current: 'Current password',
+    profile_password_new: 'New password',
+    profile_password_confirm: 'Confirm new password',
+    profile_password_submit: 'Update password',
+    profile_password_submitting: 'Updating...',
+    profile_password_success: 'Password updated successfully.',
+    profile_password_mismatch: 'New passwords do not match.',
+    profile_password_required: 'Please fill in all password fields.',
+    profile_password_error: 'Unable to update password. Please try again.',
 
     // Settings page
     settings_title: 'Settings',
@@ -422,6 +432,16 @@ export const resources: Record<SupportedLocale, Record<string, string>> = {
     profile_logout: 'Çıkış yap',
     profile_logout_success: 'Başarıyla çıkış yapıldı',
     profile_logout_error: 'Çıkış yapılamadı. Lütfen tekrar deneyin.',
+    profile_password_title: 'Şifre değiştir',
+    profile_password_current: 'Mevcut şifre',
+    profile_password_new: 'Yeni şifre',
+    profile_password_confirm: 'Yeni şifre tekrar',
+    profile_password_submit: 'Şifreyi güncelle',
+    profile_password_submitting: 'Güncelleniyor...',
+    profile_password_success: 'Şifre başarıyla güncellendi.',
+    profile_password_mismatch: 'Yeni şifreler eşleşmiyor.',
+    profile_password_required: 'Lütfen tüm şifre alanlarını doldurun.',
+    profile_password_error: 'Şifre güncellenemedi. Lütfen tekrar deneyin.',
 
     // Settings page
     settings_title: 'Ayarlar',
